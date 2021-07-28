@@ -32,6 +32,10 @@ namespace QLendApi.Models
         public string BankNumber { get; set; }
         public string AccountNumber { get; set; }
         public DateTime? RegisterTime { get; set; }
+        public int Status { get; set; }
+        // [1 sign up, 2 otp verity, 3 upload, 4 finish all info]
+        public int? OTP { get; set; }
+        public DateTime? OTPSendTIme { get; set; }
         public int? State { get; set; }
         public int? KindOfWork { get; set; }
         public int? Workplace { get; set; }
