@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using QLendApi.Dtos;
+using QLendApi.lib;
 using QLendApi.Models;
 
 namespace QLendApi.Controllers
@@ -42,10 +43,12 @@ namespace QLendApi.Controllers
                 Uino = signupUser.UINo
             };
 
+            var hashPwd = Crypt.Hash(signupUser.Password);
+
             ForeignWorker foreignWorkers = new()
             {
                 PhoneNumber = signupUser.PhoneNumber,
-                Password = signupUser.Password,
+                Password = hashPwd,
                 Uino = signupUser.UINo,
                 Status = 1,
                 RegisterTime = DateTime.UtcNow

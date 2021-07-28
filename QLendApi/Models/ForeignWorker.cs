@@ -23,6 +23,7 @@ namespace QLendApi.Models
         public string Sex { get; set; }
         public DateTime? BirthDate { get; set; }
         public string PhoneNumber { get; set; }
+        [Column(TypeName = "char(60)")]
         public string Password { get; set; }
         public int? Marriage { get; set; }
         public int? ImmediateFamilyNumber { get; set; }
