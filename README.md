@@ -11,6 +11,6 @@ dotnet ef dbcontext scaffold Name=ConnectionStrings:DatabaseAlias Microsoft.Enti
 
 ## migrations
 
-dotnet ef migrations add InitialCreate
+dotnet ef migrations add {description}
 
-dotnet ef database update InitialCreate
+dotnet ef database update {description}
