@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 #nullable disable
 
@@ -12,6 +14,8 @@ namespace QLendApi.Models
             ForeignWorkers = new HashSet<ForeignWorker>();
         }
 
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int EmployerNo { get; set; }
         public string Name { get; set; }
         public bool? ListedOrNot { get; set; }

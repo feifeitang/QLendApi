@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 #nullable disable
 
@@ -12,6 +14,8 @@ namespace QLendApi.Models
             LoanRecords = new HashSet<LoanRecord>();
         }
 
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string Name { get; set; }
         public string EnglishName { get; set; }
@@ -33,7 +37,6 @@ namespace QLendApi.Models
         public string AccountNumber { get; set; }
         public DateTime? RegisterTime { get; set; }
         public int Status { get; set; }
-        // [1 sign up, 2 otp verity, 3 upload, 4 finish all info]
         public int? OTP { get; set; }
         public DateTime? OTPSendTIme { get; set; }
         public int? State { get; set; }

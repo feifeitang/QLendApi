@@ -200,9 +200,7 @@ namespace QLendApi.Models
 
                 entity.HasComment("雇主/公司");
 
-                entity.Property(e => e.EmployerNo)
-                    .ValueGeneratedNever()
-                    .HasComment("雇主編號");
+                entity.Property(e => e.EmployerNo).HasComment("雇主編號");
 
                 entity.Property(e => e.CapitalMoreThan30m).HasComment("是否資本額3000萬以上");
 
@@ -232,7 +230,6 @@ namespace QLendApi.Models
                 entity.HasComment("外勞");
 
                 entity.Property(e => e.Id)
-                    .ValueGeneratedNever()
                     .HasColumnName("ID")
                     .HasComment("外勞會員流水號");
 
@@ -367,9 +364,7 @@ namespace QLendApi.Models
 
                 entity.HasComment("收入資訊");
 
-                entity.Property(e => e.IncomeNumber)
-                    .ValueGeneratedNever()
-                    .HasComment("收入資訊流水編號");
+                entity.Property(e => e.IncomeNumber).HasComment("收入資訊流水編號");
 
                 entity.Property(e => e.AvgMonthlyIncome).HasComment("平均月收入 1:17000~24000 2:24000~3000 3:30000以上");
 
