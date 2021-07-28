@@ -10,8 +10,8 @@ using QLendApi.Models;
 namespace QLendApi.Migrations
 {
     [DbContext(typeof(QLendDBContext))]
-    [Migration("20210728085146_ForeignWorker add Status Otp OtpSendTime")]
-    partial class ForeignWorkeraddStatusOtpOtpSendTime
+    [Migration("20210728130658_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -195,8 +195,10 @@ namespace QLendApi.Migrations
             modelBuilder.Entity("QLendApi.Models.Employer", b =>
                 {
                     b.Property<int>("EmployerNo")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasComment("雇主編號");
+                        .HasComment("雇主編號")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<bool?>("CapitalMoreThan30m")
                         .HasColumnType("bit")
@@ -233,9 +235,11 @@ namespace QLendApi.Migrations
             modelBuilder.Entity("QLendApi.Models.ForeignWorker", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("ID")
-                        .HasComment("外勞會員流水號");
+                        .HasComment("外勞會員流水號")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AccountNumber")
                         .HasMaxLength(14)
@@ -307,12 +311,6 @@ namespace QLendApi.Migrations
                         .IsFixedLength(true)
                         .HasComment("國籍");
 
-                    b.Property<int>("OTP")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("OTPSendTIme")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("PassportNumber")
                         .HasMaxLength(9)
                         .IsUnicode(false)
@@ -358,9 +356,6 @@ namespace QLendApi.Migrations
                         .HasColumnType("int")
                         .HasComment("會員註冊時間 有更新(資料建立、審查通過/沒過)都改這個時間");
 
-                    b.Property<int?>("Status")
-                        .HasColumnType("int");
-
                     b.Property<int?>("TimeInTaiwan")
                         .HasColumnType("int")
                         .HasComment("來台時長 1:未滿1年 2:1~未滿3年 3:9~12年 4:3~9年");
@@ -402,8 +397,10 @@ namespace QLendApi.Migrations
             modelBuilder.Entity("QLendApi.Models.IncomeInformation", b =>
                 {
                     b.Property<int>("IncomeNumber")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasComment("收入資訊流水編號");
+                        .HasComment("收入資訊流水編號")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("AvgMonthlyIncome")
                         .HasColumnType("int")

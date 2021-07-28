@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace QLendApi.Migrations
 {
-    public partial class ForeignWorkeraddStatusOtpOtpSendTime : Migration
+    public partial class ForeignWorkerAddStatusAndOtpAndOtpSendTime : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -11,21 +11,20 @@ namespace QLendApi.Migrations
                 name: "OTP",
                 table: "ForeignWorker",
                 type: "int",
-                nullable: false,
-                defaultValue: 0);
+                nullable: true);
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "OTPSendTIme",
                 table: "ForeignWorker",
                 type: "datetime2",
-                nullable: false,
-                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+                nullable: true);
 
             migrationBuilder.AddColumn<int>(
                 name: "Status",
                 table: "ForeignWorker",
                 type: "int",
-                nullable: true);
+                nullable: false,
+                defaultValue: 0);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

@@ -10,8 +10,8 @@ using QLendApi.Models;
 namespace QLendApi.Migrations
 {
     [DbContext(typeof(QLendDBContext))]
-    [Migration("20210728085415_ForeignWorker change Otp OtpSendTime can null")]
-    partial class ForeignWorkerchangeOtpOtpSendTimecannull
+    [Migration("20210728130945_ForeignWorkerAddStatusAndOtpAndOtpSendTime")]
+    partial class ForeignWorkerAddStatusAndOtpAndOtpSendTime
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -195,8 +195,10 @@ namespace QLendApi.Migrations
             modelBuilder.Entity("QLendApi.Models.Employer", b =>
                 {
                     b.Property<int>("EmployerNo")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasComment("雇主編號");
+                        .HasComment("雇主編號")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<bool?>("CapitalMoreThan30m")
                         .HasColumnType("bit")
@@ -233,9 +235,11 @@ namespace QLendApi.Migrations
             modelBuilder.Entity("QLendApi.Models.ForeignWorker", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("ID")
-                        .HasComment("外勞會員流水號");
+                        .HasComment("外勞會員流水號")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AccountNumber")
                         .HasMaxLength(14)
@@ -402,8 +406,10 @@ namespace QLendApi.Migrations
             modelBuilder.Entity("QLendApi.Models.IncomeInformation", b =>
                 {
                     b.Property<int>("IncomeNumber")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasComment("收入資訊流水編號");
+                        .HasComment("收入資訊流水編號")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("AvgMonthlyIncome")
                         .HasColumnType("int")
