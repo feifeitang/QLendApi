@@ -61,16 +61,6 @@ namespace QLendApi.Controllers
             return StatusCode(201);
         }
 
-        private bool ForeignWorkersPhoneNumberExists(string phoneNumber)
-        {
-            return _context.ForeignWorkers.Any(e => e.PhoneNumber == phoneNumber);
-        }
-
-        private bool CertificatesUINoExists(string Uino)
-        {
-            return _context.Certificates.Any(e => e.Uino == Uino);
-        }
-
         // POST /api/user/sendOTP
         [Route("sendOTP")]
         [HttpPost]
@@ -95,6 +85,16 @@ namespace QLendApi.Controllers
             await _context.SaveChangesAsync();
 
             return StatusCode(201);
+        }
+
+        private bool ForeignWorkersPhoneNumberExists(string phoneNumber)
+        {
+            return _context.ForeignWorkers.Any(e => e.PhoneNumber == phoneNumber);
+        }
+
+        private bool CertificatesUINoExists(string Uino)
+        {
+            return _context.Certificates.Any(e => e.Uino == Uino);
         }
     }
 }
