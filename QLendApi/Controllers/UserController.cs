@@ -20,7 +20,7 @@ namespace QLendApi.Controllers
         public UserController(QLendDBContext context)
         {
             _context = context;
-            _expireMins = 1;
+            _expireMins = 1.5;
         }
 
         // POST /api/user/signup
