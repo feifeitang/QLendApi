@@ -29,13 +29,21 @@ namespace QLendApi.Controllers
             // check UINo if exist
             if (CertificatesUINoExists(signupUser.UINo))
             {
-                return BadRequest("Exist UINo");
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 10001,
+                    Message = "Exist UINo"
+                });
             }
 
             // check PhoneNumber if exist
             if (ForeignWorkersPhoneNumberExists(signupUser.PhoneNumber))
             {
-                return BadRequest("Exist Phone Number");
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 10002,
+                    Message = "Exist Phone Number"
+                });
             }
 
             Certificate certificate = new()
