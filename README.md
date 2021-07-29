@@ -14,3 +14,5 @@ dotnet ef dbcontext scaffold Name=ConnectionStrings:DatabaseAlias Microsoft.Enti
 dotnet ef migrations add {description}
 
 dotnet ef database update {description}
+
+dotnet ef migrations list
