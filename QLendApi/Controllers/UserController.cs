@@ -139,6 +139,22 @@ namespace QLendApi.Controllers
             return StatusCode(201);
         }
 
+        // POST /api/user/arc
+        [Route("arc")]
+        [HttpPost]
+        public ActionResult Arc()
+        {
+            return StatusCode(201);
+        }
+
+        // POST /api/user/personalInfo
+        [Route("personalInfo")]
+        [HttpPost]
+        public ActionResult PersonalInfo()
+        {
+            return StatusCode(201);
+        }
+
         private bool ForeignWorkersPhoneNumberExists(string phoneNumber)
         {
             return _context.ForeignWorkers.Any(e => e.PhoneNumber == phoneNumber);
