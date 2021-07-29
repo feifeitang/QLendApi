@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using QLendApi.Models;
+using QLendApi.Repositories;
 using restapi.Settings;
 
 namespace QLendApi
@@ -38,7 +39,10 @@ namespace QLendApi
                 options.UseSqlServer(str);
             });
 
-            services.AddControllers();
+            services.AddScoped<IForeignWorkerRepository, ForeignWorkerRepository>();
+            services.AddScoped<ICertificateRepository, CertificateRepository>();
+
+            services.AddControllersWithViews();
 
             services.AddSwaggerGen(c =>
             {
