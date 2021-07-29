@@ -105,6 +105,32 @@ namespace QLendApi.Controllers
             }
         }
 
+        // POST /api/user/sendOTP
+        [Route("sendOTP")]
+        [HttpPost]
+        public async Task<ActionResult> SendOTP(SendOtpDto sendOtpDto)
+        {
+            // check user exist, and get user data
+            var foreignWorker = await _context.ForeignWorkers.FindAsync(sendOtpDto.Id);
+
+            if (foreignWorker == null)
+            {
+                return BadRequest("user not found");
+            }
+
+            Random rnd = new Random();
+            int OTP = rnd.Next(100000, 999999);
+
+            foreignWorker.OTP = OTP;
+            foreignWorker.OTPSendTIme = DateTime.UtcNow;
+
+            _context.ForeignWorkers.Update(foreignWorker);
+
+            await _context.SaveChangesAsync();
+
+            return StatusCode(201);
+        }
+
         private bool ForeignWorkersPhoneNumberExists(string phoneNumber)
         {
             return _context.ForeignWorkers.Any(e => e.PhoneNumber == phoneNumber);
