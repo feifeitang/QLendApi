@@ -1,0 +1,16 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using QLendApi.Models;
+
+namespace QLendApi.Repositories
+{
+    public interface IForeignWorkerRepository
+    {
+        Task<ForeignWorker> GetForeignWorkerByIdAsync(int id);
+        Task CreateForeignWorkerAsync(ForeignWorker foreignWorker);
+        Task UpdateForeignWorkerAsync(ForeignWorker user);
+
+        Boolean CheckPhoneNumberExist(string phoneNumber);
+    }
+}
