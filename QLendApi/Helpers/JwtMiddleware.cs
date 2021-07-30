@@ -26,12 +26,12 @@ namespace QLendApi.Helpers
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
             if (token != null)
-                attachUserToContext(context, foreignWorkerRepository, token);
+                await attachUserToContext(context, foreignWorkerRepository, token);
 
             await _next(context);
         }
 
-        private void attachUserToContext(HttpContext context, IForeignWorkerRepository foreignWorkerRepository, string token)
+        private async Task attachUserToContext(HttpContext context, IForeignWorkerRepository foreignWorkerRepository, string token)
         {
             try
             {
@@ -48,10 +48,11 @@ namespace QLendApi.Helpers
                 }, out SecurityToken validatedToken);
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
-                var foreignWorkerId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
+                var val = jwtToken.Claims.First(x => x.Type == "id").Value;
+                var foreignWorkerId = int.Parse(val);
 
                 // attach user to context on successful jwt validation
-                context.Items["ForeignWorker"] = foreignWorkerRepository.GetForeignWorkerByIdAsync(foreignWorkerId);
+                context.Items["ForeignWorker"] = await foreignWorkerRepository.GetForeignWorkerByIdAsync(foreignWorkerId);
             }
             catch
             {

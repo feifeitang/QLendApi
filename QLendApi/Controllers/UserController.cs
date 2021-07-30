@@ -335,7 +335,26 @@ namespace QLendApi.Controllers
         [HttpGet]
         public ActionResult Info()
         {
-            return Ok();
+            try
+            {
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+                return Ok(new GetForeignWorkerInfoResponse
+                {
+                    StatusCode = 1000,
+                    Message = "success",
+                    Info = foreignWorker
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90007,
+                    Message = $"get user info api error:{ex}"
+                });
+            }
+
         }
 
         private bool CheckOTPSendTimeIsVaild(DateTime sendTime)

@@ -76,6 +76,8 @@ namespace QLendApi
                 .AllowAnyMethod()
                 .AllowAnyHeader());
 
+            app.UseAuthentication();
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
