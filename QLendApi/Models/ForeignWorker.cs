@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 #nullable disable
 
@@ -24,6 +25,8 @@ namespace QLendApi.Models
         public DateTime? BirthDate { get; set; }
         public string PhoneNumber { get; set; }
         [Column(TypeName = "char(60)")]
+
+        [JsonIgnore]
         public string Password { get; set; }
         public int? Marriage { get; set; }
         public int? ImmediateFamilyNumber { get; set; }

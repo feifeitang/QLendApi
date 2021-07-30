@@ -341,7 +341,7 @@ namespace QLendApi.Controllers
 
                 return Ok(new GetForeignWorkerInfoResponse
                 {
-                    StatusCode = 1000,
+                    StatusCode = 10000,
                     Message = "success",
                     Info = foreignWorker
                 });
