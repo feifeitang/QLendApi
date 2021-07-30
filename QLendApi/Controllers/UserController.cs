@@ -215,6 +215,22 @@ namespace QLendApi.Controllers
             return StatusCode(201);
         }
 
+        // POST /api/user/login
+        [Route("login")]
+        [HttpPost]
+        public ActionResult Login()
+        {
+            return StatusCode(201);
+        }
+
+        // POST /api/user/info
+        [Route("info")]
+        [HttpGet]
+        public ActionResult Info()
+        {
+            return StatusCode(201);
+        }
+
         private bool CheckOTPSendTimeIsVaild(DateTime sendTime)
         {
             // sendTime need add _expireMins
