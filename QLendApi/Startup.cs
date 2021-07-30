@@ -13,8 +13,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using QLendApi.Helpers;
 using QLendApi.Models;
 using QLendApi.Repositories;
+using QLendApi.Services;
 using restapi.Settings;
 
 namespace QLendApi
@@ -31,6 +33,11 @@ namespace QLendApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddCors();
+
+            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
+
             var Mssqlsettings = Configuration.GetSection(nameof(MssqlSettings))
                 .Get<MssqlSettings>();
             services.AddDbContext<QLendDBContext>((options) =>
@@ -38,6 +45,8 @@ namespace QLendApi
                 var str = Mssqlsettings.ConnectionString;
                 options.UseSqlServer(str);
             });
+
+            services.AddScoped<IForeignWorkerService, ForeignWorkerService>();
 
             services.AddScoped<IForeignWorkerRepository, ForeignWorkerRepository>();
             services.AddScoped<ICertificateRepository, CertificateRepository>();
@@ -62,11 +71,18 @@ namespace QLendApi
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "QLend v1"));
             }
 
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseMiddleware<JwtMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {
