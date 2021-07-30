@@ -172,12 +172,34 @@ namespace QLendApi.Controllers
                     });
                 }
 
+                // check status
+                if (foreignWorker.Status != 2)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10007,
+                        Message = "status not correct"
+                    });
+                }
+
                 var cert = await certificateRepository.GetCertificateAsync(foreignWorker.Uino);
+
+                if (cert == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10006,
+                        Message = "certificate not found"
+                    });
+                }
 
                 cert.FrontArc = await arcDto.FrontArc.GetBytes();
                 cert.BackArc = await arcDto.BackArc.GetBytes();
 
                 await certificateRepository.UpdateCertificateAsync(cert);
+
+                foreignWorker.Status = 3;
+                await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
 
                 return StatusCode(201);
             }
