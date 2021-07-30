@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using QLendApi.Dtos;
+using QLendApi.Extensions;
 using QLendApi.lib;
 using QLendApi.Models;
 using QLendApi.Repositories;
@@ -156,9 +157,60 @@ namespace QLendApi.Controllers
         // POST /api/user/arc
         [Route("arc")]
         [HttpPost]
-        public ActionResult Arc()
+        public async Task<ActionResult> Arc([FromForm] ArcDto arcDto)
         {
-            return StatusCode(201);
+            try
+            {
+                var foreignWorker = await foreignWorkerRepository.GetForeignWorkerByIdAsync(arcDto.Id);
+
+                if (foreignWorker == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10003,
+                        Message = "user not found"
+                    });
+                }
+
+                // check status
+                if (foreignWorker.Status != 2)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10007,
+                        Message = "status not correct"
+                    });
+                }
+
+                var cert = await certificateRepository.GetCertificateAsync(foreignWorker.Uino);
+
+                if (cert == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10006,
+                        Message = "certificate not found"
+                    });
+                }
+
+                cert.FrontArc = await arcDto.FrontArc.GetBytes();
+                cert.BackArc = await arcDto.BackArc.GetBytes();
+
+                await certificateRepository.UpdateCertificateAsync(cert);
+
+                foreignWorker.Status = 3;
+                await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
+
+                return StatusCode(201);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90005,
+                    Message = $"arc api error:{ex}"
+                });
+            }
         }
 
         // POST /api/user/personalInfo
