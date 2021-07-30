@@ -24,14 +24,16 @@ namespace QLendApi.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public Task<Certificate> GetCertificateAsync(string uino)
+        public async Task<Certificate> GetCertificateAsync(string uino)
         {
-            throw new System.NotImplementedException();
+            return await _context.Certificates.FindAsync(uino);
         }
 
-        public Task UpdateCertificateAsync(Certificate certificate)
+        public async Task UpdateCertificateAsync(Certificate certificate)
         {
-            throw new System.NotImplementedException();
+            _context.Certificates.Update(certificate);
+
+            await _context.SaveChangesAsync();
         }
     }
 }
