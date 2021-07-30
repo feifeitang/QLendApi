@@ -164,8 +164,54 @@ namespace QLendApi.Controllers
         // POST /api/user/personalInfo
         [Route("personalInfo")]
         [HttpPost]
-        public ActionResult PersonalInfo()
+        public async Task<ActionResult> PersonalInfo(PersonalInfoDto personalInfo)
         {
+            // check user exist, and get user data
+            var foreignWorker = await foreignWorkerRepository.GetForeignWorkerByIdAsync(personalInfo.Id);
+
+            if (foreignWorker == null)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 10003,
+                    Message = "user not found"
+                });
+            }
+
+            // check user status
+            if (foreignWorker.Status != 3)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 10007,
+                    Message = "status not correct"
+                });
+            }
+
+            // check certificate exist, and get certificate data
+            var certificate = await certificateRepository.GetCertificateAsync(foreignWorker.Uino);
+
+            if (certificate == null)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 10006,
+                    Message = "certificate not found"
+                });
+            }
+
+            foreignWorker.UserName = personalInfo.UserName;
+            foreignWorker.EnglishName = personalInfo.EnglishName;
+            foreignWorker.Sex = personalInfo.Gender;
+            foreignWorker.Nationality = personalInfo.Nationality;
+            certificate.IssueDate = personalInfo.DateOfIssue;
+            certificate.ExpiryDate = personalInfo.DateOfExpiry;
+            certificate.BarcodeNumber = personalInfo.BarcodeNumber;
+            foreignWorker.Status = 4;
+
+            await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
+            await certificateRepository.UpdateCertificateAsync(certificate);
+
             return StatusCode(201);
         }
 
