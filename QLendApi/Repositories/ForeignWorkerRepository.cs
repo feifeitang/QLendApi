@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using QLendApi.Models;
 using QLendApi.Repositories;
 
@@ -30,6 +31,11 @@ namespace QLendApi.Repositories
         public async Task<ForeignWorker> GetForeignWorkerByIdAsync(int id)
         {
             return await _context.ForeignWorkers.FindAsync(id);
+        }
+
+        public async Task<ForeignWorker> GetForeignWorkerByUINoAsync(string uino)
+        {
+            return await _context.ForeignWorkers.FirstOrDefaultAsync(f => f.Uino == uino);
         }
 
         public async Task UpdateForeignWorkerAsync(ForeignWorker foreignWorker)
