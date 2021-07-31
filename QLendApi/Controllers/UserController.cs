@@ -318,7 +318,7 @@ namespace QLendApi.Controllers
         {
             try
             {
-                var foreignWorker = await foreignWorkerService.GetInfoByAuthOrNull(loginDto.Id, loginDto.Password);
+                var foreignWorker = await foreignWorkerService.GetInfoByAuthOrNull(loginDto.Uino, loginDto.Password);
 
                 if (foreignWorker == null)
                 {
