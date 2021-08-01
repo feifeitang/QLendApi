@@ -44,5 +44,11 @@ namespace QLendApi.Repositories
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task CreatePersonalInfo1Async(ForeignWorker foreignWorker)
+        {
+            _context.ForeignWorkers.Add(foreignWorker);
+            await _context.SaveChangesAsync();
+        }
     }
 }

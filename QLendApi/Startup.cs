@@ -46,11 +46,13 @@ namespace QLendApi
                 options.UseSqlServer(str);
             });
 
+            
             services.AddScoped<IForeignWorkerService, ForeignWorkerService>();
 
             services.AddScoped<IForeignWorkerRepository, ForeignWorkerRepository>();
             services.AddScoped<ICertificateRepository, CertificateRepository>();
-
+            services.AddScoped<ILoanRecordRepository, LoanRecordRepository>();
+            
             services.AddControllersWithViews();
 
             services.AddSwaggerGen(c =>
