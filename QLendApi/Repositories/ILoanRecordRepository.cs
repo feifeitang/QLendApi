@@ -7,6 +7,6 @@ namespace QLendApi.Repositories
     {
        Task CreateLoanApplyAsync(LoanRecord loanRecord);
 
-       
+       Task<LoanRecord[]> GetLoanRecordByIdAndStatusAsync(int id, int status);
     }
 }
