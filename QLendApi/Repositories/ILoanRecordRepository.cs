@@ -5,8 +5,6 @@ namespace QLendApi.Repositories
 {
     public interface ILoanRecordRepository
     {
-       Task CreateLoanApplyAsync(LoanRecord loanRecord);
-
-       
+        Task CreateLoanRecordAsync(LoanRecord loanRecord);
     }
 }

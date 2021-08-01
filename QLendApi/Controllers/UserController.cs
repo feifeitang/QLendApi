@@ -24,23 +24,24 @@ namespace QLendApi.Controllers
     {
         private readonly IForeignWorkerRepository foreignWorkerRepository;
         private readonly ICertificateRepository certificateRepository;
-
         private readonly IForeignWorkerService foreignWorkerService;
-
+        private readonly IIncomeInformationRepository incomeInformationRepository;
 
         private readonly AppSettings _appSettings;
-
         private readonly double _expireMins;
 
         public UserController(
             IForeignWorkerRepository foreignWorkerRepository,
             ICertificateRepository certificateRepository,
+            IIncomeInformationRepository incomeInformationRepository,
             IOptions<AppSettings> appSettings,
             IForeignWorkerService foreignWorkerService)
         {
             this.foreignWorkerRepository = foreignWorkerRepository;
 
             this.certificateRepository = certificateRepository;
+
+            this.incomeInformationRepository = incomeInformationRepository;
 
             this._appSettings = appSettings.Value;
 
@@ -144,7 +145,11 @@ namespace QLendApi.Controllers
             }
             catch (System.Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90002,
+                    Message = $"checkOTP api error:{ex}"
+                });
             }
         }
 
@@ -181,8 +186,8 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90005,
-                    Message = $"arc api error:{ex}"
+                    StatusCode = 90003,
+                    Message = $"sendOTP api error:{ex}"
                 });
             }
         }
@@ -240,7 +245,7 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90005,
+                    StatusCode = 90004,
                     Message = $"arc api error:{ex}"
                 });
             }
@@ -306,7 +311,7 @@ namespace QLendApi.Controllers
                 return BadRequest(new BaseResponse
                 {
                     StatusCode = 90005,
-                    Message = $"arc api error:{ex}"
+                    Message = $"personalInfo api error:{ex}"
                 });
             }
         }
@@ -377,6 +382,74 @@ namespace QLendApi.Controllers
                 });
             }
 
+        }
+
+        //POST /api/user/update
+        [Authorize]
+        [Route("update")]
+        [HttpPost]
+        public async Task<ActionResult> Update(UserUpdateDto userUpdateDto)
+        {
+            try
+            {
+                // get user info
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+                foreignWorker.Marriage = userUpdateDto.Marriage;
+                foreignWorker.ImmediateFamilyNumber = userUpdateDto.ImmediateFamilyNumber;
+                foreignWorker.EducationBackground = userUpdateDto.EducationBackground;
+                foreignWorker.TimeInTaiwan = userUpdateDto.TimeInTaiwan;
+
+                await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
+
+                return StatusCode(201);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90008,
+                    Message = $"user info update api error:{ex}"
+                });
+            }
+            
+        }
+
+        //POST /api/user/incomeInfo
+        [Route("incomeInfo")]
+        [HttpPost]
+        public async Task<ActionResult> IncomeInfo ([FromForm] IncomeInfoDto incomeInfoDto)
+        {
+            try
+            {
+                // get user info
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+                IncomeInformation incomeInformation = new()
+                {
+                    AvgMonthlyIncome = incomeInfoDto.AvgMonthlyIncome,
+                    LatePay = incomeInfoDto.LatePay,
+                    PayWay = incomeInfoDto.PayWay,
+                    RemittanceWay = incomeInfoDto.RemittanceWay
+                };
+
+                await incomeInformationRepository.CreateIncomeInfoAsync(incomeInformation);
+
+                incomeInformation.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
+                incomeInformation.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes();
+
+                await incomeInformationRepository.UpdateIncomeInfoAsync(incomeInformation);
+
+                return StatusCode(201);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90010,
+                    Message = $"personalInfo2 api error:{ex}"
+                });
+            }
         }
 
         private bool CheckOTPSendTimeIsVaild(DateTime sendTime)
