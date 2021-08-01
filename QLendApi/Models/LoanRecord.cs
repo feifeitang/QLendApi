@@ -18,6 +18,7 @@ namespace QLendApi.Models
         public int Period { get; set; }
         public double? InterestRate { get; set; }
         public int Purpose { get; set; }
+        public int? Status { get; set; }
         public int? State { get; set; }
         public int? Auditor { get; set; }
         public int? Id { get; set; }
