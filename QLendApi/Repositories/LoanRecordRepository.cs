@@ -10,12 +10,11 @@ namespace QLendApi.Repositories
         {
             _conetxt = context;
         }
-        
-        public async Task CreateLoanApplyAsync(LoanRecord loanRecord)
+
+        public async Task CreateLoanRecordAsync(LoanRecord loanRecord)
         {
             _conetxt.LoanRecords.Add(loanRecord);
             await _conetxt.SaveChangesAsync();
         }
-
     }
 }
