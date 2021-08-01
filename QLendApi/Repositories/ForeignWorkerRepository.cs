@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using QLendApi.Models;
 using QLendApi.Repositories;
 
@@ -36,6 +37,12 @@ namespace QLendApi.Repositories
         {
             _context.ForeignWorkers.Update(foreignWorker);
 
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task CreatePersonalInfo1Async(ForeignWorker foreignWorker)
+        {
+            _context.ForeignWorkers.Add(foreignWorker);
             await _context.SaveChangesAsync();
         }
     }
