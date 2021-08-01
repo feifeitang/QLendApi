@@ -63,23 +63,6 @@ namespace QLendApi.Controllers
         }     
 
         
-
-        // POST /api/loan/arc
-        [Route("arc")]
-        [HttpPost]
-        public ActionResult Arc()
-        {
-            return StatusCode(201);
-        }
-
-        // POST /api/loan/signature
-        [Route("signature")]
-        [HttpPost]
-        public ActionResult Signature()
-        {
-            return StatusCode(201);
-        }
-
         // POST /api/loan/confirm
         [Route("confirm")]
         [HttpPost]

@@ -416,6 +416,7 @@ namespace QLendApi.Controllers
         }
 
         //POST /api/user/incomeInfo
+        [Authorize]
         [Route("incomeInfo")]
         [HttpPost]
         public async Task<ActionResult> IncomeInfo ([FromForm] IncomeInfoDto incomeInfoDto)
@@ -451,6 +452,66 @@ namespace QLendApi.Controllers
                 });
             }
         }
+
+        //POST /api/user/arcWithSelfie
+        [Authorize]
+        [Route("arcWithSelfie")]
+        [HttpPost]
+        public async Task<ActionResult> ArcWithSelfie([FromForm] ArcWithSelfieDto arcWithSelfieDto)
+        {
+            try
+            {
+                //get user info
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+               
+                Certificate cert = new()
+                {
+                    FrontArc2 = await arcWithSelfieDto.FrontArc2.GetBytes(),
+                    BackArc2 = await arcWithSelfieDto.BackArc2.GetBytes(),
+                    SelfileArc = await arcWithSelfieDto.SelfileArc.GetBytes()
+                };
+
+                await certificateRepository.UpdateCertificateAsync(cert);
+
+                return StatusCode(201);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90004,
+                    Message = $"arc api error:{ex}"
+                });
+            }          
+        }
+
+        // POST /api/user/signature
+        [Authorize]
+        [Route("signature")]
+        [HttpPost]
+        public async Task<ActionResult> Signature(SignatureDto signatureDto)
+        {
+            try
+            {
+                //get user info
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+                foreignWorker.Signature = await signatureDto.Signature.GetBytes();
+                
+                await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
+                
+                return StatusCode(201);
+            }
+            catch(System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90009,
+                    Message = $"signature api error:{ex}"
+                });
+            }          
+        }
+
 
         private bool CheckOTPSendTimeIsVaild(DateTime sendTime)
         {
