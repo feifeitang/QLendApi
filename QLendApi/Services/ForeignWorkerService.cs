@@ -7,7 +7,7 @@ namespace QLendApi.Services
 {
     public interface IForeignWorkerService
     {
-        Task<ForeignWorker> GetInfoByAuthOrNull(int id, string password);
+        Task<ForeignWorker> GetInfoByAuthOrNull(string uino, string password);
     }
     public class ForeignWorkerService : IForeignWorkerService
     {
@@ -18,9 +18,9 @@ namespace QLendApi.Services
             this.foreignWorkerRepository = foreignWorkerRepository;
         }
 
-        public async Task<ForeignWorker> GetInfoByAuthOrNull(int id, string password)
+        public async Task<ForeignWorker> GetInfoByAuthOrNull(string uino, string password)
         {
-            var foreignWorker = await foreignWorkerRepository.GetForeignWorkerByIdAsync(id);
+            var foreignWorker = await foreignWorkerRepository.GetForeignWorkerByUINoAsync(uino);
 
             if (foreignWorker == null)
             {

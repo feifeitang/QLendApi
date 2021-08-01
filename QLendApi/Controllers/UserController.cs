@@ -153,27 +153,38 @@ namespace QLendApi.Controllers
         [HttpPost]
         public async Task<ActionResult> SendOTP(SendOtpDto sendOtpDto)
         {
-            // check user exist, and get user data
-            var foreignWorker = await foreignWorkerRepository.GetForeignWorkerByIdAsync(sendOtpDto.Id);
+            try
+            {
+                // check user exist, and get user data
+                var foreignWorker = await foreignWorkerRepository.GetForeignWorkerByIdAsync(sendOtpDto.Id);
 
-            if (foreignWorker == null)
+                if (foreignWorker == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10003,
+                        Message = "user not found"
+                    });
+                }
+
+                Random rnd = new Random();
+                int OTP = rnd.Next(100000, 999999);
+
+                foreignWorker.OTP = OTP;
+                foreignWorker.OTPSendTIme = DateTime.UtcNow;
+
+                await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
+
+                return StatusCode(201);
+            }
+            catch (System.Exception ex)
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 10003,
-                    Message = "user not found"
+                    StatusCode = 90005,
+                    Message = $"arc api error:{ex}"
                 });
             }
-
-            Random rnd = new Random();
-            int OTP = rnd.Next(100000, 999999);
-
-            foreignWorker.OTP = OTP;
-            foreignWorker.OTPSendTIme = DateTime.UtcNow;
-
-            await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
-
-            return StatusCode(201);
         }
 
         // POST /api/user/arc
@@ -240,53 +251,64 @@ namespace QLendApi.Controllers
         [HttpPost]
         public async Task<ActionResult> PersonalInfo(PersonalInfoDto personalInfo)
         {
-            // check user exist, and get user data
-            var foreignWorker = await foreignWorkerRepository.GetForeignWorkerByIdAsync(personalInfo.Id);
+            try
+            {
+                // check user exist, and get user data
+                var foreignWorker = await foreignWorkerRepository.GetForeignWorkerByIdAsync(personalInfo.Id);
 
-            if (foreignWorker == null)
+                if (foreignWorker == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10003,
+                        Message = "user not found"
+                    });
+                }
+
+                // check user status
+                if (foreignWorker.Status != 3)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10007,
+                        Message = "status not correct"
+                    });
+                }
+
+                // check certificate exist, and get certificate data
+                var certificate = await certificateRepository.GetCertificateAsync(foreignWorker.Uino);
+
+                if (certificate == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10006,
+                        Message = "certificate not found"
+                    });
+                }
+
+                foreignWorker.UserName = personalInfo.UserName;
+                foreignWorker.EnglishName = personalInfo.EnglishName;
+                foreignWorker.Sex = personalInfo.Gender;
+                foreignWorker.Nationality = personalInfo.Nationality;
+                certificate.IssueDate = personalInfo.DateOfIssue;
+                certificate.ExpiryDate = personalInfo.DateOfExpiry;
+                certificate.BarcodeNumber = personalInfo.BarcodeNumber;
+                foreignWorker.Status = 4;
+
+                await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
+                await certificateRepository.UpdateCertificateAsync(certificate);
+
+                return StatusCode(201);
+            }
+            catch (System.Exception ex)
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 10003,
-                    Message = "user not found"
+                    StatusCode = 90005,
+                    Message = $"arc api error:{ex}"
                 });
             }
-
-            // check user status
-            if (foreignWorker.Status != 3)
-            {
-                return BadRequest(new BaseResponse
-                {
-                    StatusCode = 10007,
-                    Message = "status not correct"
-                });
-            }
-
-            // check certificate exist, and get certificate data
-            var certificate = await certificateRepository.GetCertificateAsync(foreignWorker.Uino);
-
-            if (certificate == null)
-            {
-                return BadRequest(new BaseResponse
-                {
-                    StatusCode = 10006,
-                    Message = "certificate not found"
-                });
-            }
-
-            foreignWorker.UserName = personalInfo.UserName;
-            foreignWorker.EnglishName = personalInfo.EnglishName;
-            foreignWorker.Sex = personalInfo.Gender;
-            foreignWorker.Nationality = personalInfo.Nationality;
-            certificate.IssueDate = personalInfo.DateOfIssue;
-            certificate.ExpiryDate = personalInfo.DateOfExpiry;
-            certificate.BarcodeNumber = personalInfo.BarcodeNumber;
-            foreignWorker.Status = 4;
-
-            await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
-            await certificateRepository.UpdateCertificateAsync(certificate);
-
-            return StatusCode(201);
         }
 
         // POST /api/user/login
@@ -296,7 +318,7 @@ namespace QLendApi.Controllers
         {
             try
             {
-                var foreignWorker = await foreignWorkerService.GetInfoByAuthOrNull(loginDto.Id, loginDto.Password);
+                var foreignWorker = await foreignWorkerService.GetInfoByAuthOrNull(loginDto.Uino, loginDto.Password);
 
                 if (foreignWorker == null)
                 {
