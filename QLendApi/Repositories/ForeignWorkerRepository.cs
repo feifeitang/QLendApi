@@ -44,6 +44,12 @@ namespace QLendApi.Repositories
 
             await _context.SaveChangesAsync();
         }
-
+/*
+        public async Task<ForeignWorker> GetForeignWorkerAsync(int id)
+        {
+            return await _context.ForeignWorkers.Where(e => e.Id == id);
+        }
+        */
     }
+    
 }

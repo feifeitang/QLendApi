@@ -26,6 +26,7 @@ namespace QLendApi.Controllers
         private readonly ICertificateRepository certificateRepository;
         private readonly IForeignWorkerService foreignWorkerService;
         private readonly IIncomeInformationRepository incomeInformationRepository;
+        private readonly ILoanRecordRepository loanRecordRepository;
 
         private readonly AppSettings _appSettings;
         private readonly double _expireMins;
@@ -34,6 +35,7 @@ namespace QLendApi.Controllers
             IForeignWorkerRepository foreignWorkerRepository,
             ICertificateRepository certificateRepository,
             IIncomeInformationRepository incomeInformationRepository,
+            ILoanRecordRepository loanRecordRepository,
             IOptions<AppSettings> appSettings,
             IForeignWorkerService foreignWorkerService)
         {
@@ -42,6 +44,7 @@ namespace QLendApi.Controllers
             this.certificateRepository = certificateRepository;
 
             this.incomeInformationRepository = incomeInformationRepository;
+            this.loanRecordRepository = loanRecordRepository;
 
             this._appSettings = appSettings.Value;
 
@@ -464,13 +467,12 @@ namespace QLendApi.Controllers
                 //get user info
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
                
-                Certificate cert = new()
-                {
-                    FrontArc2 = await arcWithSelfieDto.FrontArc2.GetBytes(),
-                    BackArc2 = await arcWithSelfieDto.BackArc2.GetBytes(),
-                    SelfileArc = await arcWithSelfieDto.SelfileArc.GetBytes()
-                };
-
+                var cert = await certificateRepository.GetCertificateAsync(foreignWorker.Uino);
+                    
+                cert.FrontArc2 = await arcWithSelfieDto.FrontArc2.GetBytes();
+                cert.BackArc2 = await arcWithSelfieDto.BackArc2.GetBytes();
+                cert.SelfileArc = await arcWithSelfieDto.SelfileArc.GetBytes();
+                
                 await certificateRepository.UpdateCertificateAsync(cert);
 
                 return StatusCode(201);
@@ -485,16 +487,36 @@ namespace QLendApi.Controllers
             }          
         }
 
+/*
+        // GET /api/user/loanApplyData
+        [Route("loanApplyData")]
+        [HttpGet]
+        public async Task<ActionResult<GetLoanApplyDataDto>> loanApplyData(int status)
+        {
+            var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+  //  var loanRecord = await this.loanRecordRepository.GetLoanRecordByIdAndStatusAsync(foreignWorker.Id);
+
+            return Ok(new GetLoanApplyDataDto{
+                StatusCode = 10000,
+                Message = "success",
+                loanRecordInfo = loanRecord,
+                username = foreignWorker.UserName
+            });
+        }
+ */    
+
+
         // POST /api/user/signature
         [Authorize]
         [Route("signature")]
         [HttpPost]
-        public async Task<ActionResult> Signature(SignatureDto signatureDto)
+        public async Task<ActionResult> Signature([FromForm] SignatureDto signatureDto)
         {
             try
             {
                 //get user info
-                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;               
 
                 foreignWorker.Signature = await signatureDto.Signature.GetBytes();
                 
@@ -508,6 +530,33 @@ namespace QLendApi.Controllers
                 {
                     StatusCode = 90009,
                     Message = $"signature api error:{ex}"
+                });
+            }          
+        }
+
+        // POST /api/user/signatureAgain
+        [Authorize]
+        [Route("signatureAgain")]
+        [HttpPost]
+        public async Task<ActionResult> SignatureAgain([FromForm] SignatureAgainDto signatureAgainDto)
+        {
+            try
+            {
+                //get user info
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+                foreignWorker.Signature2 = await signatureAgainDto.Signature2.GetBytes();
+                
+                await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
+                
+                return StatusCode(201);
+            }
+            catch(System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90009,
+                    Message = $"signatureAgain api error:{ex}"
                 });
             }          
         }

@@ -15,6 +15,8 @@ namespace QLendApi.Repositories
         
         Task UpdateForeignWorkerAsync(ForeignWorker user);
 
+      //  Task GetForeignWorkerAsync(int id);
+
         Boolean CheckPhoneNumberExist(string phoneNumber);
     }
 }

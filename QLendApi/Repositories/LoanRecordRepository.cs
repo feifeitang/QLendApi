@@ -23,6 +23,7 @@ namespace QLendApi.Repositories
         {
             return await _conetxt.LoanRecords.Where(el => el.Id == id && el.Status == status).ToArrayAsync();
         }
+        
 
     }
 }
