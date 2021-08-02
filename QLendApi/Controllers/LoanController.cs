@@ -17,17 +17,21 @@ namespace QLendApi.Controllers
         private readonly ILoanRecordRepository loanRecordRepository;
         private readonly IForeignWorkerRepository foreignWorkerRepository;
         private readonly ICertificateRepository certificateRepository;
+        private readonly IRepaymentRecordRepository repaymentRecordRepository;
 
         public LoanController(
             ILoanRecordRepository loanRecordRepository,
             IForeignWorkerRepository foreignWorkerRepository,
-            ICertificateRepository certificateRepository)
+            ICertificateRepository certificateRepository,
+            IRepaymentRecordRepository repaymentRecordRepository)
         {
             this.loanRecordRepository = loanRecordRepository;
 
             this.foreignWorkerRepository = foreignWorkerRepository;
 
             this.certificateRepository = certificateRepository;
+
+            this.repaymentRecordRepository = repaymentRecordRepository;
         }
 
         //POST /api/loan/apply
@@ -111,14 +115,42 @@ namespace QLendApi.Controllers
         {
             var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
-            var loanRecord = await this.loanRecordRepository.GetLoanRecordByIdAndStatusAsync(foreignWorker.Id, status);
+            var loanRecord = await this.loanRecordRepository.GetLoanRecordsByIdAndStatusAsync(foreignWorker.Id, status);
 
-            return Ok(new GetLoanListResponseDto{
+            return Ok(new GetLoanListResponseDto
+            {
                 StatusCode = 10000,
                 Message = "success",
-                LoanRecord = loanRecord
+                LoanRecords = loanRecord
             });
         }
 
+        // GET /api/loan/detail/{loanNumber}
+        [Route("detail/{loanNumber}")]
+        [HttpGet]
+        public async Task<ActionResult<GetLoanDetailResponseDto>> Detail(string loanNumber)
+        {
+            var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+            var loanRecord = await this.loanRecordRepository.GetLoanRecordByLoanNumber(loanNumber);
+
+            if (foreignWorker.Id != loanRecord.Id)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 10009,
+                    Message = "id not equal"
+                });
+            }
+
+            var repaymentRecords = await this.repaymentRecordRepository.GetRepaymentRecordsByLoanNumberAsync(loanNumber);
+
+            return Ok(new GetLoanDetailResponseDto{
+                StatusCode = 10000,
+                Message = "success",
+                LoanRecord = loanRecord,
+                RepaymentRecords = repaymentRecords
+            });
+        }
     }
 }

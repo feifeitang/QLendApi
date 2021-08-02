@@ -6,6 +6,6 @@ namespace QLendApi.Dtos
     {
         public int StatusCode { get; set; }
         public string Message { get; set; }
-        public LoanRecord[] LoanRecord { get; set; }
+        public LoanRecord[] LoanRecords { get; set; }
     }
 }

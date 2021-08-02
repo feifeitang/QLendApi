@@ -20,10 +20,14 @@ namespace QLendApi.Repositories
         }
 
 
-        public async Task<LoanRecord[]> GetLoanRecordByIdAndStatusAsync(int id, int status)
+        public async Task<LoanRecord[]> GetLoanRecordsByIdAndStatusAsync(int id, int status)
         {
             return await _conetxt.LoanRecords.Where(el => el.Id == id && el.Status == status).ToArrayAsync();
         }
-
+        
+        public async Task<LoanRecord> GetLoanRecordByLoanNumber(string loanNumber)
+        {
+            return await _conetxt.LoanRecords.FindAsync(loanNumber);
+        }
     }
 }

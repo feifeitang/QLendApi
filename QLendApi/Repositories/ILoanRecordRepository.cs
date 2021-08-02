@@ -5,9 +5,10 @@ namespace QLendApi.Repositories
 {
     public interface ILoanRecordRepository
     {
-       Task<LoanRecord[]> GetLoanRecordByIdAndStatusAsync(int id, int status);
+       Task<LoanRecord[]> GetLoanRecordsByIdAndStatusAsync(int id, int status);
 
-        Task CreateLoanRecordAsync(LoanRecord loanRecord);
+       Task<LoanRecord> GetLoanRecordByLoanNumber(string loanNumber);
 
+       Task CreateLoanRecordAsync(LoanRecord loanRecord);
     }
 }
