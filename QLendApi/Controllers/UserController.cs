@@ -384,21 +384,21 @@ namespace QLendApi.Controllers
 
         }
 
-        //POST /api/user/update
+        //POST /api/user/loanSurveyInfoUpdate
         [Authorize]
-        [Route("update")]
+        [Route("loanSurveyInfoUpdate")]
         [HttpPost]
-        public async Task<ActionResult> Update(UserUpdateDto userUpdateDto)
+        public async Task<ActionResult> loanSurveyInfoUpdate(LoanSurveyInfoUpdateDto loanSurveyInfoUpdateDto)
         {
             try
             {
                 // get user info
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
-                foreignWorker.Marriage = userUpdateDto.Marriage;
-                foreignWorker.ImmediateFamilyNumber = userUpdateDto.ImmediateFamilyNumber;
-                foreignWorker.EducationBackground = userUpdateDto.EducationBackground;
-                foreignWorker.TimeInTaiwan = userUpdateDto.TimeInTaiwan;
+                foreignWorker.Marriage = loanSurveyInfoUpdateDto.Marriage;
+                foreignWorker.ImmediateFamilyNumber = loanSurveyInfoUpdateDto.ImmediateFamilyNumber;
+                foreignWorker.EducationBackground = loanSurveyInfoUpdateDto.EducationBackground;
+                foreignWorker.TimeInTaiwan = loanSurveyInfoUpdateDto.TimeInTaiwan;
 
                 await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
 
@@ -433,12 +433,10 @@ namespace QLendApi.Controllers
                     RemittanceWay = incomeInfoDto.RemittanceWay
                 };
 
-                await incomeInformationRepository.CreateIncomeInfoAsync(incomeInformation);
-
                 incomeInformation.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
                 incomeInformation.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes();
 
-                await incomeInformationRepository.UpdateIncomeInfoAsync(incomeInformation);
+                await incomeInformationRepository.CreateIncomeInfoAsync(incomeInformation);
 
                 return StatusCode(201);
             }
