@@ -430,11 +430,10 @@ namespace QLendApi.Controllers
                     AvgMonthlyIncome = incomeInfoDto.AvgMonthlyIncome,
                     LatePay = incomeInfoDto.LatePay,
                     PayWay = incomeInfoDto.PayWay,
-                    RemittanceWay = incomeInfoDto.RemittanceWay
+                    RemittanceWay = incomeInfoDto.RemittanceWay,
+                    FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes(),
+                    InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes()
                 };
-
-                incomeInformation.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
-                incomeInformation.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes();
 
                 await incomeInformationRepository.CreateIncomeInfoAsync(incomeInformation);
 
