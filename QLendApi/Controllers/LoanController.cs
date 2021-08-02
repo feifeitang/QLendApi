@@ -134,6 +134,15 @@ namespace QLendApi.Controllers
 
             var loanRecord = await this.loanRecordRepository.GetLoanRecordByLoanNumber(loanNumber);
 
+            if (foreignWorker.Id != loanRecord.Id)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 10009,
+                    Message = "id not equal"
+                });
+            }
+
             var repaymentRecords = await this.repaymentRecordRepository.GetRepaymentRecordsByLoanNumberAsync(loanNumber);
 
             return Ok(new GetLoanDetailResponseDto{
