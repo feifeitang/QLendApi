@@ -52,6 +52,7 @@ namespace QLendApi
             services.AddScoped<IForeignWorkerRepository, ForeignWorkerRepository>();
             services.AddScoped<ICertificateRepository, CertificateRepository>();
             services.AddScoped<ILoanRecordRepository, LoanRecordRepository>();
+            services.AddScoped<IIncomeInformationRepository, IncomeInformationRepository>();
             services.AddScoped<IRepaymentRecordRepository, RepaymentRecordRepository>();
             
             services.AddControllersWithViews();
