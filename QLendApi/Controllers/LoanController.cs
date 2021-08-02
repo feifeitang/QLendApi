@@ -113,12 +113,28 @@ namespace QLendApi.Controllers
 
             var loanRecord = await this.loanRecordRepository.GetLoanRecordByIdAndStatusAsync(foreignWorker.Id, status);
 
-            return Ok(new GetLoanListResponseDto{
+            return Ok(new GetLoanListResponseDto
+            {
                 StatusCode = 10000,
                 Message = "success",
                 LoanRecord = loanRecord
             });
         }
 
+        // GET /api/loan/detail/{loanNumber}
+        /*
+        [Route("detail/{loanNumber}")]
+        [HttpGet]
+        public async Task<ActionResult<GetLoanDetailResponseDto>> Detail()
+        {
+            var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+
+
+            return Ok(new GetLoanDetailResponseDto{
+
+            })
+        }
+        */
     }
 }
