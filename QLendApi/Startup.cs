@@ -48,7 +48,6 @@ namespace QLendApi
 
             
             services.AddScoped<IForeignWorkerService, ForeignWorkerService>();
-
             services.AddScoped<IForeignWorkerRepository, ForeignWorkerRepository>();
             services.AddScoped<ICertificateRepository, CertificateRepository>();
             services.AddScoped<ILoanRecordRepository, LoanRecordRepository>();
