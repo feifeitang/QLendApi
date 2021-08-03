@@ -26,6 +26,7 @@ namespace QLendApi.Controllers
         private readonly ICertificateRepository certificateRepository;
         private readonly IForeignWorkerService foreignWorkerService;
         private readonly IIncomeInformationRepository incomeInformationRepository;
+        private readonly ILoanRecordRepository loanRecordRepository;
 
         private readonly AppSettings _appSettings;
         private readonly double _expireMins;
@@ -34,6 +35,7 @@ namespace QLendApi.Controllers
             IForeignWorkerRepository foreignWorkerRepository,
             ICertificateRepository certificateRepository,
             IIncomeInformationRepository incomeInformationRepository,
+            ILoanRecordRepository loanRecordRepository,
             IOptions<AppSettings> appSettings,
             IForeignWorkerService foreignWorkerService)
         {
@@ -42,6 +44,8 @@ namespace QLendApi.Controllers
             this.certificateRepository = certificateRepository;
 
             this.incomeInformationRepository = incomeInformationRepository;
+
+            this.loanRecordRepository = loanRecordRepository;
 
             this._appSettings = appSettings.Value;
 
@@ -280,6 +284,59 @@ namespace QLendApi.Controllers
                     });
                 }
 
+                foreignWorker.UserName = personalInfo.UserName;
+                foreignWorker.EnglishName = personalInfo.EnglishName;
+                foreignWorker.Sex = personalInfo.Sex;
+                foreignWorker.Nationality = personalInfo.Nationality;
+                foreignWorker.BirthDate = personalInfo.BirthDate;
+                foreignWorker.PassportNumber = personalInfo.PassportNumber;
+                
+                foreignWorker.Status = 4;
+
+                await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
+
+                return StatusCode(201);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90005,
+                    Message = $"personalInfo api error:{ex}"
+                });
+            }
+        }
+
+
+        // POST /api/user/arcInfo
+        [Route("arcInfo")]
+        [HttpPost]
+        public async Task<ActionResult> ArcInfo(ArcInfoDto arcInfoDto)
+        {
+            try
+            {
+                // check user exist, and get user data
+                var foreignWorker = await foreignWorkerRepository.GetForeignWorkerByIdAsync(arcInfoDto.Id);
+
+                if (foreignWorker == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10003,
+                        Message = "user not found"
+                    });
+                }
+
+                // check user status
+                if (foreignWorker.Status != 4)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10007,
+                        Message = "status not correct"
+                    });
+                }
+
                 // check certificate exist, and get certificate data
                 var certificate = await certificateRepository.GetCertificateAsync(foreignWorker.Uino);
 
@@ -290,16 +347,15 @@ namespace QLendApi.Controllers
                         StatusCode = 10006,
                         Message = "certificate not found"
                     });
-                }
-
-                foreignWorker.UserName = personalInfo.UserName;
-                foreignWorker.EnglishName = personalInfo.EnglishName;
-                foreignWorker.Sex = personalInfo.Gender;
-                foreignWorker.Nationality = personalInfo.Nationality;
-                certificate.IssueDate = personalInfo.DateOfIssue;
-                certificate.ExpiryDate = personalInfo.DateOfExpiry;
-                certificate.BarcodeNumber = personalInfo.BarcodeNumber;
-                foreignWorker.Status = 4;
+                }               
+                
+                certificate.IssueDate = arcInfoDto.DateOfIssue;
+                certificate.ExpiryDate = arcInfoDto.DateOfExpiry;
+                certificate.BarcodeNumber = arcInfoDto.BarcodeNumber;
+                foreignWorker.KindOfWork = arcInfoDto.KindOfWork;
+                foreignWorker.Workplace = arcInfoDto.Workplace;
+                
+                foreignWorker.Status = 5;
 
                 await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
                 await certificateRepository.UpdateCertificateAsync(certificate);
@@ -388,7 +444,7 @@ namespace QLendApi.Controllers
         [Authorize]
         [Route("loanSurveyInfoUpdate")]
         [HttpPost]
-        public async Task<ActionResult> loanSurveyInfoUpdate(LoanSurveyInfoUpdateDto loanSurveyInfoUpdateDto)
+        public async Task<ActionResult> LoanSurveyInfoUpdate(LoanSurveyInfoUpdateDto loanSurveyInfoUpdateDto)
         {
             try
             {
@@ -418,7 +474,7 @@ namespace QLendApi.Controllers
         //POST /api/user/incomeInfo
         [Route("incomeInfo")]
         [HttpPost]
-        public async Task<ActionResult> IncomeInfo ([FromForm] IncomeInfoDto incomeInfoDto)
+        public async Task<ActionResult> IncomeInfo([FromForm] IncomeInfoDto incomeInfoDto)
         {
             try
             {
@@ -436,6 +492,8 @@ namespace QLendApi.Controllers
                 };
 
                 await incomeInformationRepository.CreateIncomeInfoAsync(incomeInformation);
+                
+                //await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);                
 
                 return StatusCode(201);
             }
@@ -444,9 +502,119 @@ namespace QLendApi.Controllers
                 return BadRequest(new BaseResponse
                 {
                     StatusCode = 90010,
-                    Message = $"personalInfo2 api error:{ex}"
+                    Message = $"incomeInfo api error:{ex}"
                 });
             }
+        }
+
+        // POST /api/user/arcSelfie
+        [Authorize]
+        [Route("arcSelfie")]
+        [HttpPost]
+        public async Task<ActionResult> ArcSelfie([FromForm] ArcWithSelfieDto arcWithSelfieDto)
+        {
+            try
+            {
+                // get user info
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;              
+                var cert = await certificateRepository.GetCertificateAsync(foreignWorker.Uino);
+               
+                cert.FrontArc2 = await arcWithSelfieDto.FrontArc2.GetBytes();
+                cert.BackArc2 = await arcWithSelfieDto.BackArc2.GetBytes();
+                cert.SelfileArc = await arcWithSelfieDto.SelfieArc.GetBytes();
+
+                await certificateRepository.UpdateCertificateAsync(cert);
+               
+                return StatusCode(201);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90040,
+                    Message = $"arcSelfie api error:{ex}"
+                });
+            }
+        }       
+
+        // POST /api/user/signature
+        [Authorize]
+        [Route("signature")]
+        [HttpPost]
+        public async Task<ActionResult> Signature([FromForm] SignatureDto signatureDto)
+        {
+            try
+            {
+                // get user info
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+               
+                foreignWorker.Signature = await signatureDto.Signature.GetBytes();
+
+                await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
+               
+                return StatusCode(201);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90050,
+                    Message = $"signature api error:{ex}"
+                });
+            }
+        } 
+
+        // POST /api/user/confirm
+        [Authorize]
+        [Route("confirm")]
+        [HttpPost]
+        public async Task<ActionResult> Confirm([FromForm] SignatureConfirmDto signatureConfirmDto)
+        {
+            try
+            {
+                // get user info
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+               
+                foreignWorker.Signature2 = await signatureConfirmDto.Signature2.GetBytes();
+
+                await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
+               
+                return StatusCode(201);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90050,
+                    Message = $"signature api error:{ex}"
+                });
+            }
+        }       
+
+        // POST /api/user/bankAccount
+        [Route("bankAccount")]
+        [HttpPost]
+        public async Task<ActionResult> BankAccount(BankAccountDto bankAccountDto)
+        {
+            try
+            {
+                //get user info
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+                foreignWorker.BankNumber = bankAccountDto.BankNumber;
+                foreignWorker.AccountNumber = bankAccountDto.AccountNumber;
+
+                await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
+                return StatusCode(201);
+            }
+            catch(System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90060,
+                    Message = $"bankAccount api error:{ex}"
+                });
+            }           
         }
 
         private bool CheckOTPSendTimeIsVaild(DateTime sendTime)

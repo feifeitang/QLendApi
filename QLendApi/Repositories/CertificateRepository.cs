@@ -32,7 +32,6 @@ namespace QLendApi.Repositories
         public async Task UpdateCertificateAsync(Certificate certificate)
         {
             _context.Certificates.Update(certificate);
-
             await _context.SaveChangesAsync();
         }
     }

@@ -22,6 +22,7 @@ namespace QLendApi.Repositories
             return _context.ForeignWorkers.Any(e => e.PhoneNumber == phoneNumber);
         }
 
+    
         public async Task CreateForeignWorkerAsync(ForeignWorker foreignWorker)
         {
             _context.ForeignWorkers.Add(foreignWorker);
