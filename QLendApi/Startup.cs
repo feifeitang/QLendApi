@@ -42,18 +42,24 @@ namespace QLendApi
                 .Get<MssqlSettings>();
             services.AddDbContext<QLendDBContext>((options) =>
             {
-                var str = Mssqlsettings.ConnectionString;
-                options.UseSqlServer(str);
+                var str = Configuration.GetConnectionString("MssqlConnectString");
+                if (str != null)
+                {
+                    options.UseSqlServer(str);
+                }
+                var localStr = Mssqlsettings.ConnectionString;
+                options.UseSqlServer(localStr);
+
             });
 
-            
+
             services.AddScoped<IForeignWorkerService, ForeignWorkerService>();
             services.AddScoped<IForeignWorkerRepository, ForeignWorkerRepository>();
             services.AddScoped<ICertificateRepository, CertificateRepository>();
             services.AddScoped<ILoanRecordRepository, LoanRecordRepository>();
             services.AddScoped<IIncomeInformationRepository, IncomeInformationRepository>();
             services.AddScoped<IRepaymentRecordRepository, RepaymentRecordRepository>();
-            
+
             services.AddControllersWithViews();
 
             services.AddSwaggerGen(c =>
