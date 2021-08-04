@@ -9,14 +9,15 @@ on:
       - main
   workflow_dispatch:
 
-defaults:
-  run:
-    working-directory: ./QLendApi
 jobs:
   build:
     runs-on: 'ubuntu-latest'
 
     steps:
+    - name: Go into project
+      run: |
+        cd QLendApi
+
     - uses: actions/checkout@v2
 
     - name: Set up Docker Buildx
