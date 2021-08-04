@@ -13,7 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using PushDemoApi.Services;
+using QLendApi.Services;
 using QLendApi.Dtos;
 using QLendApi.Helpers;
 using QLendApi.Models;

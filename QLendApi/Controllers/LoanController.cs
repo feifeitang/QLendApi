@@ -50,7 +50,7 @@ namespace QLendApi.Controllers
                     Purpose = loanApply.Purpose 
                 };
         
-                await loanRecordRepository.CreateLoanRecordAsync(loanRecord);                        
+                await loanRecordRepository.CreateAsync(loanRecord);                        
 
                 return StatusCode(201);
             }
@@ -80,7 +80,7 @@ namespace QLendApi.Controllers
         {
             var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
-            var loanRecord = await this.loanRecordRepository.GetLoanRecordsByIdAndStatusAsync(foreignWorker.Id, status);
+            var loanRecord = await this.loanRecordRepository.GetByIdAndStatusAsync(foreignWorker.Id, status);
 
             return Ok(new GetLoanListResponseDto
             {
@@ -97,7 +97,7 @@ namespace QLendApi.Controllers
         {
             var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
-            var loanRecord = await this.loanRecordRepository.GetLoanRecordByLoanNumber(loanNumber);
+            var loanRecord = await this.loanRecordRepository.GetByLoanNumber(loanNumber);
 
             if (foreignWorker.Id != loanRecord.Id)
             {
@@ -108,7 +108,7 @@ namespace QLendApi.Controllers
                 });
             }
 
-            var repaymentRecords = await this.repaymentRecordRepository.GetRepaymentRecordsByLoanNumberAsync(loanNumber);
+            var repaymentRecords = await this.repaymentRecordRepository.GetByLoanNumberAsync(loanNumber);
 
             return Ok(new GetLoanDetailResponseDto{
                 StatusCode = 10000,

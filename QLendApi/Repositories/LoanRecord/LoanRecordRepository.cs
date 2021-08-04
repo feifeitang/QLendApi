@@ -13,19 +13,19 @@ namespace QLendApi.Repositories
             _context = context;
         }
 
-        public async Task CreateLoanRecordAsync(LoanRecord loanRecord)
+        public async Task CreateAsync(LoanRecord loanRecord)
         {
             _context.LoanRecords.Add(loanRecord);
             await _context.SaveChangesAsync();
         }
 
 
-        public async Task<LoanRecord[]> GetLoanRecordsByIdAndStatusAsync(int id, int status)
+        public async Task<LoanRecord[]> GetByIdAndStatusAsync(int id, int status)
         {
             return await _context.LoanRecords.Where(el => el.Id == id && el.Status == status).ToArrayAsync();
         }
         
-        public async Task<LoanRecord> GetLoanRecordByLoanNumber(string loanNumber)
+        public async Task<LoanRecord> GetByLoanNumber(string loanNumber)
         {
             return await _context.LoanRecords.FindAsync(loanNumber);
         }

@@ -23,23 +23,23 @@ namespace QLendApi.Repositories
         }
 
     
-        public async Task CreateForeignWorkerAsync(ForeignWorker foreignWorker)
+        public async Task CreateAsync(ForeignWorker foreignWorker)
         {
             _context.ForeignWorkers.Add(foreignWorker);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<ForeignWorker> GetForeignWorkerByIdAsync(int id)
+        public async Task<ForeignWorker> GetByIdAsync(int id)
         {
             return await _context.ForeignWorkers.FindAsync(id);
         }
 
-        public async Task<ForeignWorker> GetForeignWorkerByUINoAsync(string uino)
+        public async Task<ForeignWorker> GetByUINoAsync(string uino)
         {
             return await _context.ForeignWorkers.FirstOrDefaultAsync(f => f.Uino == uino);
         }
 
-        public async Task UpdateForeignWorkerAsync(ForeignWorker foreignWorker)
+        public async Task UpdateAsync(ForeignWorker foreignWorker)
         {
             _context.ForeignWorkers.Update(foreignWorker);
 

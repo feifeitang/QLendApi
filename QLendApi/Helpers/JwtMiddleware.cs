@@ -52,7 +52,7 @@ namespace QLendApi.Helpers
                 var foreignWorkerId = int.Parse(val);
 
                 // attach user to context on successful jwt validation
-                context.Items["ForeignWorker"] = await foreignWorkerRepository.GetForeignWorkerByIdAsync(foreignWorkerId);
+                context.Items["ForeignWorker"] = await foreignWorkerRepository.GetByIdAsync(foreignWorkerId);
             }
             catch
             {

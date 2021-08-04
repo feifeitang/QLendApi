@@ -96,8 +96,8 @@ namespace QLendApi.Controllers
                 RegisterTime = DateTime.UtcNow
             };
 
-            await certificateRepository.CreateCertificateAsync(certificate);
-            await foreignWorkerRepository.CreateForeignWorkerAsync(foreignWorker);
+            await certificateRepository.CreateAsync(certificate);
+            await foreignWorkerRepository.CreateAsync(foreignWorker);
 
             return StatusCode(201);
         }
@@ -111,7 +111,7 @@ namespace QLendApi.Controllers
             try
             {
                 // check user exist, and get user data
-                var foreignWorker = await foreignWorkerRepository.GetForeignWorkerByIdAsync(checkOtpDto.Id);
+                var foreignWorker = await foreignWorkerRepository.GetByIdAsync(checkOtpDto.Id);
 
                 if (foreignWorker == null)
                 {
@@ -143,7 +143,7 @@ namespace QLendApi.Controllers
 
                 foreignWorker.Status = 2;
 
-                await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
+                await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
                 return StatusCode(201);
             }
@@ -165,7 +165,7 @@ namespace QLendApi.Controllers
             try
             {
                 // check user exist, and get user data
-                var foreignWorker = await foreignWorkerRepository.GetForeignWorkerByIdAsync(sendOtpDto.Id);
+                var foreignWorker = await foreignWorkerRepository.GetByIdAsync(sendOtpDto.Id);
 
                 if (foreignWorker == null)
                 {
@@ -182,7 +182,7 @@ namespace QLendApi.Controllers
                 foreignWorker.OTP = OTP;
                 foreignWorker.OTPSendTIme = DateTime.UtcNow;
 
-                await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
+                await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
                 return StatusCode(201);
             }
@@ -203,7 +203,7 @@ namespace QLendApi.Controllers
         {
             try
             {
-                var foreignWorker = await foreignWorkerRepository.GetForeignWorkerByIdAsync(arcDto.Id);
+                var foreignWorker = await foreignWorkerRepository.GetByIdAsync(arcDto.Id);
 
                 if (foreignWorker == null)
                 {
@@ -224,7 +224,7 @@ namespace QLendApi.Controllers
                     });
                 }
 
-                var cert = await certificateRepository.GetCertificateAsync(foreignWorker.Uino);
+                var cert = await certificateRepository.GetByUINoAsync(foreignWorker.Uino);
 
                 if (cert == null)
                 {
@@ -238,10 +238,10 @@ namespace QLendApi.Controllers
                 cert.FrontArc = await arcDto.FrontArc.GetBytes();
                 cert.BackArc = await arcDto.BackArc.GetBytes();
 
-                await certificateRepository.UpdateCertificateAsync(cert);
+                await certificateRepository.UpdateAsync(cert);
 
                 foreignWorker.Status = 3;
-                await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
+                await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
                 return StatusCode(201);
             }
@@ -263,7 +263,7 @@ namespace QLendApi.Controllers
             try
             {
                 // check user exist, and get user data
-                var foreignWorker = await foreignWorkerRepository.GetForeignWorkerByIdAsync(personalInfo.Id);
+                var foreignWorker = await foreignWorkerRepository.GetByIdAsync(personalInfo.Id);
 
                 if (foreignWorker == null)
                 {
@@ -290,10 +290,10 @@ namespace QLendApi.Controllers
                 foreignWorker.Nationality = personalInfo.Nationality;
                 foreignWorker.BirthDate = personalInfo.BirthDate;
                 foreignWorker.PassportNumber = personalInfo.PassportNumber;
-                
+
                 foreignWorker.Status = 4;
 
-                await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
+                await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
                 return StatusCode(201);
             }
@@ -316,7 +316,7 @@ namespace QLendApi.Controllers
             try
             {
                 // check user exist, and get user data
-                var foreignWorker = await foreignWorkerRepository.GetForeignWorkerByIdAsync(arcInfoDto.Id);
+                var foreignWorker = await foreignWorkerRepository.GetByIdAsync(arcInfoDto.Id);
 
                 if (foreignWorker == null)
                 {
@@ -338,7 +338,7 @@ namespace QLendApi.Controllers
                 }
 
                 // check certificate exist, and get certificate data
-                var certificate = await certificateRepository.GetCertificateAsync(foreignWorker.Uino);
+                var certificate = await certificateRepository.GetByUINoAsync(foreignWorker.Uino);
 
                 if (certificate == null)
                 {
@@ -347,18 +347,18 @@ namespace QLendApi.Controllers
                         StatusCode = 10006,
                         Message = "certificate not found"
                     });
-                }               
-                
+                }
+
                 certificate.IssueDate = arcInfoDto.DateOfIssue;
                 certificate.ExpiryDate = arcInfoDto.DateOfExpiry;
                 certificate.BarcodeNumber = arcInfoDto.BarcodeNumber;
                 foreignWorker.KindOfWork = arcInfoDto.KindOfWork;
                 foreignWorker.Workplace = arcInfoDto.Workplace;
-                
+
                 foreignWorker.Status = 5;
 
-                await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
-                await certificateRepository.UpdateCertificateAsync(certificate);
+                await foreignWorkerRepository.UpdateAsync(foreignWorker);
+                await certificateRepository.UpdateAsync(certificate);
 
                 return StatusCode(201);
             }
@@ -456,7 +456,7 @@ namespace QLendApi.Controllers
                 foreignWorker.EducationBackground = loanSurveyInfoUpdateDto.EducationBackground;
                 foreignWorker.TimeInTaiwan = loanSurveyInfoUpdateDto.TimeInTaiwan;
 
-                await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
+                await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
                 return StatusCode(201);
             }
@@ -468,7 +468,7 @@ namespace QLendApi.Controllers
                     Message = $"user info update api error:{ex}"
                 });
             }
-            
+
         }
 
         //POST /api/user/incomeInfo
@@ -491,8 +491,8 @@ namespace QLendApi.Controllers
                     InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes()
                 };
 
-                await incomeInformationRepository.CreateIncomeInfoAsync(incomeInformation);
-                
+                await incomeInformationRepository.CreateAsync(incomeInformation);
+
                 //await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);                
 
                 return StatusCode(201);
@@ -516,15 +516,15 @@ namespace QLendApi.Controllers
             try
             {
                 // get user info
-                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;              
-                var cert = await certificateRepository.GetCertificateAsync(foreignWorker.Uino);
-               
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+                var cert = await certificateRepository.GetByUINoAsync(foreignWorker.Uino);
+
                 cert.FrontArc2 = await arcWithSelfieDto.FrontArc2.GetBytes();
                 cert.BackArc2 = await arcWithSelfieDto.BackArc2.GetBytes();
                 cert.SelfileArc = await arcWithSelfieDto.SelfieArc.GetBytes();
 
-                await certificateRepository.UpdateCertificateAsync(cert);
-               
+                await certificateRepository.UpdateAsync(cert);
+
                 return StatusCode(201);
             }
             catch (System.Exception ex)
@@ -535,7 +535,7 @@ namespace QLendApi.Controllers
                     Message = $"arcSelfie api error:{ex}"
                 });
             }
-        }       
+        }
 
         // POST /api/user/signature
         [Authorize]
@@ -547,11 +547,11 @@ namespace QLendApi.Controllers
             {
                 // get user info
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
-               
+
                 foreignWorker.Signature = await signatureDto.Signature.GetBytes();
 
-                await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
-               
+                await foreignWorkerRepository.UpdateAsync(foreignWorker);
+
                 return StatusCode(201);
             }
             catch (System.Exception ex)
@@ -562,7 +562,7 @@ namespace QLendApi.Controllers
                     Message = $"signature api error:{ex}"
                 });
             }
-        } 
+        }
 
         // POST /api/user/confirm
         [Authorize]
@@ -574,11 +574,11 @@ namespace QLendApi.Controllers
             {
                 // get user info
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
-               
+
                 foreignWorker.Signature2 = await signatureConfirmDto.Signature2.GetBytes();
 
-                await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
-               
+                await foreignWorkerRepository.UpdateAsync(foreignWorker);
+
                 return StatusCode(201);
             }
             catch (System.Exception ex)
@@ -589,7 +589,7 @@ namespace QLendApi.Controllers
                     Message = $"signature api error:{ex}"
                 });
             }
-        }       
+        }
 
         // POST /api/user/bankAccount
         [Route("bankAccount")]
@@ -604,17 +604,17 @@ namespace QLendApi.Controllers
                 foreignWorker.BankNumber = bankAccountDto.BankNumber;
                 foreignWorker.AccountNumber = bankAccountDto.AccountNumber;
 
-                await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);
+                await foreignWorkerRepository.UpdateAsync(foreignWorker);
                 return StatusCode(201);
             }
-            catch(System.Exception ex)
+            catch (System.Exception ex)
             {
                 return BadRequest(new BaseResponse
                 {
                     StatusCode = 90060,
                     Message = $"bankAccount api error:{ex}"
                 });
-            }           
+            }
         }
 
         private bool CheckOTPSendTimeIsVaild(DateTime sendTime)

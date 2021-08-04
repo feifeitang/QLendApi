@@ -12,7 +12,7 @@ namespace QLendApi.Repositories
         {
             _conetxt = context;
         }
-        public async Task<RepaymentRecord[]> GetRepaymentRecordsByLoanNumberAsync(string loanNumber)
+        public async Task<RepaymentRecord[]> GetByLoanNumberAsync(string loanNumber)
         {
             return await _conetxt.RepaymentRecords.Where(el => el.LoanNumber == loanNumber).ToArrayAsync();
         }
