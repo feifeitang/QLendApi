@@ -18,20 +18,23 @@ namespace QLendApi.Dtos
         
         [Required]
         [StringLength(1, MinimumLength = 1)]
-        public string Gender { get; init; }
+        public string Sex { get; init; }
         
         [Required]
         [StringLength(11, MinimumLength = 7)]
         public string Nationality { get; init; }
-        
+
         [Required]
-        public DateTime DateOfIssue { get; init; }
-        
+        public DateTime? BirthDate { get; init; }
+
         [Required]
-        public DateTime DateOfExpiry { get; init; }
+        [StringLength(9, MinimumLength = 9)]
+        public string PassportNumber { get; init; }
         
-        [Required]
-        [StringLength(10, MinimumLength = 10)]
-        public string BarcodeNumber { get; init; }
+
+
+
+
+        
     }
 }

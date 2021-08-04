@@ -7,27 +7,27 @@ namespace QLendApi.Repositories
 {
     public class LoanRecordRepository : ILoanRecordRepository
     {
-        private readonly QLendDBContext _conetxt;
+        private readonly QLendDBContext _context;
         public LoanRecordRepository(QLendDBContext context)
         {
-            _conetxt = context;
+            _context = context;
         }
 
         public async Task CreateLoanRecordAsync(LoanRecord loanRecord)
         {
-            _conetxt.LoanRecords.Add(loanRecord);
-            await _conetxt.SaveChangesAsync();
+            _context.LoanRecords.Add(loanRecord);
+            await _context.SaveChangesAsync();
         }
 
 
         public async Task<LoanRecord[]> GetLoanRecordsByIdAndStatusAsync(int id, int status)
         {
-            return await _conetxt.LoanRecords.Where(el => el.Id == id && el.Status == status).ToArrayAsync();
+            return await _context.LoanRecords.Where(el => el.Id == id && el.Status == status).ToArrayAsync();
         }
         
         public async Task<LoanRecord> GetLoanRecordByLoanNumber(string loanNumber)
         {
-            return await _conetxt.LoanRecords.FindAsync(loanNumber);
+            return await _context.LoanRecords.FindAsync(loanNumber);
         }
     }
 }

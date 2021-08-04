@@ -5,7 +5,6 @@ using QLendApi.lib;
 using QLendApi.Models;
 using QLendApi.Extensions;
 using QLendApi.Repositories;
-using Microsoft.AspNetCore.Mvc;
 
 namespace QLendApi.Controllers
 {
@@ -65,40 +64,6 @@ namespace QLendApi.Controllers
             }
             
         }     
-
-        
-
-        // POST /api/loan/arc
-        [Route("arc")]
-        [HttpPost]
-        public ActionResult Arc()
-        {
-            return StatusCode(201);
-        }
-
-        // POST /api/loan/signature
-        [Route("signature")]
-        [HttpPost]
-        public ActionResult Signature()
-        {
-            return StatusCode(201);
-        }
-
-        // POST /api/loan/confirm
-        [Route("confirm")]
-        [HttpPost]
-        public ActionResult Confirm()
-        {
-            return StatusCode(201);
-        }
-
-        // POST /api/loan/bankAccount
-        [Route("bankAccount")]
-        [HttpPost]
-        public ActionResult bankAccount()
-        {
-            return StatusCode(201);
-        }
 
         // POST /api/loan/success
         [Route("success")]
