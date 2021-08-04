@@ -16,3 +16,7 @@ dotnet ef migrations add {description}
 dotnet ef database update {description}
 
 dotnet ef migrations list
+
+## local run in docker
+
+docker run -itd -p 8080:80 -e MssqlSettings:Password='{PASSWORD}' qlend:1.0.0
