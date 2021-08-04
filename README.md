@@ -20,3 +20,7 @@ dotnet ef migrations list
 ## local run in docker
 
 docker run -itd -p 8080:80 -e MssqlSettings:Password='{PASSWORD}' qlend:1.0.0
+
+## domain
+
+sandbox: https://qlend-sandbox.azurewebsites.net
