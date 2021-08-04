@@ -7,9 +7,9 @@ namespace QLendApi.Repositories
 {
     public interface ICertificateRepository
     {
-        Task<Certificate> GetCertificateAsync(string uino);
-        Task CreateCertificateAsync(Certificate certificate);
-        Task UpdateCertificateAsync(Certificate certificate);
+        Task<Certificate> GetByUINoAsync(string uino);
+        Task CreateAsync(Certificate certificate);
+        Task UpdateAsync(Certificate certificate);
 
         Boolean CheckUINoExist(string uino);
     }

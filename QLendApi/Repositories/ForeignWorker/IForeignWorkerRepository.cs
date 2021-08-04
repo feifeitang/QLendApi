@@ -7,13 +7,13 @@ namespace QLendApi.Repositories
 {
     public interface IForeignWorkerRepository
     {
-        Task<ForeignWorker> GetForeignWorkerByIdAsync(int id);
+        Task<ForeignWorker> GetByIdAsync(int id);
 
-        Task<ForeignWorker> GetForeignWorkerByUINoAsync(string uino);
+        Task<ForeignWorker> GetByUINoAsync(string uino);
 
-        Task CreateForeignWorkerAsync(ForeignWorker foreignWorker);
+        Task CreateAsync(ForeignWorker foreignWorker);
         
-        Task UpdateForeignWorkerAsync(ForeignWorker user);
+        Task UpdateAsync(ForeignWorker user);
 
         Task CreatePersonalInfo1Async(ForeignWorker foreignWorker);
 

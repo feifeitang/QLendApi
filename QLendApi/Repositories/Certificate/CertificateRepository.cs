@@ -18,18 +18,18 @@ namespace QLendApi.Repositories
             return _context.Certificates.Any(e => e.Uino == uino);
         }
 
-        public async Task CreateCertificateAsync(Certificate certificate)
+        public async Task CreateAsync(Certificate certificate)
         {
             _context.Certificates.Add(certificate);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Certificate> GetCertificateAsync(string uino)
+        public async Task<Certificate> GetByUINoAsync(string uino)
         {
             return await _context.Certificates.FindAsync(uino);
         }
 
-        public async Task UpdateCertificateAsync(Certificate certificate)
+        public async Task UpdateAsync(Certificate certificate)
         {
             _context.Certificates.Update(certificate);
             await _context.SaveChangesAsync();

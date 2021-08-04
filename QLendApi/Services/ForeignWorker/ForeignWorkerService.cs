@@ -5,10 +5,6 @@ using QLendApi.Repositories;
 
 namespace QLendApi.Services
 {
-    public interface IForeignWorkerService
-    {
-        Task<ForeignWorker> GetInfoByAuthOrNull(string uino, string password);
-    }
     public class ForeignWorkerService : IForeignWorkerService
     {
         private readonly IForeignWorkerRepository foreignWorkerRepository;
@@ -20,7 +16,7 @@ namespace QLendApi.Services
 
         public async Task<ForeignWorker> GetInfoByAuthOrNull(string uino, string password)
         {
-            var foreignWorker = await foreignWorkerRepository.GetForeignWorkerByUINoAsync(uino);
+            var foreignWorker = await foreignWorkerRepository.GetByUINoAsync(uino);
 
             if (foreignWorker == null)
             {

@@ -7,10 +7,9 @@ using Microsoft.Azure.NotificationHubs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using QLendApi.Dtos;
-using QLendApi.Services;
 using QLendApi.Settings;
 
-namespace PushDemoApi.Services
+namespace QLendApi.Services
 {
     public class NotificationHubService : INotificationService
     {

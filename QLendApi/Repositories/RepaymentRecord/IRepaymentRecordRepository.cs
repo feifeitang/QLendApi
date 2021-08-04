@@ -5,6 +5,6 @@ namespace QLendApi.Repositories
 {
     public interface IRepaymentRecordRepository
     {
-        Task<RepaymentRecord[]> GetRepaymentRecordsByLoanNumberAsync(string loanNumber);
+        Task<RepaymentRecord[]> GetByLoanNumberAsync(string loanNumber);
     }
 }

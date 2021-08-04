@@ -11,18 +11,18 @@ namespace QLendApi.Repositories
             _context = context;
         }
 
-        public async Task CreateIncomeInfoAsync(IncomeInformation incomeInformation)
+        public async Task CreateAsync(IncomeInformation incomeInformation)
         {
             _context.IncomeInformations.Add(incomeInformation);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IncomeInformation> GetIncomeInfoByIncomeNumberAsync(int incomeNumber)
+        public async Task<IncomeInformation> GetByIncomeNumberAsync(int incomeNumber)
         {
             return await _context.IncomeInformations.FindAsync(incomeNumber);
         }
 
-        public async Task UpdateIncomeInfoAsync(IncomeInformation incomeInformation)
+        public async Task UpdateAsync(IncomeInformation incomeInformation)
         {
             _context.IncomeInformations.Update(incomeInformation);
             await _context.SaveChangesAsync();
