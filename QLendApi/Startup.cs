@@ -13,6 +13,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using PushDemoApi.Services;
+using QLendApi.Dtos;
 using QLendApi.Helpers;
 using QLendApi.Models;
 using QLendApi.Repositories;
@@ -62,6 +64,12 @@ namespace QLendApi
             });
 
             services.AddHealthChecks();
+
+            services.AddSingleton<INotificationService, NotificationHubService>();
+
+            services.AddOptions<NotificationHubOptions>()
+                .Configure(Configuration.GetSection("NotificationHub").Bind)
+                .ValidateDataAnnotations();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
