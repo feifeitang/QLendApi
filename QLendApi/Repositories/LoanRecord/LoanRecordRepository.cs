@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,6 @@ namespace QLendApi.Repositories
             _context.LoanRecords.Add(loanRecord);
             await _context.SaveChangesAsync();
         }
-
 
         public async Task<LoanRecord[]> GetByIdAndStatusAsync(int id, int status)
         {

@@ -18,6 +18,7 @@ namespace QLendApi.Controllers
         private readonly IForeignWorkerRepository foreignWorkerRepository;
         private readonly ICertificateRepository certificateRepository;
         private readonly IRepaymentRecordRepository repaymentRecordRepository;
+        static int sn = 0;
 
         public LoanController(
             ILoanRecordRepository loanRecordRepository,
@@ -51,25 +52,9 @@ namespace QLendApi.Controllers
                     Purpose = loanApply.Purpose,
                     Id = foreignWorker.Id
                     //State = 0,
-                };
-
-                if(foreignWorker.Nationality == "Indonisia")
-                {
-                    loanRecord.LoanNumber = "I" + Guid.NewGuid().ToString("N");
-                }
-                if(foreignWorker.Nationality == "Vietnam")
-                {
-                    loanRecord.LoanNumber = "V" + Guid.NewGuid().ToString("N");
-                }
-                if(foreignWorker.Nationality == "Thailand")
-                {
-                    loanRecord.LoanNumber = "T" + Guid.NewGuid().ToString("N");
-                }
-                if(foreignWorker.Nationality == "Philippine")
-                {
-                    loanRecord.LoanNumber = "P" + Guid.NewGuid().ToString("N");
-                }
-                       
+                };                                  
+                
+                loanRecord.LoanNumber = GenerateLoanNumber(foreignWorker.Nationality);
                 await loanRecordRepository.CreateAsync(loanRecord);                        
 
                 return StatusCode(201);
@@ -178,6 +163,13 @@ namespace QLendApi.Controllers
                 LoanRecord = loanRecord,
                 RepaymentRecords = repaymentRecords
             });
+        }
+
+        public static string GenerateLoanNumber(string nationality)
+        {          
+            string number = nationality.Substring(0,1) + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + string.Format("{0:d5}", sn);                                               
+            sn ++; 
+            return number;
         }
     }
 }
