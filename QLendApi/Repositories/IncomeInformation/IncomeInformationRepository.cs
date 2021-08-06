@@ -17,7 +17,7 @@ namespace QLendApi.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IncomeInformation> GetByIncomeNumberAsync(int incomeNumber)
+        public async Task<IncomeInformation> GetByIncomeNumberAsync(int? incomeNumber)
         {
             return await _context.IncomeInformations.FindAsync(incomeNumber);
         }
@@ -27,5 +27,7 @@ namespace QLendApi.Repositories
             _context.IncomeInformations.Update(incomeInformation);
             await _context.SaveChangesAsync();
         }
+
+    
     }
 }

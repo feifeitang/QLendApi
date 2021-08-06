@@ -258,12 +258,12 @@ namespace QLendApi.Controllers
         // POST /api/user/personalInfo
         [Route("personalInfo")]
         [HttpPost]
-        public async Task<ActionResult> PersonalInfo(PersonalInfoDto personalInfo)
+        public async Task<ActionResult> PersonalInfo(PersonalInfoDto personalInfoDto)
         {
             try
             {
                 // check user exist, and get user data
-                var foreignWorker = await foreignWorkerRepository.GetByIdAsync(personalInfo.Id);
+                var foreignWorker = await foreignWorkerRepository.GetByIdAsync(personalInfoDto.Id);
 
                 if (foreignWorker == null)
                 {
@@ -284,12 +284,12 @@ namespace QLendApi.Controllers
                     });
                 }
 
-                foreignWorker.UserName = personalInfo.UserName;
-                foreignWorker.EnglishName = personalInfo.EnglishName;
-                foreignWorker.Sex = personalInfo.Sex;
-                foreignWorker.Nationality = personalInfo.Nationality;
-                foreignWorker.BirthDate = personalInfo.BirthDate;
-                foreignWorker.PassportNumber = personalInfo.PassportNumber;
+                foreignWorker.UserName = personalInfoDto.UserName;
+                foreignWorker.EnglishName = personalInfoDto.EnglishName;
+                foreignWorker.Sex = personalInfoDto.Sex;
+                foreignWorker.Nationality = personalInfoDto.Nationality;
+                foreignWorker.BirthDate = personalInfoDto.BirthDate;
+                foreignWorker.PassportNumber = personalInfoDto.PassportNumber;
 
                 foreignWorker.Status = 4;
 
@@ -471,31 +471,73 @@ namespace QLendApi.Controllers
 
         }
 
+/*
         //POST /api/user/incomeInfo
         [Route("incomeInfo")]
         [HttpPost]
         public async Task<ActionResult> IncomeInfo([FromForm] IncomeInfoDto incomeInfoDto)
-        {
+        {           
             try
             {
                 // get user info
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
+                //check incomeNumber if exist
+                if(foreignWorker.IncomeNumber != null)
+                {
+                    var incomeInfo = await incomeInformationRepository.GetByIncomeNumberAsync(foreignWorker.IncomeNumber);
+                                       
+                    incomeInfo.AvgMonthlyIncome = incomeInfoDto.AvgMonthlyIncome;
+                    incomeInfo.LatePay = incomeInfoDto.LatePay;
+                    incomeInfo.PayWay = incomeInfoDto.PayWay;
+                    incomeInfo.RemittanceWay = incomeInfoDto.RemittanceWay;
+
+                    if(incomeInfoDto.FrontSalaryPassbook != null)
+                    {
+                        incomeInfo.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();              
+                    }
+                    if(incomeInfoDto.InsideSalarybook != null)
+                    {
+                        incomeInfo.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes();
+                    }
+                    else
+                    {
+                        incomeInfo.FrontSalaryPassbook = null;
+                        incomeInfo.InsideSalarybook = null;
+                    }
+
+                    await incomeInformationRepository.UpdateAsync(incomeInfo);
+                }
+            
+                 //if incomeNumber doesn't exist                   
                 IncomeInformation incomeInformation = new()
                 {
                     AvgMonthlyIncome = incomeInfoDto.AvgMonthlyIncome,
                     LatePay = incomeInfoDto.LatePay,
                     PayWay = incomeInfoDto.PayWay,
-                    RemittanceWay = incomeInfoDto.RemittanceWay,
-                    FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes(),
-                    InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes()
+                    RemittanceWay = incomeInfoDto.RemittanceWay                     
                 };
 
-                await incomeInformationRepository.CreateAsync(incomeInformation);
-
-                //await foreignWorkerRepository.UpdateForeignWorkerAsync(foreignWorker);                
-
-                return StatusCode(201);
+                if(incomeInfoDto.FrontSalaryPassbook != null)
+                {
+                    incomeInformation.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();              
+                }
+                if(incomeInfoDto.InsideSalarybook != null)
+                {
+                    incomeInformation.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes();
+                }
+                else
+                {
+                    incomeInformation.FrontSalaryPassbook = null;
+                    incomeInformation.InsideSalarybook = null;
+                }
+                            
+                await incomeInformationRepository.CreateAsync(incomeInformation);               
+                foreignWorker.IncomeNumber = incomeInformation.IncomeNumber;
+                await foreignWorkerRepository.UpdateAsync(foreignWorker);                                                                           
+                             
+                return StatusCode(201);                      
+               
             }
             catch (System.Exception ex)
             {
@@ -505,8 +547,9 @@ namespace QLendApi.Controllers
                     Message = $"incomeInfo api error:{ex}"
                 });
             }
+            
         }
-
+*/
         // POST /api/user/arcSelfie
         [Authorize]
         [Route("arcSelfie")]
@@ -517,14 +560,30 @@ namespace QLendApi.Controllers
             {
                 // get user info
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
-                var cert = await certificateRepository.GetByUINoAsync(foreignWorker.Uino);
+ /*               
+                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id);                
+
+                 // check user status
+                if (loanRecord.State != 0)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10007,
+                        Message = "status not correct"
+                    });             
+                }
+*/
+                var cert = await certificateRepository.GetByUINoAsync(foreignWorker.Uino); 
 
                 cert.FrontArc2 = await arcWithSelfieDto.FrontArc2.GetBytes();
                 cert.BackArc2 = await arcWithSelfieDto.BackArc2.GetBytes();
-                cert.SelfileArc = await arcWithSelfieDto.SelfieArc.GetBytes();
+                cert.SelfileArc = await arcWithSelfieDto.SelfieArc.GetBytes();    
 
-                await certificateRepository.UpdateAsync(cert);
-
+                await certificateRepository.UpdateAsync(cert); 
+/*                
+                loanRecord.State = 1;
+                await loanRecordRepository.UpdateAsync(loanRecord);
+*/
                 return StatusCode(201);
             }
             catch (System.Exception ex)
