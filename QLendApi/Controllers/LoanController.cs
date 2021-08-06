@@ -53,7 +53,7 @@ namespace QLendApi.Controllers
                     //State = 0,
                 };
 
-                if(foreignWorker.Nationality == "Indonisiamm")
+                if(foreignWorker.Nationality == "Indonisia")
                 {
                     loanRecord.LoanNumber = "I" + Guid.NewGuid().ToString("N");
                 }
