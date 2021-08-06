@@ -54,6 +54,15 @@ namespace QLendApi.Controllers
                     //State = 0,
                 };                                  
                 
+                if(foreignWorker.Nationality == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10509,
+                        Message = "nationaality is null"
+                    });
+                }
+                
                 loanRecord.LoanNumber = GenerateLoanNumber(foreignWorker.Nationality);
                 await loanRecordRepository.CreateAsync(loanRecord);                        
 
