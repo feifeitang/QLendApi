@@ -10,7 +10,6 @@ using QLendApi.Settings;
 
 namespace QLendApi.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class NotificationsController : ControllerBase
@@ -28,7 +27,7 @@ namespace QLendApi.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
         public async Task<IActionResult> UpdateInstallation(
-            [Required]DeviceInstallation deviceInstallation)
+            [Required] DeviceInstallation deviceInstallation)
         {
             var success = await _notificationService
                 .CreateOrUpdateInstallationAsync(deviceInstallation, HttpContext.RequestAborted);
@@ -45,7 +44,7 @@ namespace QLendApi.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
         public async Task<ActionResult> DeleteInstallation(
-            [Required][FromRoute]string installationId)
+            [Required][FromRoute] string installationId)
         {
             var success = await _notificationService
                 .DeleteInstallationByIdAsync(installationId, CancellationToken.None);
@@ -62,7 +61,7 @@ namespace QLendApi.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
         public async Task<IActionResult> RequestPush(
-            [Required]NotificationRequest notificationRequest)
+            [Required] NotificationRequest notificationRequest)
         {
             if ((notificationRequest.Silent &&
                 string.IsNullOrWhiteSpace(notificationRequest?.Action)) ||
