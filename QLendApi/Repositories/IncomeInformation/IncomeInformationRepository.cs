@@ -24,6 +24,7 @@ namespace QLendApi.Repositories
 
         public async Task UpdateAsync(IncomeInformation incomeInformation)
         {
+           
             _context.IncomeInformations.Update(incomeInformation);
             await _context.SaveChangesAsync();
         }
