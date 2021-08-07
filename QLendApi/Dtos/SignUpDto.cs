@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace QLendApi.Dtos
 {
-    public record SignupUserDto
+    public record SignUpDto
     {
         [Required]
         [StringLength(10, MinimumLength = 10)]

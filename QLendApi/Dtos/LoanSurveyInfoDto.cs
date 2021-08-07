@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace QLendApi.Dtos
 {
-    public record LoanSurveyInfoUpdateDto
+    public record LoanSurveyInfoDto
     {
         [Required]
         public int Marriage { get; init;}
