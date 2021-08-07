@@ -28,6 +28,10 @@ namespace QLendApi.Controllers
         private readonly IIncomeInformationRepository incomeInformationRepository;
         private readonly ILoanRecordRepository loanRecordRepository;
 
+       static int sn = 0;  
+
+    
+
         private readonly AppSettings _appSettings;
         private readonly double _expireMins;
 
@@ -471,7 +475,7 @@ namespace QLendApi.Controllers
 
         }
 
-/*
+
         //POST /api/user/incomeInfo
         [Route("incomeInfo")]
         [HttpPost]
@@ -486,56 +490,75 @@ namespace QLendApi.Controllers
                 if(foreignWorker.IncomeNumber != null)
                 {
                     var incomeInfo = await incomeInformationRepository.GetByIncomeNumberAsync(foreignWorker.IncomeNumber);
-                                       
+                                                               
                     incomeInfo.AvgMonthlyIncome = incomeInfoDto.AvgMonthlyIncome;
                     incomeInfo.LatePay = incomeInfoDto.LatePay;
                     incomeInfo.PayWay = incomeInfoDto.PayWay;
                     incomeInfo.RemittanceWay = incomeInfoDto.RemittanceWay;
 
-                    if(incomeInfoDto.FrontSalaryPassbook != null)
+                    if(incomeInfoDto.FrontSalaryPassbook != null && incomeInfoDto.InsideSalarybook != null)
                     {
-                        incomeInfo.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();              
+                        incomeInfo.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
+                        incomeInfo.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes(); 
                     }
-                    if(incomeInfoDto.InsideSalarybook != null)
+                    if(incomeInfoDto.FrontSalaryPassbook == null && incomeInfoDto.InsideSalarybook != null)
                     {
+                        incomeInfo.FrontSalaryPassbook = null;
                         incomeInfo.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes();
                     }
-                    else
+                    if(incomeInfoDto.FrontSalaryPassbook != null && incomeInfoDto.InsideSalarybook == null)
+                    {
+                        incomeInfo.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
+                        incomeInfo.InsideSalarybook = null;
+                    }
+                    if(incomeInfoDto.FrontSalaryPassbook == null && incomeInfoDto.InsideSalarybook == null)
                     {
                         incomeInfo.FrontSalaryPassbook = null;
                         incomeInfo.InsideSalarybook = null;
                     }
 
-                    await incomeInformationRepository.UpdateAsync(incomeInfo);
-                }
-            
-                 //if incomeNumber doesn't exist                   
-                IncomeInformation incomeInformation = new()
-                {
-                    AvgMonthlyIncome = incomeInfoDto.AvgMonthlyIncome,
-                    LatePay = incomeInfoDto.LatePay,
-                    PayWay = incomeInfoDto.PayWay,
-                    RemittanceWay = incomeInfoDto.RemittanceWay                     
-                };
-
-                if(incomeInfoDto.FrontSalaryPassbook != null)
-                {
-                    incomeInformation.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();              
-                }
-                if(incomeInfoDto.InsideSalarybook != null)
-                {
-                    incomeInformation.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes();
+                    await incomeInformationRepository.UpdateAsync(incomeInfo);                                                                                           
                 }
                 else
                 {
-                    incomeInformation.FrontSalaryPassbook = null;
-                    incomeInformation.InsideSalarybook = null;
-                }
-                            
-                await incomeInformationRepository.CreateAsync(incomeInformation);               
-                foreignWorker.IncomeNumber = incomeInformation.IncomeNumber;
-                await foreignWorkerRepository.UpdateAsync(foreignWorker);                                                                           
-                             
+                    //if incomeNumber doesn't exist                   
+                    IncomeInformation incomeInformation = new()
+                    {
+                        AvgMonthlyIncome = incomeInfoDto.AvgMonthlyIncome,
+                        LatePay = incomeInfoDto.LatePay,
+                        PayWay = incomeInfoDto.PayWay,
+                        RemittanceWay = incomeInfoDto.RemittanceWay                     
+                    };
+
+                    if(incomeInfoDto.FrontSalaryPassbook != null && incomeInfoDto.InsideSalarybook != null)
+                    {
+                        incomeInformation.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
+                        incomeInformation.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes(); 
+                    }
+                    if(incomeInfoDto.FrontSalaryPassbook == null && incomeInfoDto.InsideSalarybook != null)
+                    {
+                        incomeInformation.FrontSalaryPassbook = null;
+                        incomeInformation.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes();
+                    }
+                    if(incomeInfoDto.FrontSalaryPassbook != null && incomeInfoDto.InsideSalarybook == null)
+                    {
+                        incomeInformation.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
+                        incomeInformation.InsideSalarybook = null;
+                    }
+                    if(incomeInfoDto.FrontSalaryPassbook == null && incomeInfoDto.InsideSalarybook == null)
+                    {
+                        incomeInformation.FrontSalaryPassbook = null;
+                        incomeInformation.InsideSalarybook = null;
+                    }
+                    
+                    incomeInformation.IncomeNumber = GenerateIncomeNumber();
+                    
+                    await incomeInformationRepository.CreateAsync(incomeInformation); 
+
+                    foreignWorker.IncomeNumber = incomeInformation.IncomeNumber;
+                    await foreignWorkerRepository.UpdateAsync(foreignWorker);  
+                }                                                               
+                                                                                                            
                 return StatusCode(201);                      
                
             }
@@ -547,9 +570,9 @@ namespace QLendApi.Controllers
                     Message = $"incomeInfo api error:{ex}"
                 });
             }
-            
+          
         }
-*/
+
         // POST /api/user/arcSelfie
         [Authorize]
         [Route("arcSelfie")]
@@ -705,5 +728,15 @@ namespace QLendApi.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
+        public static int GenerateIncomeNumber()
+        {     
+               
+            int number = int.Parse(DateTime.UtcNow.ToString("yyMMdd") + string.Format("{0:d4}", sn));                                               
+            sn ++; 
+            return number;
+        }
+
+        
     }
 }
