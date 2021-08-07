@@ -127,7 +127,7 @@ namespace QLendApi.Controllers
                 }
 
                 // check send time and compare OTP number
-                if (!CheckOTPSendTimeIsVaild(foreignWorker.OTPSendTIme.Value))
+                if (!CheckOtpSendTimeIsVaild(foreignWorker.OTPSendTIme.Value))
                 {
                     return BadRequest(new BaseResponse
                     {
@@ -699,7 +699,7 @@ namespace QLendApi.Controllers
             }
         }
 
-        private bool CheckOTPSendTimeIsVaild(DateTime sendTime)
+        private bool CheckOtpSendTimeIsVaild(DateTime sendTime)
         {
             // sendTime need add _expireMins
             var expireTime = sendTime.AddMinutes(this._expireMins);
@@ -729,7 +729,7 @@ namespace QLendApi.Controllers
             return tokenHandler.WriteToken(token);
         }
 
-        public static int GenerateIncomeNumber()
+        private int GenerateIncomeNumber()
         {     
                
             int number = int.Parse(DateTime.UtcNow.ToString("yyMMdd") + string.Format("{0:d4}", sn));                                               
