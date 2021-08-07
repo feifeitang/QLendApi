@@ -5,7 +5,7 @@ namespace QLendApi.Repositories
 {
     public interface IIncomeInformationRepository
     {
-        Task <IncomeInformation> GetByIncomeNumberAsync(int incomeNumber);
+        Task <IncomeInformation> GetByIncomeNumberAsync(int? incomeNumber);
 
         Task CreateAsync(IncomeInformation incomeInformation);
 
