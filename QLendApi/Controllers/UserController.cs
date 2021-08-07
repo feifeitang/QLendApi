@@ -54,10 +54,10 @@ namespace QLendApi.Controllers
             this._expireMins = 1.5;
         }
 
-        // POST /api/user/signup
-        [Route("signup")]
+        // POST /api/user/signUp
+        [Route("signUp")]
         [HttpPost]
-        public async Task<ActionResult> SignupUser(SignupUserDto signupUser)
+        public async Task<ActionResult> SignUp(SignUpDto signupUser)
         {
 
             // check UINo if exist
@@ -103,10 +103,10 @@ namespace QLendApi.Controllers
         }
 
 
-        // POST /api/user/checkOTP
-        [Route("checkOTP")]
+        // POST /api/user/checkOtp
+        [Route("checkOtp")]
         [HttpPost]
-        public async Task<ActionResult> CheckOTP(CheckOtpDto checkOtpDto)
+        public async Task<ActionResult> CheckOtp(CheckOtpDto checkOtpDto)
         {
             try
             {
@@ -157,10 +157,10 @@ namespace QLendApi.Controllers
             }
         }
 
-        // POST /api/user/sendOTP
-        [Route("sendOTP")]
+        // POST /api/user/sendOtp
+        [Route("sendOtp")]
         [HttpPost]
-        public async Task<ActionResult> SendOTP(SendOtpDto sendOtpDto)
+        public async Task<ActionResult> SendOtp(SendOtpDto sendOtpDto)
         {
             try
             {
@@ -196,10 +196,10 @@ namespace QLendApi.Controllers
             }
         }
 
-        // POST /api/user/arc
-        [Route("arc")]
+        // POST /api/user/initArc
+        [Route("initArc")]
         [HttpPost]
-        public async Task<ActionResult> Arc([FromForm] ArcDto arcDto)
+        public async Task<ActionResult> InitArc([FromForm] ArcDto arcDto)
         {
             try
             {
@@ -440,21 +440,21 @@ namespace QLendApi.Controllers
 
         }
 
-        //POST /api/user/loanSurveyInfoUpdate
+        //POST /api/user/loanSurveyInfo
         [Authorize]
-        [Route("loanSurveyInfoUpdate")]
+        [Route("loanSurveyInfo")]
         [HttpPost]
-        public async Task<ActionResult> LoanSurveyInfoUpdate(LoanSurveyInfoUpdateDto loanSurveyInfoUpdateDto)
+        public async Task<ActionResult> LoanSurveyInfo(LoanSurveyInfoDto loanSurveyInfoDto)
         {
             try
             {
                 // get user info
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
-                foreignWorker.Marriage = loanSurveyInfoUpdateDto.Marriage;
-                foreignWorker.ImmediateFamilyNumber = loanSurveyInfoUpdateDto.ImmediateFamilyNumber;
-                foreignWorker.EducationBackground = loanSurveyInfoUpdateDto.EducationBackground;
-                foreignWorker.TimeInTaiwan = loanSurveyInfoUpdateDto.TimeInTaiwan;
+                foreignWorker.Marriage = loanSurveyInfoDto.Marriage;
+                foreignWorker.ImmediateFamilyNumber = loanSurveyInfoDto.ImmediateFamilyNumber;
+                foreignWorker.EducationBackground = loanSurveyInfoDto.EducationBackground;
+                foreignWorker.TimeInTaiwan = loanSurveyInfoDto.TimeInTaiwan;
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
@@ -550,11 +550,11 @@ namespace QLendApi.Controllers
             
         }
 */
-        // POST /api/user/arcSelfie
+        // POST /api/user/loanSurveyArc
         [Authorize]
-        [Route("arcSelfie")]
+        [Route("loanSurveyArc")]
         [HttpPost]
-        public async Task<ActionResult> ArcSelfie([FromForm] ArcWithSelfieDto arcWithSelfieDto)
+        public async Task<ActionResult> loanSurveyArc([FromForm] LoanSurveyArcDto loanSurveyArcDto)
         {
             try
             {
@@ -575,9 +575,9 @@ namespace QLendApi.Controllers
 */
                 var cert = await certificateRepository.GetByUINoAsync(foreignWorker.Uino); 
 
-                cert.FrontArc2 = await arcWithSelfieDto.FrontArc2.GetBytes();
-                cert.BackArc2 = await arcWithSelfieDto.BackArc2.GetBytes();
-                cert.SelfileArc = await arcWithSelfieDto.SelfieArc.GetBytes();    
+                cert.FrontArc2 = await loanSurveyArcDto.FrontArc2.GetBytes();
+                cert.BackArc2 = await loanSurveyArcDto.BackArc2.GetBytes();
+                cert.SelfileArc = await loanSurveyArcDto.SelfieArc.GetBytes();    
 
                 await certificateRepository.UpdateAsync(cert); 
 /*                
@@ -623,18 +623,18 @@ namespace QLendApi.Controllers
             }
         }
 
-        // POST /api/user/confirm
+        // POST /api/user/loanConfirmSignature
         [Authorize]
-        [Route("confirm")]
+        [Route("loanConfirmSignature")]
         [HttpPost]
-        public async Task<ActionResult> Confirm([FromForm] SignatureConfirmDto signatureConfirmDto)
+        public async Task<ActionResult> LoanConfirmSignature([FromForm] LoanConfirmSignatureDto loanConfirmSignatureDto)
         {
             try
             {
                 // get user info
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
-                foreignWorker.Signature2 = await signatureConfirmDto.Signature2.GetBytes();
+                foreignWorker.Signature2 = await loanConfirmSignatureDto.Signature2.GetBytes();
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
 

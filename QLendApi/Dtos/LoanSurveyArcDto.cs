@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace QLendApi.Dtos
 {
-    public record ArcWithSelfieDto
+    public record LoanSurveyArcDto
     {
         [Required]
         public IFormFile FrontArc2 {get; init;}
