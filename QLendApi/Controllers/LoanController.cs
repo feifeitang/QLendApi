@@ -174,7 +174,7 @@ namespace QLendApi.Controllers
             });
         }
 
-        public static string GenerateLoanNumber(string nationality)
+        private string GenerateLoanNumber(string nationality)
         {          
             string number = nationality.Substring(0,1) + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + string.Format("{0:d5}", sn);                                               
             sn ++; 
