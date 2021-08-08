@@ -26,7 +26,6 @@ namespace QLendApi.Services
 
             _installationPlatform = new Dictionary<string, NotificationPlatform>
             {
-                { nameof(NotificationPlatform.Apns).ToLower(), NotificationPlatform.Apns },
                 { nameof(NotificationPlatform.Fcm).ToLower(), NotificationPlatform.Fcm }
             };
         }
@@ -92,17 +91,8 @@ namespace QLendApi.Services
                 PushTemplates.Silent.Android :
                 PushTemplates.Generic.Android;
 
-            var iOSPushTemplate = notificationRequest.Silent ?
-                PushTemplates.Silent.iOS :
-                PushTemplates.Generic.iOS;
-
             var androidPayload = PrepareNotificationPayload(
                 androidPushTemplate,
-                notificationRequest.Text,
-                notificationRequest.Action);
-
-            var iOSPayload = PrepareNotificationPayload(
-                iOSPushTemplate,
                 notificationRequest.Text,
                 notificationRequest.Action);
 
@@ -111,21 +101,22 @@ namespace QLendApi.Services
                 if (notificationRequest.Tags.Length == 0)
                 {
                     // This will broadcast to all users registered in the notification hub
-                    await SendPlatformNotificationsAsync(androidPayload, iOSPayload, token);
+                    await SendPlatformNotificationsAsync(androidPayload, token);
                 }
                 else if (notificationRequest.Tags.Length <= 20)
                 {
-                    await SendPlatformNotificationsAsync(androidPayload, iOSPayload, notificationRequest.Tags, token);
+                    await SendPlatformNotificationsAsync(androidPayload, notificationRequest.Tags, token);
                 }
                 else
                 {
                     var notificationTasks = notificationRequest.Tags
                         .Select((value, index) => (value, index))
                         .GroupBy(g => g.index / 20, i => i.value)
-                        .Select(tags => SendPlatformNotificationsAsync(androidPayload, iOSPayload, tags, token));
+                        .Select(tags => SendPlatformNotificationsAsync(androidPayload, tags, token));
 
                     await Task.WhenAll(notificationTasks);
                 }
+                Console.WriteLine("send success");
 
                 return true;
             }
@@ -140,23 +131,22 @@ namespace QLendApi.Services
             .Replace("$(alertMessage)", text, StringComparison.InvariantCulture)
             .Replace("$(alertAction)", action, StringComparison.InvariantCulture);
 
-        Task SendPlatformNotificationsAsync(string androidPayload, string iOSPayload, CancellationToken token)
+        Task SendPlatformNotificationsAsync(string androidPayload, CancellationToken token)
         {
             var sendTasks = new Task[]
             {
                 _hub.SendFcmNativeNotificationAsync(androidPayload, token),
-                _hub.SendAppleNativeNotificationAsync(iOSPayload, token)
+
             };
 
             return Task.WhenAll(sendTasks);
         }
 
-        Task SendPlatformNotificationsAsync(string androidPayload, string iOSPayload, IEnumerable<string> tags, CancellationToken token)
+        Task SendPlatformNotificationsAsync(string androidPayload, IEnumerable<string> tags, CancellationToken token)
         {
             var sendTasks = new Task[]
             {
                 _hub.SendFcmNativeNotificationAsync(androidPayload, tags, token),
-                _hub.SendAppleNativeNotificationAsync(iOSPayload, tags, token)
             };
 
             return Task.WhenAll(sendTasks);
