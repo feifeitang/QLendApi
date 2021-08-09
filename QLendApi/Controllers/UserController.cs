@@ -61,7 +61,7 @@ namespace QLendApi.Controllers
         // POST /api/user/signUp
         [Route("signUp")]
         [HttpPost]
-        public async Task<ActionResult> SignUp(SignUpDto signupUser)
+        public async Task<ActionResult> SignUp(SignUpDto signUp)
         {
 
             // check UINo if exist
@@ -93,9 +93,9 @@ namespace QLendApi.Controllers
 
             ForeignWorker foreignWorker = new()
             {
-                PhoneNumber = signupUser.PhoneNumber,
+                PhoneNumber = signUp.PhoneNumber,
                 Password = hashPwd,
-                Uino = signupUser.UINo,
+                Uino = signUp.UINo,
                 Status = 1,
                 RegisterTime = DateTime.UtcNow
             };
