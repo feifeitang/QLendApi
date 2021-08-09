@@ -47,6 +47,8 @@ namespace QLendApi.Models
         public int? KindOfWork { get; set; }
         public int? Workplace { get; set; }
         public string Uino { get; set; }
+        [Column(TypeName = "varchar(32)")]
+        public string DeviceTag { get; set; }
         public int? IncomeNumber { get; set; }
         public int? EmployerNumber { get; set; }
         public byte[] Signature2 { get; set; }
