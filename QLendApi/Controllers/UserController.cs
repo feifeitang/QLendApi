@@ -448,7 +448,9 @@ namespace QLendApi.Controllers
                     });
                 }
 
-                foreignWorker.Password = passwordDto.Password;
+                var hashPwd = Crypt.Hash(passwordDto.Password);
+
+                foreignWorker.Password = hashPwd;
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
