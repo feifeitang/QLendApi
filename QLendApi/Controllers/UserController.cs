@@ -28,12 +28,10 @@ namespace QLendApi.Controllers
         private readonly IIncomeInformationRepository incomeInformationRepository;
         private readonly ILoanRecordRepository loanRecordRepository;
 
-       static int sn = 0;  
-
-    
-
         private readonly AppSettings _appSettings;
         private readonly double _expireMins;
+
+        private int sn = 0;
 
         public UserController(
             IForeignWorkerRepository foreignWorkerRepository,
@@ -63,49 +61,97 @@ namespace QLendApi.Controllers
         [HttpPost]
         public async Task<ActionResult> SignUp(SignUpDto signUp)
         {
+            try
+            {
+                // check UINo if exist
+                if (certificateRepository.CheckUINoExist(signUp.UINo))
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10001,
+                        Message = "Exist UINo"
+                    });
+                }
 
-            // check UINo if exist
-            if (certificateRepository.CheckUINoExist(signUp.UINo))
+                // check PhoneNumber if exist
+                if (foreignWorkerRepository.CheckPhoneNumberExist(signUp.PhoneNumber))
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10002,
+                        Message = "Exist Phone Number"
+                    });
+                }
+
+                Certificate certificate = new()
+                {
+                    Uino = signUp.UINo
+                };
+
+                var hashPwd = Crypt.Hash(signUp.Password);
+
+                ForeignWorker foreignWorker = new()
+                {
+                    PhoneNumber = signUp.PhoneNumber,
+                    Password = hashPwd,
+                    Uino = signUp.UINo,
+                    Status = 1,
+                    RegisterTime = DateTime.UtcNow
+                };
+
+                await certificateRepository.CreateAsync(certificate);
+                await foreignWorkerRepository.CreateAsync(foreignWorker);
+
+                return StatusCode(201);
+            }
+            catch (System.Exception ex)
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 10001,
-                    Message = "Exist UINo"
+                    StatusCode = 90001,
+                    Message = $"signUp api error:{ex}"
                 });
             }
-
-            // check PhoneNumber if exist
-            if (foreignWorkerRepository.CheckPhoneNumberExist(signUp.PhoneNumber))
-            {
-                return BadRequest(new BaseResponse
-                {
-                    StatusCode = 10002,
-                    Message = "Exist Phone Number"
-                });
-            }
-
-            Certificate certificate = new()
-            {
-                Uino = signUp.UINo
-            };
-
-            var hashPwd = Crypt.Hash(signUp.Password);
-
-            ForeignWorker foreignWorker = new()
-            {
-                PhoneNumber = signUp.PhoneNumber,
-                Password = hashPwd,
-                Uino = signUp.UINo,
-                Status = 1,
-                RegisterTime = DateTime.UtcNow
-            };
-
-            await certificateRepository.CreateAsync(certificate);
-            await foreignWorkerRepository.CreateAsync(foreignWorker);
-
-            return StatusCode(201);
         }
 
+        // POST /api/user/sendOtp
+        [Route("sendOtp")]
+        [HttpPost]
+        public async Task<ActionResult> SendOtp(SendOtpDto sendOtpDto)
+        {
+            try
+            {
+                // check user exist, and get user data
+                var foreignWorker = await foreignWorkerRepository.GetByIdAsync(sendOtpDto.Id);
+
+                if (foreignWorker == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10003,
+                        Message = "user not found"
+                    });
+                }
+
+                Random rnd = new Random();
+                int OTP = rnd.Next(100000, 999999);
+
+                foreignWorker.OTP = OTP;
+                foreignWorker.OTPSendTIme = DateTime.UtcNow;
+
+                await foreignWorkerRepository.UpdateAsync(foreignWorker);
+
+                return StatusCode(201);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90002,
+                    Message = $"sendOtp api error:{ex}"
+                });
+            }
+        }
 
         // POST /api/user/checkOtp
         [Route("checkOtp")]
@@ -155,47 +201,8 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90002,
-                    Message = $"checkOTP api error:{ex}"
-                });
-            }
-        }
-
-        // POST /api/user/sendOtp
-        [Route("sendOtp")]
-        [HttpPost]
-        public async Task<ActionResult> SendOtp(SendOtpDto sendOtpDto)
-        {
-            try
-            {
-                // check user exist, and get user data
-                var foreignWorker = await foreignWorkerRepository.GetByIdAsync(sendOtpDto.Id);
-
-                if (foreignWorker == null)
-                {
-                    return BadRequest(new BaseResponse
-                    {
-                        StatusCode = 10003,
-                        Message = "user not found"
-                    });
-                }
-
-                Random rnd = new Random();
-                int OTP = rnd.Next(100000, 999999);
-
-                foreignWorker.OTP = OTP;
-                foreignWorker.OTPSendTIme = DateTime.UtcNow;
-
-                await foreignWorkerRepository.UpdateAsync(foreignWorker);
-
-                return StatusCode(201);
-            }
-            catch (System.Exception ex)
-            {
-                return BadRequest(new BaseResponse
-                {
                     StatusCode = 90003,
-                    Message = $"sendOTP api error:{ex}"
+                    Message = $"checkOtp api error:{ex}"
                 });
             }
         }
@@ -223,7 +230,7 @@ namespace QLendApi.Controllers
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10007,
+                        StatusCode = 10006,
                         Message = "status not correct"
                     });
                 }
@@ -234,7 +241,7 @@ namespace QLendApi.Controllers
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10006,
+                        StatusCode = 10007,
                         Message = "certificate not found"
                     });
                 }
@@ -254,7 +261,7 @@ namespace QLendApi.Controllers
                 return BadRequest(new BaseResponse
                 {
                     StatusCode = 90004,
-                    Message = $"arc api error:{ex}"
+                    Message = $"initArc api error:{ex}"
                 });
             }
         }
@@ -283,7 +290,7 @@ namespace QLendApi.Controllers
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10007,
+                        StatusCode = 10006,
                         Message = "status not correct"
                     });
                 }
@@ -311,7 +318,6 @@ namespace QLendApi.Controllers
             }
         }
 
-
         // POST /api/user/arcInfo
         [Route("arcInfo")]
         [HttpPost]
@@ -336,7 +342,7 @@ namespace QLendApi.Controllers
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10007,
+                        StatusCode = 10006,
                         Message = "status not correct"
                     });
                 }
@@ -348,7 +354,7 @@ namespace QLendApi.Controllers
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10006,
+                        StatusCode = 10007,
                         Message = "certificate not found"
                     });
                 }
@@ -370,8 +376,8 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90005,
-                    Message = $"personalInfo api error:{ex}"
+                    StatusCode = 90006,
+                    Message = $"arcInfo api error:{ex}"
                 });
             }
         }
@@ -394,7 +400,15 @@ namespace QLendApi.Controllers
                     });
                 }
 
-                // need to check user status
+                // check user status
+                if (foreignWorker.Status != 5)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10009,
+                        Message = $"{foreignWorker.Id}'s status is {foreignWorker.Status}"
+                    });
+                }
 
                 // authentication successful so generate jwt token
                 var token = generateJwtToken(foreignWorker);
@@ -410,8 +424,42 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90006,
+                    StatusCode = 90007,
                     Message = $"login api error:{ex}"
+                });
+            }
+        }
+
+        // POST /api/user/password
+        [Route("password")]
+        [HttpPost]
+        public async Task<ActionResult> Password(PasswordDto passwordDto)
+        {
+            try
+            {
+                var foreignWorker = await foreignWorkerRepository.GetByPhoneNumberAsync(passwordDto.PhoneNumber);
+
+                if (foreignWorker == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10003,
+                        Message = "user not found"
+                    });
+                }
+
+                foreignWorker.Password = passwordDto.Password;
+
+                await foreignWorkerRepository.UpdateAsync(foreignWorker);
+
+                return StatusCode(201);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90008,
+                    Message = $"password api error:{ex}"
                 });
             }
         }
@@ -437,8 +485,8 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90007,
-                    Message = $"get user info api error:{ex}"
+                    StatusCode = 90009,
+                    Message = $"info api error:{ex}"
                 });
             }
 
@@ -468,15 +516,15 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90008,
-                    Message = $"user info update api error:{ex}"
+                    StatusCode = 90010,
+                    Message = $"loanSurveyInfo api error:{ex}"
                 });
             }
 
         }
 
-
         //POST /api/user/incomeInfo
+        [Authorize]
         [Route("incomeInfo")]
         [HttpPost]
         public async Task<ActionResult> IncomeInfo([FromForm] IncomeInfoDto incomeInfoDto)
@@ -566,7 +614,7 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90010,
+                    StatusCode = 90020,
                     Message = $"incomeInfo api error:{ex}"
                 });
             }
@@ -577,7 +625,7 @@ namespace QLendApi.Controllers
         [Authorize]
         [Route("loanSurveyArc")]
         [HttpPost]
-        public async Task<ActionResult> loanSurveyArc([FromForm] LoanSurveyArcDto loanSurveyArcDto)
+        public async Task<ActionResult> LoanSurveyArc([FromForm] LoanSurveyArcDto loanSurveyArcDto)
         {
             try
             {
@@ -591,7 +639,7 @@ namespace QLendApi.Controllers
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10007,
+                        StatusCode = 10006,
                         Message = "status not correct"
                     });             
                 }
@@ -613,24 +661,24 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90040,
-                    Message = $"arcSelfie api error:{ex}"
+                    StatusCode = 90030,
+                    Message = $"loanSurveyArc api error:{ex}"
                 });
             }
         }
 
-        // POST /api/user/signature
+        // POST /api/user/loanApplySignature
         [Authorize]
-        [Route("signature")]
+        [Route("loanApplySignature")]
         [HttpPost]
-        public async Task<ActionResult> Signature([FromForm] SignatureDto signatureDto)
+        public async Task<ActionResult> LoanApplySignature([FromForm] LoanApplySignatureDto loanApplySignatureDto)
         {
             try
             {
                 // get user info
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
-                foreignWorker.Signature = await signatureDto.Signature.GetBytes();
+                foreignWorker.Signature = await loanApplySignatureDto.Signature.GetBytes();
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
@@ -640,8 +688,8 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90050,
-                    Message = $"signature api error:{ex}"
+                    StatusCode = 90040,
+                    Message = $"loanApplySignature api error:{ex}"
                 });
             }
         }
@@ -668,12 +716,13 @@ namespace QLendApi.Controllers
                 return BadRequest(new BaseResponse
                 {
                     StatusCode = 90050,
-                    Message = $"signature api error:{ex}"
+                    Message = $"loanConfirmSignature api error:{ex}"
                 });
             }
         }
 
         // POST /api/user/bankAccount
+        [Authorize]
         [Route("bankAccount")]
         [HttpPost]
         public async Task<ActionResult> BankAccount(BankAccountDto bankAccountDto)
@@ -736,7 +785,5 @@ namespace QLendApi.Controllers
             sn ++; 
             return number;
         }
-
-        
     }
 }

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace QLendApi.Dtos
 {
-    public record SignatureDto
+    public record LoanApplySignatureDto
     {
         [Required]
         public IFormFile Signature { get; init; }

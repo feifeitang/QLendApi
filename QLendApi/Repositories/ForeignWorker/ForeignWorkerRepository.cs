@@ -39,6 +39,11 @@ namespace QLendApi.Repositories
             return await _context.ForeignWorkers.FirstOrDefaultAsync(f => f.Uino == uino);
         }
 
+        public async Task<ForeignWorker> GetByPhoneNumberAsync(string phoneNumber)
+        {
+            return await _context.ForeignWorkers.FirstOrDefaultAsync(f => f.PhoneNumber == phoneNumber);
+        }
+
         public async Task UpdateAsync(ForeignWorker foreignWorker)
         {
             _context.ForeignWorkers.Update(foreignWorker);
