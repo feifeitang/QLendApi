@@ -65,7 +65,7 @@ namespace QLendApi.Controllers
         {
 
             // check UINo if exist
-            if (certificateRepository.CheckUINoExist(signupUser.UINo))
+            if (certificateRepository.CheckUINoExist(signUp.UINo))
             {
                 return BadRequest(new BaseResponse
                 {
@@ -75,7 +75,7 @@ namespace QLendApi.Controllers
             }
 
             // check PhoneNumber if exist
-            if (foreignWorkerRepository.CheckPhoneNumberExist(signupUser.PhoneNumber))
+            if (foreignWorkerRepository.CheckPhoneNumberExist(signUp.PhoneNumber))
             {
                 return BadRequest(new BaseResponse
                 {
@@ -86,10 +86,10 @@ namespace QLendApi.Controllers
 
             Certificate certificate = new()
             {
-                Uino = signupUser.UINo
+                Uino = signUp.UINo
             };
 
-            var hashPwd = Crypt.Hash(signupUser.Password);
+            var hashPwd = Crypt.Hash(signUp.Password);
 
             ForeignWorker foreignWorker = new()
             {
