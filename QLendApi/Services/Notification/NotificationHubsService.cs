@@ -93,6 +93,7 @@ namespace QLendApi.Services
 
             var androidPayload = PrepareNotificationPayload(
                 androidPushTemplate,
+                notificationRequest.Title,
                 notificationRequest.Text,
                 notificationRequest.Action);
 
@@ -127,7 +128,8 @@ namespace QLendApi.Services
             }
         }
 
-        string PrepareNotificationPayload(string template, string text, string action) => template
+        string PrepareNotificationPayload(string template, string title, string text, string action) => template
+            .Replace("$(alertTitle)", title, StringComparison.InvariantCulture)
             .Replace("$(alertMessage)", text, StringComparison.InvariantCulture)
             .Replace("$(alertAction)", action, StringComparison.InvariantCulture);
 

@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QLendApi.Dtos;
+using QLendApi.Models;
+using QLendApi.Repositories;
 using QLendApi.Services;
 using QLendApi.Settings;
 
@@ -14,13 +16,20 @@ namespace QLendApi.Controllers
     [Route("api/[controller]")]
     public class NotificationsController : ControllerBase
     {
-        readonly INotificationService _notificationService;
+        private readonly INotificationService _notificationService;
+        private readonly IForeignWorkerRepository foreignWorkerRepository;
 
-        public NotificationsController(INotificationService notificationService)
+        public NotificationsController(
+            INotificationService notificationService,
+            IForeignWorkerRepository foreignWorkerRepository
+        )
         {
             _notificationService = notificationService;
+
+            this.foreignWorkerRepository = foreignWorkerRepository;
         }
 
+        [Authorize]
         [HttpPut]
         [Route("installations")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -29,6 +38,16 @@ namespace QLendApi.Controllers
         public async Task<IActionResult> UpdateInstallation(
             [Required] DeviceInstallation deviceInstallation)
         {
+            var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+            if (foreignWorker.DeviceTag == null)
+            {
+                // add national info into tag ?
+                foreignWorker.DeviceTag = "user_" + foreignWorker.Id;
+
+                await foreignWorkerRepository.UpdateAsync(foreignWorker);
+            }
+
             var success = await _notificationService
                 .CreateOrUpdateInstallationAsync(deviceInstallation, HttpContext.RequestAborted);
 
@@ -44,7 +63,7 @@ namespace QLendApi.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
         public async Task<ActionResult> DeleteInstallation(
-            [Required][FromRoute] string installationId)
+           [Required][FromRoute] string installationId)
         {
             var success = await _notificationService
                 .DeleteInstallationByIdAsync(installationId, CancellationToken.None);
