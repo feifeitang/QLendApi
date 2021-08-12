@@ -29,7 +29,6 @@ namespace QLendApi.Controllers
             this.foreignWorkerRepository = foreignWorkerRepository;
         }
 
-        [Authorize]
         [HttpPut]
         [Route("installations")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -38,7 +37,7 @@ namespace QLendApi.Controllers
         public async Task<IActionResult> UpdateInstallation(
             [Required] DeviceInstallation deviceInstallation)
         {
-            var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+            var foreignWorker = await foreignWorkerRepository.GetByIdAsync(deviceInstallation.UserId);
 
             if (foreignWorker.DeviceTag == null)
             {
@@ -47,6 +46,8 @@ namespace QLendApi.Controllers
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
             }
+            
+            deviceInstallation.Tags.Add(foreignWorker.DeviceTag);
 
             var success = await _notificationService
                 .CreateOrUpdateInstallationAsync(deviceInstallation, HttpContext.RequestAborted);
@@ -57,22 +58,22 @@ namespace QLendApi.Controllers
             return new OkResult();
         }
 
-        [HttpDelete()]
-        [Route("installations/{installationId}")]
-        [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
-        public async Task<ActionResult> DeleteInstallation(
-           [Required][FromRoute] string installationId)
-        {
-            var success = await _notificationService
-                .DeleteInstallationByIdAsync(installationId, CancellationToken.None);
+        // [HttpDelete()]
+        // [Route("installations/{installationId}")]
+        // [ProducesResponseType((int)HttpStatusCode.OK)]
+        // [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        // [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
+        // public async Task<ActionResult> DeleteInstallation(
+        //    [Required][FromRoute] string installationId)
+        // {
+        //     var success = await _notificationService
+        //         .DeleteInstallationByIdAsync(installationId, CancellationToken.None);
 
-            if (!success)
-                return new UnprocessableEntityResult();
+        //     if (!success)
+        //         return new UnprocessableEntityResult();
 
-            return new OkResult();
-        }
+        //     return new OkResult();
+        // }
 
         [HttpPost]
         [Route("requests")]

@@ -14,7 +14,7 @@ namespace QLendApi.Dtos
 
         [Required]
         public string PushChannel { get; set; }
-
+        public int UserId { get; set; }
         public IList<string> Tags { get; set; } = Array.Empty<string>();
     }
 }
