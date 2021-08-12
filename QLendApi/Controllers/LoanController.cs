@@ -45,26 +45,43 @@ namespace QLendApi.Controllers
                 // get user info
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
-                LoanRecord loanRecord = new()
+                var  loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id, 0);
+
+                if(loanRecord  != null)
                 {
-                    Amount = loanApply.Amount,
-                    Period = loanApply.Period,
-                    Purpose = loanApply.Purpose,
-                    Id = foreignWorker.Id
-                    //State = 0,
-                };                                  
-                
-                if(foreignWorker.Nationality == null)
-                {
-                    return BadRequest(new BaseResponse
-                    {
-                        StatusCode = 10509,
-                        Message = "nationaality is null"
-                    });
+                    loanRecord.Amount = loanApply.Amount;
+                    loanRecord.Period = loanApply.Period;
+                    loanRecord.Purpose = loanApply.Purpose;
+                    loanRecord.Id = foreignWorker.Id;
+                    loanRecord.State = 0;
+
+                    await loanRecordRepository.UpdateAsync(loanRecord);
                 }
+                else              
+                {
+                    LoanRecord loanRecordInfo = new()
+                    {
+                        Amount = loanApply.Amount,
+                        Period = loanApply.Period,
+                        Purpose = loanApply.Purpose,
+                        Id = foreignWorker.Id,
+                        State = 0                 
+                    };
+
+                    if(foreignWorker.Nationality == null)
+                    {
+                        return BadRequest(new BaseResponse
+                        {
+                            StatusCode = 10509,
+                            Message = "nationaality is null"
+                        });
+                    }
                 
-                loanRecord.LoanNumber = GenerateLoanNumber(foreignWorker.Nationality);
-                await loanRecordRepository.CreateAsync(loanRecord);                        
+                    loanRecordInfo.LoanNumber = GenerateLoanNumber(foreignWorker.Nationality);
+                    await loanRecordRepository.CreateAsync(loanRecordInfo);     
+                }           
+                                                                          
+                                   
 
                 return StatusCode(201);
             }
@@ -85,49 +102,92 @@ namespace QLendApi.Controllers
         {
             return StatusCode(201);
         }
-/*
+
         //GET /api/loan/loanData
         [Route("loanData")]
         [HttpGet]
-        public async Task<ActionResult<GetLoanDataResponseDto>> loanData(int id)
+        public async Task<ActionResult<GetLoanDataResponseDto>> LoanData()
         {
-            //get user info
-            var foreignWorker = this.HttpContext.Items["forwignWorker"] as ForeignWorker;
-
-            var loanRecord = await this.loanRecordRepository.GetByIdAsync(foreignWorker.Id );
-            
-
-            return Ok(new GetLoanDataResponseDto
+           try
             {
-                StatusCode = 10000,
-                Message = "success",
-                UserName = foreignWorker.UserName,
-                Amount = loanRecord.Amount,
-                Period = loanRecord.Period
-            });
-        }
-/*
-            var loanRecord = await this.loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id, state);
-             if(loanRecord.State != 0)
-             {
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+              ///  var loanRecord = await loanRecordRepository.GetByIdAsync(foreignWorker.Id);
+                                
+                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id,3);              
+
+                if(loanRecord == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10350,
+                        Message = "haven't loanRecord."
+                    });
+                }
+                else
+                {
+                     return Ok(new GetLoanDataResponseDto
+                    {
+                        StatusCode = 10000,
+                        Message = "success",
+                        UserName = foreignWorker.UserName,
+                        Amount = loanRecord.Amount,
+                        Period = loanRecord.Period
+                    });
+                }
+               
+            }
+            catch (System.Exception ex)
+            {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 10007,
-                    Message = "status not correct"
-                }); 
-             }
-      
-            return Ok(new GetLoanDataResponseDto
-            {
-                StatusCode = 10030,
-                Message = "Success",
-                UserName = foreignWorker.UserName,
-                Amount = loanRecord.Amount,
-                Period = loanRecord.Period
-            });            
+                    StatusCode = 90009,
+                    Message = $"loanData api error:{ex}"
+                });
+            }
         }
 
-*/
+        //GET api/loan/applySuccess
+        [Route("applySuccess")]
+        [HttpGet]
+        public  async Task<ActionResult<GetLoanApplySuccessDto>> LoanApplySuccess()
+        {
+            try
+            {
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id,4);
+
+                if(loanRecord == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10350,
+                        Message = "haven't loanRecord."
+                    });
+                }
+                else
+                {
+                    loanRecord.State = 5;
+                    await loanRecordRepository.UpdateAsync(loanRecord);
+
+                    return Ok(new GetLoanApplySuccessDto
+                    {
+                        StatusCode = 10000,
+                        Message = "success",
+                        Amount = loanRecord.Amount,
+                        Period = loanRecord.Period
+                    });   
+                }                
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90036,
+                    Message = $"applySuccess api error:{ex}"
+                });
+            }
+        }
 
         // GET /api/loan/list
         [Route("list")]
