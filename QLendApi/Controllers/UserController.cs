@@ -503,13 +503,27 @@ namespace QLendApi.Controllers
             try
             {
                 // get user info
-                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;              
 
                 foreignWorker.Marriage = loanSurveyInfoDto.Marriage;
                 foreignWorker.ImmediateFamilyNumber = loanSurveyInfoDto.ImmediateFamilyNumber;
                 foreignWorker.EducationBackground = loanSurveyInfoDto.EducationBackground;
-                foreignWorker.TimeInTaiwan = loanSurveyInfoDto.TimeInTaiwan;
+                foreignWorker.TimeInTaiwan = loanSurveyInfoDto.TimeInTaiwan;                
 
+                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id,0);
+                if(loanRecord == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10360,
+                        Message = "status error."
+                    });
+                }
+                else
+                {
+                    loanRecord.State = 1;
+                    await loanRecordRepository.UpdateAsync(loanRecord);
+                }
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
                 return StatusCode(201);
@@ -567,7 +581,8 @@ namespace QLendApi.Controllers
                         incomeInfo.InsideSalarybook = null;
                     }
 
-                    await incomeInformationRepository.UpdateAsync(incomeInfo);                                                                                           
+                    await incomeInformationRepository.UpdateAsync(incomeInfo);  
+                                                                                                  
                 }
                 else
                 {
@@ -606,9 +621,25 @@ namespace QLendApi.Controllers
                     await incomeInformationRepository.CreateAsync(incomeInformation); 
 
                     foreignWorker.IncomeNumber = incomeInformation.IncomeNumber;
-                    await foreignWorkerRepository.UpdateAsync(foreignWorker);  
-                }                                                               
-                                                                                                            
+                    await foreignWorkerRepository.UpdateAsync(foreignWorker); 
+                      
+                }   
+
+                    var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id,1);
+                    if(loanRecord == null)
+                    {
+                        return BadRequest(new BaseResponse
+                        {
+                            StatusCode = 10350,
+                            Message = "status error."
+                        });
+                    }
+                    else
+                    {  
+                        loanRecord.State = 2;  
+                    }
+                    await loanRecordRepository.UpdateAsync(loanRecord);       
+                                                                                                         
                 return StatusCode(201);                      
                
             }
@@ -632,31 +663,31 @@ namespace QLendApi.Controllers
             try
             {
                 // get user info
-                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
- /*               
-                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id);                
-
-                 // check user status
-                if (loanRecord.State != 0)
-                {
-                    return BadRequest(new BaseResponse
-                    {
-                        StatusCode = 10006,
-                        Message = "status not correct"
-                    });             
-                }
-*/
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;             
+        
                 var cert = await certificateRepository.GetByUINoAsync(foreignWorker.Uino); 
 
                 cert.FrontArc2 = await loanSurveyArcDto.FrontArc2.GetBytes();
                 cert.BackArc2 = await loanSurveyArcDto.BackArc2.GetBytes();
-                cert.SelfileArc = await loanSurveyArcDto.SelfieArc.GetBytes();    
+                cert.SelfileArc = await loanSurveyArcDto.SelfieArc.GetBytes();       
+               
+                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id,2); 
 
-                await certificateRepository.UpdateAsync(cert); 
-/*                
-                loanRecord.State = 1;
+                if(loanRecord == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10350,
+                        Message = "status error"
+                    });
+                }
+                else
+                {  
+                    loanRecord.State = 3;
+                }
+
+                await certificateRepository.UpdateAsync(cert);   
                 await loanRecordRepository.UpdateAsync(loanRecord);
-*/
                 return StatusCode(201);
             }
             catch (System.Exception ex)
@@ -682,7 +713,23 @@ namespace QLendApi.Controllers
 
                 foreignWorker.Signature = await loanApplySignatureDto.Signature.GetBytes();
 
+                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id,3);
+
+                if(loanRecord == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10350,
+                        Message = "stature error"
+                    });
+                }
+                else
+                {
+                    loanRecord.State = 4;
+                }
+
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
+                await loanRecordRepository.UpdateAsync(loanRecord);
 
                 return StatusCode(201);
             }
@@ -782,8 +829,8 @@ namespace QLendApi.Controllers
 
         private int GenerateIncomeNumber()
         {     
-               
-            int number = int.Parse(DateTime.UtcNow.ToString("yyMMdd") + string.Format("{0:d4}", sn));                                               
+           // Random rnd = new Random();           
+            int number = int.Parse(DateTime.UtcNow.ToString("yyddHHss")+string.Format("{0:d2}", sn));                                               
             sn ++; 
             return number;
         }

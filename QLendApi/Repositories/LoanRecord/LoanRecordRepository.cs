@@ -24,17 +24,17 @@ namespace QLendApi.Repositories
         {
             return await _context.LoanRecords.Where(el => el.Id == id && el.Status == status).ToArrayAsync();
         }
-/*
+
         public async Task<LoanRecord> GetByIdAndStateAsync(int id, int state)
-        {
-            return await _context.LoanRecords.SingleOrDefaultAsync(e => e.Id == id && e.State == 0);
+        {            
+            return await _context.LoanRecords.SingleOrDefaultAsync(e => e.Id == id && (e.State >= state && e.State <=4));
         }
-       
-        public async Task<LoanRecord> GetByIdAsync(int id, int State)
+ /*
+        public async Task<LoanRecord[]> GetByIdAsync(int id)
         {           
-            return await _context.LoanRecords.SingleOrDefaultAsync(e => e.Id == id && e.State == State);
+             return await _context.LoanRecords.Where(el => el.Id == id).ToArrayAsync();
         }
- */       
+   */   
         public async Task<LoanRecord> GetByLoanNumber(string loanNumber)
         {
             return await _context.LoanRecords.FindAsync(loanNumber);
