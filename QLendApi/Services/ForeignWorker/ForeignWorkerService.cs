@@ -14,6 +14,15 @@ namespace QLendApi.Services
             this.foreignWorkerRepository = foreignWorkerRepository;
         }
 
+        public bool CheckSignupIsFinish(int status)
+        {
+            if (status != 5)
+            {
+                return false;
+            }
+            return true;
+        }
+
         public async Task<ForeignWorker> GetInfoByAuthOrNull(string uino, string password)
         {
             var foreignWorker = await foreignWorkerRepository.GetByUINoAsync(uino);

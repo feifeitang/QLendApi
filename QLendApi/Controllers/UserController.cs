@@ -400,13 +400,19 @@ namespace QLendApi.Controllers
                     });
                 }
 
-                // check user status
-                if (foreignWorker.Status != 5)
+                var checkResult = this.foreignWorkerService.CheckSignupIsFinish(foreignWorker.Status);
+
+                if (!checkResult)
                 {
-                    return BadRequest(new BaseResponse
+                    return Ok(new NotFinishSignupResponse
                     {
                         StatusCode = 10009,
-                        Message = $"{foreignWorker.Id}'s status is {foreignWorker.Status}"
+                        Message = "sign up process not finish",
+                        Data = (new NotFinishSignupResponse.DataStruct
+                        {
+                            NextStatus = foreignWorker.Status + 1,
+                            ForeignWorkerId = foreignWorker.Id,
+                        })
                     });
                 }
 
@@ -503,15 +509,15 @@ namespace QLendApi.Controllers
             try
             {
                 // get user info
-                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;              
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
                 foreignWorker.Marriage = loanSurveyInfoDto.Marriage;
                 foreignWorker.ImmediateFamilyNumber = loanSurveyInfoDto.ImmediateFamilyNumber;
                 foreignWorker.EducationBackground = loanSurveyInfoDto.EducationBackground;
-                foreignWorker.TimeInTaiwan = loanSurveyInfoDto.TimeInTaiwan;                
+                foreignWorker.TimeInTaiwan = loanSurveyInfoDto.TimeInTaiwan;
 
-                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id,0);
-                if(loanRecord == null)
+                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id, 0);
+                if (loanRecord == null)
                 {
                     return BadRequest(new BaseResponse
                     {
@@ -544,45 +550,45 @@ namespace QLendApi.Controllers
         [Route("incomeInfo")]
         [HttpPost]
         public async Task<ActionResult> IncomeInfo([FromForm] IncomeInfoDto incomeInfoDto)
-        {           
+        {
             try
             {
                 // get user info
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
                 //check incomeNumber if exist
-                if(foreignWorker.IncomeNumber != null)
+                if (foreignWorker.IncomeNumber != null)
                 {
                     var incomeInfo = await incomeInformationRepository.GetByIncomeNumberAsync(foreignWorker.IncomeNumber);
-                                                               
+
                     incomeInfo.AvgMonthlyIncome = incomeInfoDto.AvgMonthlyIncome;
                     incomeInfo.LatePay = incomeInfoDto.LatePay;
                     incomeInfo.PayWay = incomeInfoDto.PayWay;
                     incomeInfo.RemittanceWay = incomeInfoDto.RemittanceWay;
 
-                    if(incomeInfoDto.FrontSalaryPassbook != null && incomeInfoDto.InsideSalarybook != null)
+                    if (incomeInfoDto.FrontSalaryPassbook != null && incomeInfoDto.InsideSalarybook != null)
                     {
                         incomeInfo.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
-                        incomeInfo.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes(); 
+                        incomeInfo.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes();
                     }
-                    if(incomeInfoDto.FrontSalaryPassbook == null && incomeInfoDto.InsideSalarybook != null)
+                    if (incomeInfoDto.FrontSalaryPassbook == null && incomeInfoDto.InsideSalarybook != null)
                     {
                         incomeInfo.FrontSalaryPassbook = null;
                         incomeInfo.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes();
                     }
-                    if(incomeInfoDto.FrontSalaryPassbook != null && incomeInfoDto.InsideSalarybook == null)
+                    if (incomeInfoDto.FrontSalaryPassbook != null && incomeInfoDto.InsideSalarybook == null)
                     {
                         incomeInfo.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
                         incomeInfo.InsideSalarybook = null;
                     }
-                    if(incomeInfoDto.FrontSalaryPassbook == null && incomeInfoDto.InsideSalarybook == null)
+                    if (incomeInfoDto.FrontSalaryPassbook == null && incomeInfoDto.InsideSalarybook == null)
                     {
                         incomeInfo.FrontSalaryPassbook = null;
                         incomeInfo.InsideSalarybook = null;
                     }
 
-                    await incomeInformationRepository.UpdateAsync(incomeInfo);  
-                                                                                                  
+                    await incomeInformationRepository.UpdateAsync(incomeInfo);
+
                 }
                 else
                 {
@@ -592,56 +598,56 @@ namespace QLendApi.Controllers
                         AvgMonthlyIncome = incomeInfoDto.AvgMonthlyIncome,
                         LatePay = incomeInfoDto.LatePay,
                         PayWay = incomeInfoDto.PayWay,
-                        RemittanceWay = incomeInfoDto.RemittanceWay                     
+                        RemittanceWay = incomeInfoDto.RemittanceWay
                     };
 
-                    if(incomeInfoDto.FrontSalaryPassbook != null && incomeInfoDto.InsideSalarybook != null)
+                    if (incomeInfoDto.FrontSalaryPassbook != null && incomeInfoDto.InsideSalarybook != null)
                     {
                         incomeInformation.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
-                        incomeInformation.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes(); 
+                        incomeInformation.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes();
                     }
-                    if(incomeInfoDto.FrontSalaryPassbook == null && incomeInfoDto.InsideSalarybook != null)
+                    if (incomeInfoDto.FrontSalaryPassbook == null && incomeInfoDto.InsideSalarybook != null)
                     {
                         incomeInformation.FrontSalaryPassbook = null;
                         incomeInformation.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes();
                     }
-                    if(incomeInfoDto.FrontSalaryPassbook != null && incomeInfoDto.InsideSalarybook == null)
+                    if (incomeInfoDto.FrontSalaryPassbook != null && incomeInfoDto.InsideSalarybook == null)
                     {
                         incomeInformation.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
                         incomeInformation.InsideSalarybook = null;
                     }
-                    if(incomeInfoDto.FrontSalaryPassbook == null && incomeInfoDto.InsideSalarybook == null)
+                    if (incomeInfoDto.FrontSalaryPassbook == null && incomeInfoDto.InsideSalarybook == null)
                     {
                         incomeInformation.FrontSalaryPassbook = null;
                         incomeInformation.InsideSalarybook = null;
                     }
-                    
+
                     incomeInformation.IncomeNumber = GenerateIncomeNumber();
-                    
-                    await incomeInformationRepository.CreateAsync(incomeInformation); 
+
+                    await incomeInformationRepository.CreateAsync(incomeInformation);
 
                     foreignWorker.IncomeNumber = incomeInformation.IncomeNumber;
-                    await foreignWorkerRepository.UpdateAsync(foreignWorker); 
-                      
-                }   
+                    await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
-                    var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id,1);
-                    if(loanRecord == null)
+                }
+
+                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id, 1);
+                if (loanRecord == null)
+                {
+                    return BadRequest(new BaseResponse
                     {
-                        return BadRequest(new BaseResponse
-                        {
-                            StatusCode = 10350,
-                            Message = "status error."
-                        });
-                    }
-                    else
-                    {  
-                        loanRecord.State = 2;  
-                    }
-                    await loanRecordRepository.UpdateAsync(loanRecord);       
-                                                                                                         
-                return StatusCode(201);                      
-               
+                        StatusCode = 10350,
+                        Message = "status error."
+                    });
+                }
+                else
+                {
+                    loanRecord.State = 2;
+                }
+                await loanRecordRepository.UpdateAsync(loanRecord);
+
+                return StatusCode(201);
+
             }
             catch (System.Exception ex)
             {
@@ -651,7 +657,7 @@ namespace QLendApi.Controllers
                     Message = $"incomeInfo api error:{ex}"
                 });
             }
-          
+
         }
 
         // POST /api/user/loanSurveyArc
@@ -663,17 +669,17 @@ namespace QLendApi.Controllers
             try
             {
                 // get user info
-                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;             
-        
-                var cert = await certificateRepository.GetByUINoAsync(foreignWorker.Uino); 
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+                var cert = await certificateRepository.GetByUINoAsync(foreignWorker.Uino);
 
                 cert.FrontArc2 = await loanSurveyArcDto.FrontArc2.GetBytes();
                 cert.BackArc2 = await loanSurveyArcDto.BackArc2.GetBytes();
-                cert.SelfileArc = await loanSurveyArcDto.SelfieArc.GetBytes();       
-               
-                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id,2); 
+                cert.SelfileArc = await loanSurveyArcDto.SelfieArc.GetBytes();
 
-                if(loanRecord == null)
+                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id, 2);
+
+                if (loanRecord == null)
                 {
                     return BadRequest(new BaseResponse
                     {
@@ -682,11 +688,11 @@ namespace QLendApi.Controllers
                     });
                 }
                 else
-                {  
+                {
                     loanRecord.State = 3;
                 }
 
-                await certificateRepository.UpdateAsync(cert);   
+                await certificateRepository.UpdateAsync(cert);
                 await loanRecordRepository.UpdateAsync(loanRecord);
                 return StatusCode(201);
             }
@@ -713,9 +719,9 @@ namespace QLendApi.Controllers
 
                 foreignWorker.Signature = await loanApplySignatureDto.Signature.GetBytes();
 
-                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id,3);
+                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id, 3);
 
-                if(loanRecord == null)
+                if (loanRecord == null)
                 {
                     return BadRequest(new BaseResponse
                     {
@@ -828,10 +834,10 @@ namespace QLendApi.Controllers
         }
 
         private int GenerateIncomeNumber()
-        {     
-           // Random rnd = new Random();           
-            int number = int.Parse(DateTime.UtcNow.ToString("yyddHHss")+string.Format("{0:d2}", sn));                                               
-            sn ++; 
+        {
+            // Random rnd = new Random();           
+            int number = int.Parse(DateTime.UtcNow.ToString("yyddHHss") + string.Format("{0:d2}", sn));
+            sn++;
             return number;
         }
     }
