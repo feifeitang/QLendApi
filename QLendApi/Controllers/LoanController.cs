@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using QLendApi.Dtos;
 using QLendApi.lib;
 using QLendApi.Models;
-using QLendApi.Extensions;
 using QLendApi.Repositories;
 using System;
 using QLendApi.Services;
@@ -43,7 +42,7 @@ namespace QLendApi.Controllers
         //GET /api/loan/editRecord
         [Route("editRecord")]
         [HttpGet]
-        public async Task<ActionResult<GetLoanEditRecordResponseDto>> EditRecord()
+        public async Task<ActionResult<GetLoanEditRecordResponse>> EditRecord()
         {
             try
             {
@@ -51,11 +50,13 @@ namespace QLendApi.Controllers
 
                 var loanRecord = await loanRecordService.GetEditRecordByForeignWorkerId(foreignWorker.Id);
 
-                return Ok(new GetLoanEditRecordResponseDto
+                return Ok(new GetLoanEditRecordResponse
                 {
                     StatusCode = 10000,
                     Message = "success",
-                    LoanRecord = loanRecord
+                    Data = (new GetLoanEditRecordResponse.DataStruct{
+                        LoanRecord = loanRecord
+                    }) 
                 });
             }
             catch (System.Exception ex)
@@ -100,7 +101,14 @@ namespace QLendApi.Controllers
 
                 await loanRecordRepository.CreateAsync(loanRecord);
 
-                return StatusCode(201);
+                return Ok(new LoanApplyResponse
+                {
+                    StatusCode = 10000,
+                    Message = "success",
+                    Data = (new LoanApplyResponse.DataStruct{
+                        LoanNumber = loanRecord.LoanNumber
+                    }) 
+                });
             }
             catch (System.Exception ex)
             {
