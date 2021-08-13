@@ -45,9 +45,9 @@ namespace QLendApi.Controllers
                 // get user info
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
-                var  loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id, 0);
+                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id, 0);
 
-                if(loanRecord  != null)
+                if(loanRecord != null)
                 {
                     loanRecord.Amount = loanApply.Amount;
                     loanRecord.Period = loanApply.Period;
@@ -59,8 +59,18 @@ namespace QLendApi.Controllers
                 }
                 else              
                 {
+                    if(foreignWorker.Nationality == null)
+                    {
+                        return BadRequest(new BaseResponse
+                        {
+                            StatusCode = 10010,
+                            Message = "nationaality is null"
+                        });
+                    }
+
                     LoanRecord loanRecordInfo = new()
                     {
+                        LoanNumber = GenerateLoanNumber(foreignWorker.Nationality),
                         Amount = loanApply.Amount,
                         Period = loanApply.Period,
                         Purpose = loanApply.Purpose,
@@ -68,20 +78,8 @@ namespace QLendApi.Controllers
                         State = 0                 
                     };
 
-                    if(foreignWorker.Nationality == null)
-                    {
-                        return BadRequest(new BaseResponse
-                        {
-                            StatusCode = 10509,
-                            Message = "nationaality is null"
-                        });
-                    }
-                
-                    loanRecordInfo.LoanNumber = GenerateLoanNumber(foreignWorker.Nationality);
                     await loanRecordRepository.CreateAsync(loanRecordInfo);     
-                }           
-                                                                          
-                                   
+                }
 
                 return StatusCode(201);
             }
@@ -89,7 +87,7 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90009,
+                    StatusCode = 90070,
                     Message = $"loan apply api error:{ex}"
                 });
             }           
@@ -103,16 +101,16 @@ namespace QLendApi.Controllers
             return StatusCode(201);
         }
 
-        //GET /api/loan/loanData
-        [Route("loanData")]
+        //GET /api/loan/data
+        [Route("data")]
         [HttpGet]
-        public async Task<ActionResult<GetLoanDataResponseDto>> LoanData()
+        public async Task<ActionResult<GetLoanDataResponseDto>> Data()
         {
            try
             {
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
-              ///  var loanRecord = await loanRecordRepository.GetByIdAsync(foreignWorker.Id);
+                //  var loanRecord = await loanRecordRepository.GetByIdAsync(foreignWorker.Id);
                                 
                 var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id,3);              
 
@@ -120,8 +118,8 @@ namespace QLendApi.Controllers
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10350,
-                        Message = "haven't loanRecord."
+                        StatusCode = 10020,
+                        Message = "haven't loanRecord"
                     });
                 }
                 else
@@ -141,7 +139,7 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90009,
+                    StatusCode = 90080,
                     Message = $"loanData api error:{ex}"
                 });
             }
@@ -155,13 +153,14 @@ namespace QLendApi.Controllers
             try
             {
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
                 var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id,4);
 
                 if(loanRecord == null)
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10350,
+                        StatusCode = 10020,
                         Message = "haven't loanRecord."
                     });
                 }
@@ -183,7 +182,7 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90036,
+                    StatusCode = 90090,
                     Message = $"applySuccess api error:{ex}"
                 });
             }
@@ -219,7 +218,7 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 10009,
+                    StatusCode = 10030,
                     Message = "id not equal"
                 });
             }
