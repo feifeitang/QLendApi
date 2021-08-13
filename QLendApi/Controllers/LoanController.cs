@@ -57,7 +57,7 @@ namespace QLendApi.Controllers
 
                     await loanRecordRepository.UpdateAsync(loanRecord);
                 }
-                else
+                else              
                 {
                     LoanRecord loanRecordInfo = new()
                     {
