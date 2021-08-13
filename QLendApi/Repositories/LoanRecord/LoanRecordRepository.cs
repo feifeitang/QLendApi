@@ -20,7 +20,12 @@ namespace QLendApi.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<LoanRecord[]> GetByIdAndStatusAsync(int id, int status)
+        public async Task<LoanRecord[]> GetByForeignWorkerIdAsync(int id)
+        {
+            return await _context.LoanRecords.Where(el => el.Id == id).ToArrayAsync();
+        }
+
+        public async Task<LoanRecord[]> GetByForeignWorkerIdAndStatusAsync(int id, int status)
         {
             return await _context.LoanRecords.Where(el => el.Id == id && el.Status == status).ToArrayAsync();
         }
@@ -29,12 +34,7 @@ namespace QLendApi.Repositories
         {            
             return await _context.LoanRecords.SingleOrDefaultAsync(e => e.Id == id && (e.State >= state && e.State <=4));
         }
- /*
-        public async Task<LoanRecord[]> GetByIdAsync(int id)
-        {           
-             return await _context.LoanRecords.Where(el => el.Id == id).ToArrayAsync();
-        }
-   */   
+
         public async Task<LoanRecord> GetByLoanNumber(string loanNumber)
         {
             return await _context.LoanRecords.FindAsync(loanNumber);

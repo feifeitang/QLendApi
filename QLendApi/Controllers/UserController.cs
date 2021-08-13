@@ -510,21 +510,13 @@ namespace QLendApi.Controllers
                 foreignWorker.EducationBackground = loanSurveyInfoDto.EducationBackground;
                 foreignWorker.TimeInTaiwan = loanSurveyInfoDto.TimeInTaiwan;                
 
-                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id,0);
-                if(loanRecord == null)
-                {
-                    return BadRequest(new BaseResponse
-                    {
-                        StatusCode = 10360,
-                        Message = "status error."
-                    });
-                }
-                else
-                {
-                    loanRecord.State = 1;
-                    await loanRecordRepository.UpdateAsync(loanRecord);
-                }
+                var loanRecord = await loanRecordRepository.GetByLoanNumber(loanSurveyInfoDto.LoanNumber);
+                
+                loanRecord.State = 2;
+                loanRecord.CreateTime = DateTime.UtcNow;
+
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
+                await loanRecordRepository.UpdateAsync(loanRecord);
 
                 return StatusCode(201);
             }
@@ -550,7 +542,7 @@ namespace QLendApi.Controllers
                 // get user info
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
-                //check incomeNumber if exist
+                // if incomeNumber exist
                 if(foreignWorker.IncomeNumber != null)
                 {
                     var incomeInfo = await incomeInformationRepository.GetByIncomeNumberAsync(foreignWorker.IncomeNumber);
@@ -560,85 +552,69 @@ namespace QLendApi.Controllers
                     incomeInfo.PayWay = incomeInfoDto.PayWay;
                     incomeInfo.RemittanceWay = incomeInfoDto.RemittanceWay;
 
-                    if(incomeInfoDto.FrontSalaryPassbook != null && incomeInfoDto.InsideSalarybook != null)
+                    if (incomeInfoDto.FrontSalaryPassbook != null)
                     {
                         incomeInfo.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
-                        incomeInfo.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes(); 
                     }
-                    if(incomeInfoDto.FrontSalaryPassbook == null && incomeInfoDto.InsideSalarybook != null)
+                    else
                     {
                         incomeInfo.FrontSalaryPassbook = null;
+                    }
+
+                    if (incomeInfoDto.InsideSalarybook != null)
+                    {
                         incomeInfo.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes();
                     }
-                    if(incomeInfoDto.FrontSalaryPassbook != null && incomeInfoDto.InsideSalarybook == null)
+                    else
                     {
-                        incomeInfo.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
-                        incomeInfo.InsideSalarybook = null;
-                    }
-                    if(incomeInfoDto.FrontSalaryPassbook == null && incomeInfoDto.InsideSalarybook == null)
-                    {
-                        incomeInfo.FrontSalaryPassbook = null;
                         incomeInfo.InsideSalarybook = null;
                     }
 
-                    await incomeInformationRepository.UpdateAsync(incomeInfo);  
-                                                                                                  
+                    await incomeInformationRepository.UpdateAsync(incomeInfo);                                                           
                 }
+                // if incomeNumber not exist
                 else
-                {
-                    //if incomeNumber doesn't exist                   
-                    IncomeInformation incomeInformation = new()
+                {               
+                    IncomeInformation incomeInfo = new()
                     {
+                        IncomeNumber = GenerateIncomeNumber(),
                         AvgMonthlyIncome = incomeInfoDto.AvgMonthlyIncome,
                         LatePay = incomeInfoDto.LatePay,
                         PayWay = incomeInfoDto.PayWay,
                         RemittanceWay = incomeInfoDto.RemittanceWay                     
                     };
 
-                    if(incomeInfoDto.FrontSalaryPassbook != null && incomeInfoDto.InsideSalarybook != null)
+                    if (incomeInfoDto.FrontSalaryPassbook != null)
                     {
-                        incomeInformation.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
-                        incomeInformation.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes(); 
-                    }
-                    if(incomeInfoDto.FrontSalaryPassbook == null && incomeInfoDto.InsideSalarybook != null)
-                    {
-                        incomeInformation.FrontSalaryPassbook = null;
-                        incomeInformation.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes();
-                    }
-                    if(incomeInfoDto.FrontSalaryPassbook != null && incomeInfoDto.InsideSalarybook == null)
-                    {
-                        incomeInformation.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
-                        incomeInformation.InsideSalarybook = null;
-                    }
-                    if(incomeInfoDto.FrontSalaryPassbook == null && incomeInfoDto.InsideSalarybook == null)
-                    {
-                        incomeInformation.FrontSalaryPassbook = null;
-                        incomeInformation.InsideSalarybook = null;
-                    }
-                    
-                    incomeInformation.IncomeNumber = GenerateIncomeNumber();
-                    
-                    await incomeInformationRepository.CreateAsync(incomeInformation); 
-
-                    foreignWorker.IncomeNumber = incomeInformation.IncomeNumber;
-                    await foreignWorkerRepository.UpdateAsync(foreignWorker); 
-                      
-                }   
-
-                    var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id,1);
-                    if(loanRecord == null)
-                    {
-                        return BadRequest(new BaseResponse
-                        {
-                            StatusCode = 10350,
-                            Message = "status error."
-                        });
+                        incomeInfo.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
                     }
                     else
-                    {  
-                        loanRecord.State = 2;  
+                    {
+                        incomeInfo.FrontSalaryPassbook = null;
                     }
-                    await loanRecordRepository.UpdateAsync(loanRecord);       
+
+                    if (incomeInfoDto.InsideSalarybook != null)
+                    {
+                        incomeInfo.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes();
+                    }
+                    else
+                    {
+                        incomeInfo.InsideSalarybook = null;
+                    }
+                    
+                    foreignWorker.IncomeNumber = incomeInfo.IncomeNumber;
+
+                    await incomeInformationRepository.CreateAsync(incomeInfo); 
+                    await foreignWorkerRepository.UpdateAsync(foreignWorker); 
+                      
+                }
+
+                var loanRecord = await loanRecordRepository.GetByLoanNumber(incomeInfoDto.LoanNumber);
+
+                loanRecord.State = 3;
+                loanRecord.CreateTime = DateTime.UtcNow;
+
+                await loanRecordRepository.UpdateAsync(loanRecord);
                                                                                                          
                 return StatusCode(201);                      
                
@@ -671,23 +647,14 @@ namespace QLendApi.Controllers
                 cert.BackArc2 = await loanSurveyArcDto.BackArc2.GetBytes();
                 cert.SelfileArc = await loanSurveyArcDto.SelfieArc.GetBytes();       
                
-                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id,2); 
+                var loanRecord = await loanRecordRepository.GetByLoanNumber(loanSurveyArcDto.LoanNumber);
 
-                if(loanRecord == null)
-                {
-                    return BadRequest(new BaseResponse
-                    {
-                        StatusCode = 10350,
-                        Message = "status error"
-                    });
-                }
-                else
-                {  
-                    loanRecord.State = 3;
-                }
+                loanRecord.State = 4;
+                loanRecord.CreateTime = DateTime.UtcNow;
 
                 await certificateRepository.UpdateAsync(cert);   
                 await loanRecordRepository.UpdateAsync(loanRecord);
+
                 return StatusCode(201);
             }
             catch (System.Exception ex)
@@ -713,20 +680,10 @@ namespace QLendApi.Controllers
 
                 foreignWorker.Signature = await loanApplySignatureDto.Signature.GetBytes();
 
-                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id,3);
+                var loanRecord = await loanRecordRepository.GetByLoanNumber(loanApplySignatureDto.LoanNumber);
 
-                if(loanRecord == null)
-                {
-                    return BadRequest(new BaseResponse
-                    {
-                        StatusCode = 10350,
-                        Message = "stature error"
-                    });
-                }
-                else
-                {
-                    loanRecord.State = 4;
-                }
+                loanRecord.State = 5;
+                loanRecord.CreateTime = DateTime.UtcNow;                
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
                 await loanRecordRepository.UpdateAsync(loanRecord);

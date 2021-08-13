@@ -5,6 +5,8 @@ namespace QLendApi.Dtos
 {
     public record IncomeInfoDto
     {
+        [Required]
+        public string LoanNumber { get; init; }
         
         [Required]
         public int AvgMonthlyIncome { get; init; }
