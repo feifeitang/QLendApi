@@ -61,6 +61,7 @@ namespace QLendApi
             services.AddScoped<ILoanRecordRepository, LoanRecordRepository>();
             services.AddScoped<IIncomeInformationRepository, IncomeInformationRepository>();
             services.AddScoped<IRepaymentRecordRepository, RepaymentRecordRepository>();
+            services.AddScoped<INoticeRepository, NoticeRepository>();
 
             services.AddControllersWithViews();
 

@@ -366,6 +366,7 @@ namespace QLendApi.Controllers
                 foreignWorker.Workplace = arcInfoDto.Workplace;
 
                 foreignWorker.Status = 5;
+                foreignWorker.State = 0;
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
                 await certificateRepository.UpdateAsync(certificate);
@@ -400,22 +401,36 @@ namespace QLendApi.Controllers
                     });
                 }
 
-                // check user status
-                if (foreignWorker.Status != 5)
+                var foreignWorkerState = (int)(foreignWorker.State == null ? -1 : foreignWorker.State);
+
+                var checkIsApprove = this.foreignWorkerService.CheckSignupIsApprove(foreignWorkerState);
+
+                if (!checkIsApprove)
                 {
-                    return BadRequest(new BaseResponse
+                    var checkIsFinishResult = this.foreignWorkerService.CheckSignupIsFinish(foreignWorker.Status);
+
+                    if (!checkIsFinishResult)
                     {
-                        StatusCode = 10009,
-                        Message = $"{foreignWorker.Id}'s status is {foreignWorker.Status}"
-                    });
+                        return Ok(new NotFinishSignupResponse
+                        {
+                            StatusCode = 10009,
+                            Message = "sign up process not finish",
+                            Data = (new NotFinishSignupResponse.DataStruct
+                            {
+                                NextStatus = foreignWorker.Status + 1,
+                                ForeignWorkerId = foreignWorker.Id,
+                            })
+                        });
+                    }
                 }
+
 
                 // authentication successful so generate jwt token
                 var token = generateJwtToken(foreignWorker);
 
                 return Ok(new LoginResponse
                 {
-                    StatusCode = 10000,
+                    StatusCode = ResponseStatusCode.Success,
                     Message = "login success",
                     Token = token
                 });
@@ -478,7 +493,7 @@ namespace QLendApi.Controllers
 
                 return Ok(new GetForeignWorkerInfoResponse
                 {
-                    StatusCode = 10000,
+                    StatusCode = ResponseStatusCode.Success,
                     Message = "success",
                     Info = foreignWorker
                 });
@@ -503,12 +518,12 @@ namespace QLendApi.Controllers
             try
             {
                 // get user info
-                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;              
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
                 foreignWorker.Marriage = loanSurveyInfoDto.Marriage;
                 foreignWorker.ImmediateFamilyNumber = loanSurveyInfoDto.ImmediateFamilyNumber;
                 foreignWorker.EducationBackground = loanSurveyInfoDto.EducationBackground;
-                foreignWorker.TimeInTaiwan = loanSurveyInfoDto.TimeInTaiwan;                
+                foreignWorker.TimeInTaiwan = loanSurveyInfoDto.TimeInTaiwan;
 
                 var loanRecord = await loanRecordRepository.GetByLoanNumber(loanSurveyInfoDto.LoanNumber);
                 
@@ -536,7 +551,7 @@ namespace QLendApi.Controllers
         [Route("incomeInfo")]
         [HttpPost]
         public async Task<ActionResult> IncomeInfo([FromForm] IncomeInfoDto incomeInfoDto)
-        {           
+        {
             try
             {
                 // get user info
@@ -546,7 +561,7 @@ namespace QLendApi.Controllers
                 if(foreignWorker.IncomeNumber != null)
                 {
                     var incomeInfo = await incomeInformationRepository.GetByIncomeNumberAsync(foreignWorker.IncomeNumber);
-                                                               
+
                     incomeInfo.AvgMonthlyIncome = incomeInfoDto.AvgMonthlyIncome;
                     incomeInfo.LatePay = incomeInfoDto.LatePay;
                     incomeInfo.PayWay = incomeInfoDto.PayWay;
@@ -581,7 +596,7 @@ namespace QLendApi.Controllers
                         AvgMonthlyIncome = incomeInfoDto.AvgMonthlyIncome,
                         LatePay = incomeInfoDto.LatePay,
                         PayWay = incomeInfoDto.PayWay,
-                        RemittanceWay = incomeInfoDto.RemittanceWay                     
+                        RemittanceWay = incomeInfoDto.RemittanceWay
                     };
 
                     if (incomeInfoDto.FrontSalaryPassbook != null)
@@ -627,7 +642,7 @@ namespace QLendApi.Controllers
                     Message = $"incomeInfo api error:{ex}"
                 });
             }
-          
+
         }
 
         // POST /api/user/loanSurveyArc
@@ -639,9 +654,9 @@ namespace QLendApi.Controllers
             try
             {
                 // get user info
-                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;             
-        
-                var cert = await certificateRepository.GetByUINoAsync(foreignWorker.Uino); 
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+                var cert = await certificateRepository.GetByUINoAsync(foreignWorker.Uino);
 
                 cert.FrontArc2 = await loanSurveyArcDto.FrontArc2.GetBytes();
                 cert.BackArc2 = await loanSurveyArcDto.BackArc2.GetBytes();
@@ -652,7 +667,7 @@ namespace QLendApi.Controllers
                 loanRecord.State = 4;
                 loanRecord.CreateTime = DateTime.UtcNow;
 
-                await certificateRepository.UpdateAsync(cert);   
+                await certificateRepository.UpdateAsync(cert);
                 await loanRecordRepository.UpdateAsync(loanRecord);
 
                 return StatusCode(201);
@@ -785,10 +800,10 @@ namespace QLendApi.Controllers
         }
 
         private int GenerateIncomeNumber()
-        {     
-           // Random rnd = new Random();           
-            int number = int.Parse(DateTime.UtcNow.ToString("yyddHHss")+string.Format("{0:d2}", sn));                                               
-            sn ++; 
+        {
+            // Random rnd = new Random();           
+            int number = int.Parse(DateTime.UtcNow.ToString("yyddHHss") + string.Format("{0:d2}", sn));
+            sn++;
             return number;
         }
     }

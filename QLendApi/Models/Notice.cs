@@ -17,6 +17,6 @@ namespace QLendApi.Models
         public string? Link { get; set; }
         public DateTime? CreateTime { get; set; }
         public int ForeignWorkerId { get; set; }
-        public virtual ForeignWorker ForeignWorkerIdNavigation { get; set; }
+        // public virtual ForeignWorker ForeignWorkerIdNavigation { get; set; }
     }
 }
