@@ -366,6 +366,7 @@ namespace QLendApi.Controllers
                 foreignWorker.Workplace = arcInfoDto.Workplace;
 
                 foreignWorker.Status = 5;
+                foreignWorker.State = 0;
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
                 await certificateRepository.UpdateAsync(certificate);
@@ -400,28 +401,36 @@ namespace QLendApi.Controllers
                     });
                 }
 
-                var checkResult = this.foreignWorkerService.CheckSignupIsFinish(foreignWorker.Status);
+                var foreignWorkerState = (int)(foreignWorker.State == null ? -1 : foreignWorker.State);
 
-                if (!checkResult)
+                var checkIsApprove = this.foreignWorkerService.CheckSignupIsApprove(foreignWorkerState);
+
+                if (!checkIsApprove)
                 {
-                    return Ok(new NotFinishSignupResponse
+                    var checkIsFinishResult = this.foreignWorkerService.CheckSignupIsFinish(foreignWorker.Status);
+
+                    if (!checkIsFinishResult)
                     {
-                        StatusCode = 10009,
-                        Message = "sign up process not finish",
-                        Data = (new NotFinishSignupResponse.DataStruct
+                        return Ok(new NotFinishSignupResponse
                         {
-                            NextStatus = foreignWorker.Status + 1,
-                            ForeignWorkerId = foreignWorker.Id,
-                        })
-                    });
+                            StatusCode = 10009,
+                            Message = "sign up process not finish",
+                            Data = (new NotFinishSignupResponse.DataStruct
+                            {
+                                NextStatus = foreignWorker.Status + 1,
+                                ForeignWorkerId = foreignWorker.Id,
+                            })
+                        });
+                    }
                 }
+
 
                 // authentication successful so generate jwt token
                 var token = generateJwtToken(foreignWorker);
 
                 return Ok(new LoginResponse
                 {
-                    StatusCode = 10000,
+                    StatusCode = ResponseStatusCode.Success,
                     Message = "login success",
                     Token = token
                 });
@@ -484,7 +493,7 @@ namespace QLendApi.Controllers
 
                 return Ok(new GetForeignWorkerInfoResponse
                 {
-                    StatusCode = 10000,
+                    StatusCode = ResponseStatusCode.Success,
                     Message = "success",
                     Info = foreignWorker
                 });

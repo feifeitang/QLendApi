@@ -10,5 +10,6 @@ namespace QLendApi.Services
     {
         Task<ForeignWorker> GetInfoByAuthOrNull(string uino, string password);
         bool CheckSignupIsFinish(int status);
+        bool CheckSignupIsApprove(int state);
     }
 }

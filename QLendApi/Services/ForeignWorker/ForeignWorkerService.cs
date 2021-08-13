@@ -14,9 +14,19 @@ namespace QLendApi.Services
             this.foreignWorkerRepository = foreignWorkerRepository;
         }
 
+        public bool CheckSignupIsApprove(int state)
+        {
+
+            if (state == ForeignWorkState.Approve)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public bool CheckSignupIsFinish(int status)
         {
-            if (status != 5)
+            if (status != ForeignWorkStatus.Finish)
             {
                 return false;
             }
