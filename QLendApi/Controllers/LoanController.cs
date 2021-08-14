@@ -1,11 +1,11 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using QLendApi.Dtos;
-using QLendApi.lib;
 using QLendApi.Models;
 using QLendApi.Repositories;
 using System;
 using QLendApi.Services;
+using QLendApi.Responses;
 
 namespace QLendApi.Controllers
 {
@@ -42,7 +42,7 @@ namespace QLendApi.Controllers
         //GET /api/loan/editRecord
         [Route("editRecord")]
         [HttpGet]
-        public async Task<ActionResult<GetLoanEditRecordResponse>> EditRecord()
+        public async Task<ActionResult<EditRecordResponse>> EditRecord()
         {
             try
             {
@@ -50,13 +50,14 @@ namespace QLendApi.Controllers
 
                 var loanRecord = await loanRecordService.GetEditRecordByForeignWorkerId(foreignWorker.Id);
 
-                return Ok(new GetLoanEditRecordResponse
+                return Ok(new EditRecordResponse
                 {
                     StatusCode = 10000,
                     Message = "success",
-                    Data = (new GetLoanEditRecordResponse.DataStruct{
+                    Data = new EditRecordResponse.DataStruct
+                    {
                         LoanRecord = loanRecord
-                    }) 
+                    }
                 });
             }
             catch (System.Exception ex)
@@ -105,9 +106,10 @@ namespace QLendApi.Controllers
                 {
                     StatusCode = 10000,
                     Message = "success",
-                    Data = (new LoanApplyResponse.DataStruct{
+                    Data = new LoanApplyResponse.DataStruct
+                    {
                         LoanNumber = loanRecord.LoanNumber
-                    }) 
+                    }
                 });
             }
             catch (System.Exception ex)
@@ -118,60 +120,79 @@ namespace QLendApi.Controllers
                     Message = $"loan apply api error:{ex}"
                 });
             }
-        }     
-
-        // POST /api/loan/success
-        [Route("success")]
-        [HttpPost]
-        public ActionResult success()
-        {
-            return StatusCode(201);
         }
-
 
         // GET /api/loan/list
         [Route("list")]
         [HttpGet]
-        public async Task<ActionResult<GetLoanListResponseDto>> list(int status)
+        public async Task<ActionResult<LoanListResponse>> list(int status)
         {
-            var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
-
-            var loanRecord = await this.loanRecordRepository.GetByForeignWorkerIdAndStatusAsync(foreignWorker.Id, status);
-
-            return Ok(new GetLoanListResponseDto
+            try
             {
-                StatusCode = 10000,
-                Message = "success",
-                LoanRecords = loanRecord
-            });
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+                var loanRecord = await this.loanRecordRepository.GetByForeignWorkerIdAndStatusAsync(foreignWorker.Id, status);
+
+                return Ok(new LoanListResponse
+                {
+                    StatusCode = 10000,
+                    Message = "success",
+                    Data = new LoanListResponse.DataStruct
+                    {
+                        LoanRecords = loanRecord
+                    }
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90090,
+                    Message = $"loan list api error:{ex}"
+                });
+            }
         }
 
         // GET /api/loan/detail/{loanNumber}
         [Route("detail/{loanNumber}")]
         [HttpGet]
-        public async Task<ActionResult<GetLoanDetailResponseDto>> Detail(string loanNumber)
+        public async Task<ActionResult<LoanDetailResponse>> Detail(string loanNumber)
         {
-            var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+            try
+            {
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
-            var loanRecord = await this.loanRecordRepository.GetByLoanNumber(loanNumber);
+                var loanRecord = await this.loanRecordRepository.GetByLoanNumber(loanNumber);
 
-            if (foreignWorker.Id != loanRecord.Id)
+                if (foreignWorker.Id != loanRecord.Id)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10030,
+                        Message = "id not equal"
+                    });
+                }
+
+                var repaymentRecords = await this.repaymentRecordRepository.GetByLoanNumberAsync(loanNumber);
+
+                return Ok(new LoanDetailResponse{
+                    StatusCode = 10000,
+                    Message = "success",
+                    Data = new LoanDetailResponse.DataStruct
+                    {
+                        LoanRecord = loanRecord,
+                        RepaymentRecords = repaymentRecords
+                    }
+                });
+            }
+            catch (System.Exception ex)
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 10030,
-                    Message = "id not equal"
+                    StatusCode = 90100,
+                    Message = $"loan detail api error:{ex}"
                 });
             }
-
-            var repaymentRecords = await this.repaymentRecordRepository.GetByLoanNumberAsync(loanNumber);
-
-            return Ok(new GetLoanDetailResponseDto{
-                StatusCode = 10000,
-                Message = "success",
-                LoanRecord = loanRecord,
-                RepaymentRecords = repaymentRecords
-            });
         }
 
         private string GenerateLoanNumber(string nationality)

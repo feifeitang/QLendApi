@@ -1,9 +1,8 @@
-using QLendApi.lib;
 using QLendApi.Models;
 
-namespace QLendApi.Dtos
+namespace QLendApi.Responses
 {
-    public class GetLoanEditRecordResponse : BaseResponse
+    public class EditRecordResponse : BaseResponse
     {
         public class DataStruct
         {

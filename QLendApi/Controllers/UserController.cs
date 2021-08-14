@@ -13,6 +13,7 @@ using QLendApi.lib;
 using QLendApi.Models;
 using QLendApi.Repositories;
 using QLendApi.Services;
+using QLendApi.Responses;
 
 namespace QLendApi.Controllers
 {
@@ -100,7 +101,15 @@ namespace QLendApi.Controllers
                 await certificateRepository.CreateAsync(certificate);
                 await foreignWorkerRepository.CreateAsync(foreignWorker);
 
-                return StatusCode(201);
+                return Ok(new SignUpResponse
+                {
+                    StatusCode = 10000,
+                    Message = "success",
+                    Data = new SignUpResponse.DataStruct
+                    {
+                        Id = foreignWorker.Id
+                    }
+                });
             }
             catch (System.Exception ex)
             {
@@ -409,15 +418,15 @@ namespace QLendApi.Controllers
 
                     if (!checkIsFinishResult)
                     {
-                        return Ok(new NotFinishSignupResponse
+                        return BadRequest(new NotFinishSignupResponse
                         {
                             StatusCode = 10009,
                             Message = "sign up process not finish",
-                            Data = (new NotFinishSignupResponse.DataStruct
+                            Data = new NotFinishSignupResponse.DataStruct
                             {
                                 NextStatus = foreignWorker.Status + 1,
                                 ForeignWorkerId = foreignWorker.Id,
-                            })
+                            }
                         });
                     }
                 }
@@ -430,7 +439,10 @@ namespace QLendApi.Controllers
                 {
                     StatusCode = ResponseStatusCode.Success,
                     Message = "login success",
-                    Token = token
+                    Data = new LoginResponse.DataStruct
+                    {
+                        Token = token
+                    }
                 });
             }
             catch (System.Exception ex)
@@ -489,11 +501,14 @@ namespace QLendApi.Controllers
             {
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
-                return Ok(new GetForeignWorkerInfoResponse
+                return Ok(new ForeignWorkerInfoResponse
                 {
                     StatusCode = ResponseStatusCode.Success,
                     Message = "success",
-                    Info = foreignWorker
+                    Data = new ForeignWorkerInfoResponse.DataStruct
+                    {
+                        Info = foreignWorker
+                    }
                 });
             }
             catch (System.Exception ex)

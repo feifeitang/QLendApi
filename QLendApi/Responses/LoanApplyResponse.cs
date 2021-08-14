@@ -1,6 +1,4 @@
-using QLendApi.lib;
-
-namespace QLendApi.Dtos
+namespace QLendApi.Responses
 {
     public class LoanApplyResponse : BaseResponse
     {

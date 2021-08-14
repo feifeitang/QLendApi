@@ -1,9 +1,8 @@
-namespace QLendApi.Dtos
+namespace QLendApi.Responses
 {
-    public class LoginResponse
+    public class BaseResponse
     {
         public int StatusCode { get; set; }
         public string Message { get; set; }
-        public string Token { get; set; }
     }
 }
