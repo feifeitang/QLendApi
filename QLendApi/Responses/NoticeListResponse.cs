@@ -4,11 +4,11 @@ namespace QLendApi.Responses
 {
     public class NoticeListResponse : BaseResponse
     {
-        public class DataStruct
+        public class NoticeListDataStruct
         {
             public Notice[] NoticeRecords { get; set; }
         }
         
-        public DataStruct Data { get; init; }
+        public NoticeListDataStruct Data { get; init; }
     }
 }

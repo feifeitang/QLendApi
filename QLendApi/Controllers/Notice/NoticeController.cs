@@ -32,7 +32,7 @@ namespace QLendApi.Controllers
                 {
                     StatusCode = 10000,
                     Message = "success",
-                    Data = new NoticeListResponse.DataStruct
+                    Data = new NoticeListResponse.NoticeListDataStruct
                     {
                         NoticeRecords = noticeRecords
                     }

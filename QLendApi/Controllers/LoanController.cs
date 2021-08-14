@@ -54,7 +54,7 @@ namespace QLendApi.Controllers
                 {
                     StatusCode = 10000,
                     Message = "success",
-                    Data = new EditRecordResponse.DataStruct
+                    Data = new EditRecordResponse.EditRecordDataStruct
                     {
                         LoanRecord = loanRecord
                     }
@@ -80,7 +80,7 @@ namespace QLendApi.Controllers
                 // get user info
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
-                if(foreignWorker.Nationality == null)
+                if (foreignWorker.Nationality == null)
                 {
                     return BadRequest(new BaseResponse
                     {
@@ -106,7 +106,7 @@ namespace QLendApi.Controllers
                 {
                     StatusCode = 10000,
                     Message = "success",
-                    Data = new LoanApplyResponse.DataStruct
+                    Data = new LoanApplyResponse.LoanApplyDataStruct
                     {
                         LoanNumber = loanRecord.LoanNumber
                     }
@@ -137,7 +137,7 @@ namespace QLendApi.Controllers
                 {
                     StatusCode = 10000,
                     Message = "success",
-                    Data = new LoanListResponse.DataStruct
+                    Data = new LoanListResponse.LoanListDataStruct
                     {
                         LoanRecords = loanRecord
                     }
@@ -175,10 +175,11 @@ namespace QLendApi.Controllers
 
                 var repaymentRecords = await this.repaymentRecordRepository.GetByLoanNumberAsync(loanNumber);
 
-                return Ok(new LoanDetailResponse{
+                return Ok(new LoanDetailResponse
+                {
                     StatusCode = 10000,
                     Message = "success",
-                    Data = new LoanDetailResponse.DataStruct
+                    Data = new LoanDetailResponse.LoanDetailDataStruct
                     {
                         LoanRecord = loanRecord,
                         RepaymentRecords = repaymentRecords
@@ -196,9 +197,9 @@ namespace QLendApi.Controllers
         }
 
         private string GenerateLoanNumber(string nationality)
-        {          
-            string number = nationality.Substring(0,1) + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + string.Format("{0:d5}", sn);                                               
-            sn ++; 
+        {
+            string number = nationality.Substring(0, 1) + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + string.Format("{0:d5}", sn);
+            sn++;
             return number;
         }
     }

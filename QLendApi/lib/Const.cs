@@ -12,11 +12,16 @@ namespace QLendApi.lib
     }
     public class ForeignWorkStatus
     {
-        public const int Finish = 5;
+        public const int Init = 1;
+        public const int InitArcFinish = 2;
+        public const int PersonalInfoFinish = 3;
+        public const int Finish = 4;
     }
 
     public class LoanState
     {
+        public const int LoanSurveyInfoFinish = 3;
+        public const int IncomeInfoFinish = 3;
         public const int ApplyFinish = 5;
     }
 

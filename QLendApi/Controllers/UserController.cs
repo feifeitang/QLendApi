@@ -104,7 +104,7 @@ namespace QLendApi.Controllers
                     PhoneNumber = signUp.PhoneNumber,
                     Password = hashPwd,
                     Uino = signUp.UINo,
-                    Status = 1,
+                    Status = ForeignWorkStatus.Init,
                     RegisterTime = DateTime.UtcNow
                 };
 
@@ -113,7 +113,7 @@ namespace QLendApi.Controllers
 
                 return Ok(new SignUpResponse
                 {
-                    StatusCode = 10000,
+                    StatusCode = ResponseStatusCode.Success,
                     Message = "success",
                     Data = new SignUpResponse.DataStruct
                     {
@@ -239,7 +239,7 @@ namespace QLendApi.Controllers
                 }
 
                 // check status
-                if (foreignWorker.Status != 2)
+                if (foreignWorker.Status != ForeignWorkStatus.Init)
                 {
                     return BadRequest(new BaseResponse
                     {
@@ -264,7 +264,8 @@ namespace QLendApi.Controllers
 
                 await certificateRepository.UpdateAsync(cert);
 
-                foreignWorker.Status = 3;
+                foreignWorker.Status = ForeignWorkStatus.InitArcFinish;
+
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
                 return StatusCode(201);
@@ -299,7 +300,7 @@ namespace QLendApi.Controllers
                 }
 
                 // check user status
-                if (foreignWorker.Status != 3)
+                if (foreignWorker.Status != ForeignWorkStatus.InitArcFinish)
                 {
                     return BadRequest(new BaseResponse
                     {
@@ -315,7 +316,7 @@ namespace QLendApi.Controllers
                 foreignWorker.BirthDate = personalInfoDto.BirthDate;
                 foreignWorker.PassportNumber = personalInfoDto.PassportNumber;
 
-                foreignWorker.Status = 4;
+                foreignWorker.Status = ForeignWorkStatus.PersonalInfoFinish;
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
@@ -351,7 +352,7 @@ namespace QLendApi.Controllers
                 }
 
                 // check user status
-                if (foreignWorker.Status != 4)
+                if (foreignWorker.Status != ForeignWorkStatus.PersonalInfoFinish)
                 {
                     return BadRequest(new BaseResponse
                     {
@@ -378,8 +379,8 @@ namespace QLendApi.Controllers
                 foreignWorker.KindOfWork = arcInfoDto.KindOfWork;
                 foreignWorker.Workplace = arcInfoDto.Workplace;
 
-                foreignWorker.Status = 5;
-                foreignWorker.State = 0;
+                foreignWorker.Status = ForeignWorkStatus.Finish;
+                foreignWorker.State = ForeignWorkState.Pending;
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
                 await certificateRepository.UpdateAsync(certificate);
@@ -414,7 +415,7 @@ namespace QLendApi.Controllers
                     });
                 }
 
-                var foreignWorkerState = (int)(foreignWorker.State == null ? -1 : foreignWorker.State);
+                var foreignWorkerState = (int)(foreignWorker.State == null ? ForeignWorkState.Failure : foreignWorker.State);
 
                 var checkIsApprove = this.foreignWorkerService.CheckSignupIsApprove(foreignWorkerState);
 
@@ -546,7 +547,7 @@ namespace QLendApi.Controllers
 
                 var loanRecord = await loanRecordRepository.GetByLoanNumber(loanSurveyInfoDto.LoanNumber);
 
-                loanRecord.State = 2;
+                loanRecord.State = LoanState.LoanSurveyInfoFinish;
                 loanRecord.CreateTime = DateTime.UtcNow;
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
@@ -645,7 +646,7 @@ namespace QLendApi.Controllers
 
                 var loanRecord = await loanRecordRepository.GetByLoanNumber(incomeInfoDto.LoanNumber);
 
-                loanRecord.State = 3;
+                loanRecord.State = LoanState.IncomeInfoFinish;
                 loanRecord.CreateTime = DateTime.UtcNow;
 
                 await loanRecordRepository.UpdateAsync(loanRecord);

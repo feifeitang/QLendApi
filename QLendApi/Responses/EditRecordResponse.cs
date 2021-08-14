@@ -4,11 +4,11 @@ namespace QLendApi.Responses
 {
     public class EditRecordResponse : BaseResponse
     {
-        public class DataStruct
+        public class EditRecordDataStruct
         {
             public LoanRecord LoanRecord { get; init; }
         }
 
-        public DataStruct Data { get; init; }
+        public EditRecordDataStruct Data { get; init; }
     }
 }
