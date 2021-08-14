@@ -14,4 +14,14 @@ namespace QLendApi.lib
     {
         public const int Finish = 5;
     }
+
+    public class LoanState
+    {
+        public const int ApplyFinish = 5;
+    }
+
+    public class NoticeStatus
+    {
+        public const int Success = 1;
+    }
 }

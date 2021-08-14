@@ -15,6 +15,7 @@ using QLendApi.Repositories;
 using QLendApi.Services;
 using QLendApi.Responses;
 using QLendApi.Settings;
+using System.Threading;
 
 namespace QLendApi.Controllers
 {
@@ -544,7 +545,7 @@ namespace QLendApi.Controllers
                 foreignWorker.TimeInTaiwan = loanSurveyInfoDto.TimeInTaiwan;
 
                 var loanRecord = await loanRecordRepository.GetByLoanNumber(loanSurveyInfoDto.LoanNumber);
-                
+
                 loanRecord.State = 2;
                 loanRecord.CreateTime = DateTime.UtcNow;
 
@@ -576,7 +577,7 @@ namespace QLendApi.Controllers
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
                 // if incomeNumber exist
-                if(foreignWorker.IncomeNumber != null)
+                if (foreignWorker.IncomeNumber != null)
                 {
                     var incomeInfo = await incomeInformationRepository.GetByIncomeNumberAsync(foreignWorker.IncomeNumber);
 
@@ -603,11 +604,11 @@ namespace QLendApi.Controllers
                         incomeInfo.InsideSalarybook = null;
                     }
 
-                    await incomeInformationRepository.UpdateAsync(incomeInfo);                                                           
+                    await incomeInformationRepository.UpdateAsync(incomeInfo);
                 }
                 // if incomeNumber not exist
                 else
-                {               
+                {
                     IncomeInformation incomeInfo = new()
                     {
                         IncomeNumber = GenerateIncomeNumber(),
@@ -634,12 +635,12 @@ namespace QLendApi.Controllers
                     {
                         incomeInfo.InsideSalarybook = null;
                     }
-                    
+
                     foreignWorker.IncomeNumber = incomeInfo.IncomeNumber;
 
-                    await incomeInformationRepository.CreateAsync(incomeInfo); 
-                    await foreignWorkerRepository.UpdateAsync(foreignWorker); 
-                      
+                    await incomeInformationRepository.CreateAsync(incomeInfo);
+                    await foreignWorkerRepository.UpdateAsync(foreignWorker);
+
                 }
 
                 var loanRecord = await loanRecordRepository.GetByLoanNumber(incomeInfoDto.LoanNumber);
@@ -648,9 +649,9 @@ namespace QLendApi.Controllers
                 loanRecord.CreateTime = DateTime.UtcNow;
 
                 await loanRecordRepository.UpdateAsync(loanRecord);
-                                                                                                         
-                return StatusCode(201);                      
-               
+
+                return StatusCode(201);
+
             }
             catch (System.Exception ex)
             {
@@ -678,8 +679,8 @@ namespace QLendApi.Controllers
 
                 cert.FrontArc2 = await loanSurveyArcDto.FrontArc2.GetBytes();
                 cert.BackArc2 = await loanSurveyArcDto.BackArc2.GetBytes();
-                cert.SelfileArc = await loanSurveyArcDto.SelfieArc.GetBytes();       
-               
+                cert.SelfileArc = await loanSurveyArcDto.SelfieArc.GetBytes();
+
                 var loanRecord = await loanRecordRepository.GetByLoanNumber(loanSurveyArcDto.LoanNumber);
 
                 loanRecord.State = 4;
@@ -715,33 +716,40 @@ namespace QLendApi.Controllers
 
                 var loanRecord = await loanRecordRepository.GetByLoanNumber(loanApplySignatureDto.LoanNumber);
 
-                loanRecord.State = 5;
+                loanRecord.State = LoanState.ApplyFinish;
                 loanRecord.CreateTime = DateTime.UtcNow;
+
+                var Content = "We haved received your application. Please wait for the result.";
 
                 Notice notice = new()
                 {
-                    Content = "We haved received your application. Please wait for the result.",
-                    Status = 1,
+                    Content = Content,
+                    Status = NoticeStatus.Success,
                     Link = null,
                     CreateTime = DateTime.UtcNow,
                     ForeignWorkerId = foreignWorker.Id
                 };
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
+
                 await loanRecordRepository.UpdateAsync(loanRecord);
+
                 await noticeRepository.CreateAsync(notice);
-/*
+
+                CancellationTokenSource source = new CancellationTokenSource();
+                CancellationToken token = source.Token;
+
                 NotificationRequest notificationRequest = new()
                 {
                     Title = "QLend",
-                    Text = "We haved received your application. Please wait for the result.",
-                    Action = "",
-                    Tags = "",
-                    Silent = 
+                    Text = Content,
+                    Action = Content,
+                    Tags = new string[] { foreignWorker.DeviceTag },
+                    Silent = false
                 };
 
-                var success = await _notificationService.RequestNotificationAsync(notificationRequest, null);
-*/
+                await _notificationService.RequestNotificationAsync(notificationRequest, token);
+
                 return StatusCode(201);
             }
             catch (System.Exception ex)
