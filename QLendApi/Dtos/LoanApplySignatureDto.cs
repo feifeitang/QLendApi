@@ -6,6 +6,9 @@ namespace QLendApi.Dtos
     public record LoanApplySignatureDto
     {
         [Required]
+        public string LoanNumber { get; init; }
+
+        [Required]
         public IFormFile Signature { get; init; }
     }
 }

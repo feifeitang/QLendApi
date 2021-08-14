@@ -29,6 +29,7 @@ namespace QLendApi.Models
         public int? Auditor { get; set; }
         public int? Id { get; set; }
         public string Idno { get; set; }
+        public DateTime CreateTime { get; set; }
 
         public virtual ForeignWorker IdNavigation { get; set; }
         public virtual CreditSide IdnoNavigation { get; set; }

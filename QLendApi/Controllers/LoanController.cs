@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using QLendApi.Dtos;
 using QLendApi.lib;
 using QLendApi.Models;
-using QLendApi.Extensions;
 using QLendApi.Repositories;
 using System;
+using QLendApi.Services;
 
 namespace QLendApi.Controllers
 {
@@ -18,13 +18,15 @@ namespace QLendApi.Controllers
         private readonly IForeignWorkerRepository foreignWorkerRepository;
         private readonly ICertificateRepository certificateRepository;
         private readonly IRepaymentRecordRepository repaymentRecordRepository;
+        private readonly ILoanRecordService loanRecordService;
         static int sn = 0;
 
         public LoanController(
             ILoanRecordRepository loanRecordRepository,
             IForeignWorkerRepository foreignWorkerRepository,
             ICertificateRepository certificateRepository,
-            IRepaymentRecordRepository repaymentRecordRepository)
+            IRepaymentRecordRepository repaymentRecordRepository,
+            ILoanRecordService loanRecordService)
         {
             this.loanRecordRepository = loanRecordRepository;
 
@@ -33,6 +35,38 @@ namespace QLendApi.Controllers
             this.certificateRepository = certificateRepository;
 
             this.repaymentRecordRepository = repaymentRecordRepository;
+
+            this.loanRecordService = loanRecordService;
+        }
+
+        //GET /api/loan/editRecord
+        [Route("editRecord")]
+        [HttpGet]
+        public async Task<ActionResult<GetLoanEditRecordResponse>> EditRecord()
+        {
+            try
+            {
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+                var loanRecord = await loanRecordService.GetEditRecordByForeignWorkerId(foreignWorker.Id);
+
+                return Ok(new GetLoanEditRecordResponse
+                {
+                    StatusCode = 10000,
+                    Message = "success",
+                    Data = (new GetLoanEditRecordResponse.DataStruct{
+                        LoanRecord = loanRecord
+                    }) 
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90070,
+                    Message = $"editRecord api error:{ex}"
+                });
+            }
         }
 
         //POST /api/loan/apply
@@ -45,52 +79,45 @@ namespace QLendApi.Controllers
                 // get user info
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
-                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id, 0);
-
-                if(loanRecord != null)
+                if(foreignWorker.Nationality == null)
                 {
-                    loanRecord.Amount = loanApply.Amount;
-                    loanRecord.Period = loanApply.Period;
-                    loanRecord.Purpose = loanApply.Purpose;
-                    loanRecord.Id = foreignWorker.Id;
-                    loanRecord.State = 0;
-
-                    await loanRecordRepository.UpdateAsync(loanRecord);
-                }
-                else              
-                {
-                    if(foreignWorker.Nationality == null)
+                    return BadRequest(new BaseResponse
                     {
-                        return BadRequest(new BaseResponse
-                        {
-                            StatusCode = 10010,
-                            Message = "nationaality is null"
-                        });
-                    }
-
-                    LoanRecord loanRecordInfo = new()
-                    {
-                        LoanNumber = GenerateLoanNumber(foreignWorker.Nationality),
-                        Amount = loanApply.Amount,
-                        Period = loanApply.Period,
-                        Purpose = loanApply.Purpose,
-                        Id = foreignWorker.Id,
-                        State = 0                 
-                    };
-
-                    await loanRecordRepository.CreateAsync(loanRecordInfo);     
+                        StatusCode = 10010,
+                        Message = "nationaality is null"
+                    });
                 }
 
-                return StatusCode(201);
+                LoanRecord loanRecord = new()
+                {
+                    LoanNumber = GenerateLoanNumber(foreignWorker.Nationality),
+                    Amount = loanApply.Amount,
+                    Period = loanApply.Period,
+                    Purpose = loanApply.Purpose,
+                    State = 1,
+                    Id = foreignWorker.Id,
+                    CreateTime = DateTime.UtcNow
+                };
+
+                await loanRecordRepository.CreateAsync(loanRecord);
+
+                return Ok(new LoanApplyResponse
+                {
+                    StatusCode = 10000,
+                    Message = "success",
+                    Data = (new LoanApplyResponse.DataStruct{
+                        LoanNumber = loanRecord.LoanNumber
+                    }) 
+                });
             }
             catch (System.Exception ex)
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90070,
+                    StatusCode = 90080,
                     Message = $"loan apply api error:{ex}"
                 });
-            }           
+            }
         }     
 
         // POST /api/loan/success
@@ -101,92 +128,6 @@ namespace QLendApi.Controllers
             return StatusCode(201);
         }
 
-        //GET /api/loan/data
-        [Route("data")]
-        [HttpGet]
-        public async Task<ActionResult<GetLoanDataResponseDto>> Data()
-        {
-           try
-            {
-                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
-
-                //  var loanRecord = await loanRecordRepository.GetByIdAsync(foreignWorker.Id);
-                                
-                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id,3);              
-
-                if(loanRecord == null)
-                {
-                    return BadRequest(new BaseResponse
-                    {
-                        StatusCode = 10020,
-                        Message = "haven't loanRecord"
-                    });
-                }
-                else
-                {
-                     return Ok(new GetLoanDataResponseDto
-                    {
-                        StatusCode = 10000,
-                        Message = "success",
-                        UserName = foreignWorker.UserName,
-                        Amount = loanRecord.Amount,
-                        Period = loanRecord.Period
-                    });
-                }
-               
-            }
-            catch (System.Exception ex)
-            {
-                return BadRequest(new BaseResponse
-                {
-                    StatusCode = 90080,
-                    Message = $"loanData api error:{ex}"
-                });
-            }
-        }
-
-        //GET api/loan/applySuccess
-        [Route("applySuccess")]
-        [HttpGet]
-        public  async Task<ActionResult<GetLoanApplySuccessDto>> LoanApplySuccess()
-        {
-            try
-            {
-                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
-
-                var loanRecord = await loanRecordRepository.GetByIdAndStateAsync(foreignWorker.Id,4);
-
-                if(loanRecord == null)
-                {
-                    return BadRequest(new BaseResponse
-                    {
-                        StatusCode = 10020,
-                        Message = "haven't loanRecord."
-                    });
-                }
-                else
-                {
-                    loanRecord.State = 5;
-                    await loanRecordRepository.UpdateAsync(loanRecord);
-
-                    return Ok(new GetLoanApplySuccessDto
-                    {
-                        StatusCode = 10000,
-                        Message = "success",
-                        Amount = loanRecord.Amount,
-                        Period = loanRecord.Period
-                    });   
-                }                
-            }
-            catch (System.Exception ex)
-            {
-                return BadRequest(new BaseResponse
-                {
-                    StatusCode = 90090,
-                    Message = $"applySuccess api error:{ex}"
-                });
-            }
-        }
 
         // GET /api/loan/list
         [Route("list")]
@@ -195,7 +136,7 @@ namespace QLendApi.Controllers
         {
             var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
-            var loanRecord = await this.loanRecordRepository.GetByIdAndStatusAsync(foreignWorker.Id, status);
+            var loanRecord = await this.loanRecordRepository.GetByForeignWorkerIdAndStatusAsync(foreignWorker.Id, status);
 
             return Ok(new GetLoanListResponseDto
             {
