@@ -6,6 +6,7 @@ using QLendApi.Repositories;
 using System;
 using QLendApi.Services;
 using QLendApi.Responses;
+using QLendApi.lib;
 
 namespace QLendApi.Controllers
 {
@@ -95,7 +96,7 @@ namespace QLendApi.Controllers
                     Amount = loanApply.Amount,
                     Period = loanApply.Period,
                     Purpose = loanApply.Purpose,
-                    State = 1,
+                    State = LoanState.ApplyInit,
                     Id = foreignWorker.Id,
                     CreateTime = DateTime.UtcNow
                 };

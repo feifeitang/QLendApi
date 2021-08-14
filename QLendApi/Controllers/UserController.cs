@@ -684,7 +684,7 @@ namespace QLendApi.Controllers
 
                 var loanRecord = await loanRecordRepository.GetByLoanNumber(loanSurveyArcDto.LoanNumber);
 
-                loanRecord.State = 4;
+                loanRecord.State = LoanState.LoanSurveyArcFinish;
                 loanRecord.CreateTime = DateTime.UtcNow;
 
                 await certificateRepository.UpdateAsync(cert);

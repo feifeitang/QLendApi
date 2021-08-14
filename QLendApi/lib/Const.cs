@@ -20,8 +20,10 @@ namespace QLendApi.lib
 
     public class LoanState
     {
-        public const int LoanSurveyInfoFinish = 3;
+        public const int ApplyInit = 1;
+        public const int LoanSurveyInfoFinish = 2;
         public const int IncomeInfoFinish = 3;
+        public const int LoanSurveyArcFinish = 4;
         public const int ApplyFinish = 5;
     }
 
