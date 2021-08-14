@@ -14,6 +14,7 @@ using QLendApi.Models;
 using QLendApi.Repositories;
 using QLendApi.Services;
 using QLendApi.Responses;
+using QLendApi.Settings;
 
 namespace QLendApi.Controllers
 {
@@ -26,6 +27,8 @@ namespace QLendApi.Controllers
         private readonly IForeignWorkerService foreignWorkerService;
         private readonly IIncomeInformationRepository incomeInformationRepository;
         private readonly ILoanRecordRepository loanRecordRepository;
+        private readonly INoticeRepository noticeRepository;
+        private readonly INotificationService _notificationService;
 
         private readonly AppSettings _appSettings;
         private readonly double _expireMins;
@@ -38,7 +41,9 @@ namespace QLendApi.Controllers
             IIncomeInformationRepository incomeInformationRepository,
             ILoanRecordRepository loanRecordRepository,
             IOptions<AppSettings> appSettings,
-            IForeignWorkerService foreignWorkerService)
+            IForeignWorkerService foreignWorkerService,
+            INoticeRepository noticeRepository,
+            INotificationService _notificationService)
         {
             this.foreignWorkerRepository = foreignWorkerRepository;
 
@@ -48,9 +53,13 @@ namespace QLendApi.Controllers
 
             this.loanRecordRepository = loanRecordRepository;
 
+            this.noticeRepository = noticeRepository;
+
             this._appSettings = appSettings.Value;
 
             this.foreignWorkerService = foreignWorkerService;
+
+            this._notificationService = _notificationService;
 
             this._expireMins = 1.5;
         }
@@ -197,10 +206,6 @@ namespace QLendApi.Controllers
                         Message = "otp code not equal"
                     });
                 }
-
-                foreignWorker.Status = 2;
-
-                await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
                 return StatusCode(201);
             }
@@ -711,11 +716,32 @@ namespace QLendApi.Controllers
                 var loanRecord = await loanRecordRepository.GetByLoanNumber(loanApplySignatureDto.LoanNumber);
 
                 loanRecord.State = 5;
-                loanRecord.CreateTime = DateTime.UtcNow;                
+                loanRecord.CreateTime = DateTime.UtcNow;
+
+                Notice notice = new()
+                {
+                    Content = "We haved received your application. Please wait for the result.",
+                    Status = 1,
+                    Link = null,
+                    CreateTime = DateTime.UtcNow,
+                    ForeignWorkerId = foreignWorker.Id
+                };
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
                 await loanRecordRepository.UpdateAsync(loanRecord);
+                await noticeRepository.CreateAsync(notice);
+/*
+                NotificationRequest notificationRequest = new()
+                {
+                    Title = "QLend",
+                    Text = "We haved received your application. Please wait for the result.",
+                    Action = "",
+                    Tags = "",
+                    Silent = 
+                };
 
+                var success = await _notificationService.RequestNotificationAsync(notificationRequest, null);
+*/
                 return StatusCode(201);
             }
             catch (System.Exception ex)
