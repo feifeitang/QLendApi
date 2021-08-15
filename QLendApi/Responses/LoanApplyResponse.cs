@@ -1,14 +1,12 @@
-using QLendApi.lib;
-
-namespace QLendApi.Dtos
+namespace QLendApi.Responses
 {
     public class LoanApplyResponse : BaseResponse
     {
-        public class DataStruct
+        public class LoanApplyDataStruct
         {
             public string LoanNumber { get; init; }
         }
 
-        public DataStruct Data { get; init; }
+        public LoanApplyDataStruct Data { get; init; }
     }
 }

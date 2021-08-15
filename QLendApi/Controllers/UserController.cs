@@ -13,6 +13,9 @@ using QLendApi.lib;
 using QLendApi.Models;
 using QLendApi.Repositories;
 using QLendApi.Services;
+using QLendApi.Responses;
+using QLendApi.Settings;
+using System.Threading;
 
 namespace QLendApi.Controllers
 {
@@ -25,6 +28,8 @@ namespace QLendApi.Controllers
         private readonly IForeignWorkerService foreignWorkerService;
         private readonly IIncomeInformationRepository incomeInformationRepository;
         private readonly ILoanRecordRepository loanRecordRepository;
+        private readonly INoticeRepository noticeRepository;
+        private readonly INotificationService _notificationService;
 
         private readonly AppSettings _appSettings;
         private readonly double _expireMins;
@@ -37,7 +42,9 @@ namespace QLendApi.Controllers
             IIncomeInformationRepository incomeInformationRepository,
             ILoanRecordRepository loanRecordRepository,
             IOptions<AppSettings> appSettings,
-            IForeignWorkerService foreignWorkerService)
+            IForeignWorkerService foreignWorkerService,
+            INoticeRepository noticeRepository,
+            INotificationService _notificationService)
         {
             this.foreignWorkerRepository = foreignWorkerRepository;
 
@@ -47,9 +54,13 @@ namespace QLendApi.Controllers
 
             this.loanRecordRepository = loanRecordRepository;
 
+            this.noticeRepository = noticeRepository;
+
             this._appSettings = appSettings.Value;
 
             this.foreignWorkerService = foreignWorkerService;
+
+            this._notificationService = _notificationService;
 
             this._expireMins = 1.5;
         }
@@ -93,14 +104,22 @@ namespace QLendApi.Controllers
                     PhoneNumber = signUp.PhoneNumber,
                     Password = hashPwd,
                     Uino = signUp.UINo,
-                    Status = 1,
+                    Status = ForeignWorkStatus.Init,
                     RegisterTime = DateTime.UtcNow
                 };
 
                 await certificateRepository.CreateAsync(certificate);
                 await foreignWorkerRepository.CreateAsync(foreignWorker);
 
-                return StatusCode(201);
+                return Ok(new SignUpResponse
+                {
+                    StatusCode = ResponseStatusCode.Success,
+                    Message = "success",
+                    Data = new SignUpResponse.DataStruct
+                    {
+                        Id = foreignWorker.Id
+                    }
+                });
             }
             catch (System.Exception ex)
             {
@@ -189,10 +208,6 @@ namespace QLendApi.Controllers
                     });
                 }
 
-                foreignWorker.Status = 2;
-
-                await foreignWorkerRepository.UpdateAsync(foreignWorker);
-
                 return StatusCode(201);
             }
             catch (System.Exception ex)
@@ -224,7 +239,7 @@ namespace QLendApi.Controllers
                 }
 
                 // check status
-                if (foreignWorker.Status != 2)
+                if (foreignWorker.Status != ForeignWorkStatus.Init)
                 {
                     return BadRequest(new BaseResponse
                     {
@@ -249,7 +264,8 @@ namespace QLendApi.Controllers
 
                 await certificateRepository.UpdateAsync(cert);
 
-                foreignWorker.Status = 3;
+                foreignWorker.Status = ForeignWorkStatus.InitArcFinish;
+
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
                 return StatusCode(201);
@@ -284,7 +300,7 @@ namespace QLendApi.Controllers
                 }
 
                 // check user status
-                if (foreignWorker.Status != 3)
+                if (foreignWorker.Status != ForeignWorkStatus.InitArcFinish)
                 {
                     return BadRequest(new BaseResponse
                     {
@@ -300,7 +316,7 @@ namespace QLendApi.Controllers
                 foreignWorker.BirthDate = personalInfoDto.BirthDate;
                 foreignWorker.PassportNumber = personalInfoDto.PassportNumber;
 
-                foreignWorker.Status = 4;
+                foreignWorker.Status = ForeignWorkStatus.PersonalInfoFinish;
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
@@ -336,7 +352,7 @@ namespace QLendApi.Controllers
                 }
 
                 // check user status
-                if (foreignWorker.Status != 4)
+                if (foreignWorker.Status != ForeignWorkStatus.PersonalInfoFinish)
                 {
                     return BadRequest(new BaseResponse
                     {
@@ -363,8 +379,8 @@ namespace QLendApi.Controllers
                 foreignWorker.KindOfWork = arcInfoDto.KindOfWork;
                 foreignWorker.Workplace = arcInfoDto.Workplace;
 
-                foreignWorker.Status = 5;
-                foreignWorker.State = 0;
+                foreignWorker.Status = ForeignWorkStatus.Finish;
+                foreignWorker.State = ForeignWorkState.Pending;
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
                 await certificateRepository.UpdateAsync(certificate);
@@ -399,7 +415,7 @@ namespace QLendApi.Controllers
                     });
                 }
 
-                var foreignWorkerState = (int)(foreignWorker.State == null ? -1 : foreignWorker.State);
+                var foreignWorkerState = (int)(foreignWorker.State == null ? ForeignWorkState.Failure : foreignWorker.State);
 
                 var checkIsApprove = this.foreignWorkerService.CheckSignupIsApprove(foreignWorkerState);
 
@@ -409,15 +425,15 @@ namespace QLendApi.Controllers
 
                     if (!checkIsFinishResult)
                     {
-                        return Ok(new NotFinishSignupResponse
+                        return BadRequest(new NotFinishSignupResponse
                         {
                             StatusCode = 10009,
                             Message = "sign up process not finish",
-                            Data = (new NotFinishSignupResponse.DataStruct
+                            Data = new NotFinishSignupResponse.DataStruct
                             {
                                 NextStatus = foreignWorker.Status + 1,
                                 ForeignWorkerId = foreignWorker.Id,
-                            })
+                            }
                         });
                     }
                 }
@@ -430,7 +446,10 @@ namespace QLendApi.Controllers
                 {
                     StatusCode = ResponseStatusCode.Success,
                     Message = "login success",
-                    Token = token
+                    Data = new LoginResponse.DataStruct
+                    {
+                        Token = token
+                    }
                 });
             }
             catch (System.Exception ex)
@@ -489,11 +508,14 @@ namespace QLendApi.Controllers
             {
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
-                return Ok(new GetForeignWorkerInfoResponse
+                return Ok(new ForeignWorkerInfoResponse
                 {
                     StatusCode = ResponseStatusCode.Success,
                     Message = "success",
-                    Info = foreignWorker
+                    Data = new ForeignWorkerInfoResponse.DataStruct
+                    {
+                        Info = foreignWorker
+                    }
                 });
             }
             catch (System.Exception ex)
@@ -524,8 +546,8 @@ namespace QLendApi.Controllers
                 foreignWorker.TimeInTaiwan = loanSurveyInfoDto.TimeInTaiwan;
 
                 var loanRecord = await loanRecordRepository.GetByLoanNumber(loanSurveyInfoDto.LoanNumber);
-                
-                loanRecord.State = 2;
+
+                loanRecord.State = LoanState.LoanSurveyInfoFinish;
                 loanRecord.CreateTime = DateTime.UtcNow;
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
@@ -556,7 +578,7 @@ namespace QLendApi.Controllers
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
                 // if incomeNumber exist
-                if(foreignWorker.IncomeNumber != null)
+                if (foreignWorker.IncomeNumber != null)
                 {
                     var incomeInfo = await incomeInformationRepository.GetByIncomeNumberAsync(foreignWorker.IncomeNumber);
 
@@ -583,11 +605,11 @@ namespace QLendApi.Controllers
                         incomeInfo.InsideSalarybook = null;
                     }
 
-                    await incomeInformationRepository.UpdateAsync(incomeInfo);                                                           
+                    await incomeInformationRepository.UpdateAsync(incomeInfo);
                 }
                 // if incomeNumber not exist
                 else
-                {               
+                {
                     IncomeInformation incomeInfo = new()
                     {
                         IncomeNumber = GenerateIncomeNumber(),
@@ -614,23 +636,23 @@ namespace QLendApi.Controllers
                     {
                         incomeInfo.InsideSalarybook = null;
                     }
-                    
+
                     foreignWorker.IncomeNumber = incomeInfo.IncomeNumber;
 
-                    await incomeInformationRepository.CreateAsync(incomeInfo); 
-                    await foreignWorkerRepository.UpdateAsync(foreignWorker); 
-                      
+                    await incomeInformationRepository.CreateAsync(incomeInfo);
+                    await foreignWorkerRepository.UpdateAsync(foreignWorker);
+
                 }
 
                 var loanRecord = await loanRecordRepository.GetByLoanNumber(incomeInfoDto.LoanNumber);
 
-                loanRecord.State = 3;
+                loanRecord.State = LoanState.IncomeInfoFinish;
                 loanRecord.CreateTime = DateTime.UtcNow;
 
                 await loanRecordRepository.UpdateAsync(loanRecord);
-                                                                                                         
-                return StatusCode(201);                      
-               
+
+                return StatusCode(201);
+
             }
             catch (System.Exception ex)
             {
@@ -658,11 +680,11 @@ namespace QLendApi.Controllers
 
                 cert.FrontArc2 = await loanSurveyArcDto.FrontArc2.GetBytes();
                 cert.BackArc2 = await loanSurveyArcDto.BackArc2.GetBytes();
-                cert.SelfileArc = await loanSurveyArcDto.SelfieArc.GetBytes();       
-               
+                cert.SelfileArc = await loanSurveyArcDto.SelfieArc.GetBytes();
+
                 var loanRecord = await loanRecordRepository.GetByLoanNumber(loanSurveyArcDto.LoanNumber);
 
-                loanRecord.State = 4;
+                loanRecord.State = LoanState.LoanSurveyArcFinish;
                 loanRecord.CreateTime = DateTime.UtcNow;
 
                 await certificateRepository.UpdateAsync(cert);
@@ -695,11 +717,39 @@ namespace QLendApi.Controllers
 
                 var loanRecord = await loanRecordRepository.GetByLoanNumber(loanApplySignatureDto.LoanNumber);
 
-                loanRecord.State = 5;
-                loanRecord.CreateTime = DateTime.UtcNow;                
+                loanRecord.State = LoanState.ApplyFinish;
+                loanRecord.CreateTime = DateTime.UtcNow;
+
+                var Content = "We haved received your application. Please wait for the result.";
+
+                Notice notice = new()
+                {
+                    Content = Content,
+                    Status = NoticeStatus.Success,
+                    Link = null,
+                    CreateTime = DateTime.UtcNow,
+                    ForeignWorkerId = foreignWorker.Id
+                };
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
+
                 await loanRecordRepository.UpdateAsync(loanRecord);
+
+                await noticeRepository.CreateAsync(notice);
+
+                CancellationTokenSource source = new CancellationTokenSource();
+                CancellationToken token = source.Token;
+
+                NotificationRequest notificationRequest = new()
+                {
+                    Title = "QLend",
+                    Text = Content,
+                    Action = Content,
+                    Tags = new string[] { foreignWorker.DeviceTag },
+                    Silent = false
+                };
+
+                await _notificationService.RequestNotificationAsync(notificationRequest, token);
 
                 return StatusCode(201);
             }

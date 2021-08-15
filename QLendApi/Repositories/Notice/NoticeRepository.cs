@@ -7,14 +7,21 @@ namespace QLendApi.Repositories
 {
     public class NoticeRepository : INoticeRepository
     {
-        private readonly QLendDBContext _conetxt;
+        private readonly QLendDBContext _context;
         public NoticeRepository(QLendDBContext context)
         {
-            _conetxt = context;
+            _context = context;
         }
+
+        public async Task CreateAsync(Notice notice)
+        {
+            _context.Notices.Add(notice);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<Notice[]> GetListByForeignWorkerIdAsync(int Id)
         {
-            return await _conetxt.Notices.Where(el => el.ForeignWorkerId == Id).ToArrayAsync();
+            return await _context.Notices.Where(el => el.ForeignWorkerId == Id).ToArrayAsync();
         }
     }
 

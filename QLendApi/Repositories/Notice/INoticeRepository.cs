@@ -6,5 +6,7 @@ namespace QLendApi.Repositories
     public interface INoticeRepository
     {
         Task<Notice[]> GetListByForeignWorkerIdAsync(int Id);
+
+        Task CreateAsync(Notice notice);
     }
 }
