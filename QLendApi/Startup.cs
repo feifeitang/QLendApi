@@ -1,24 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using QLendApi.Services;
 using QLendApi.Dtos;
 using QLendApi.Helpers;
 using QLendApi.Models;
 using QLendApi.Repositories;
-using QLendApi.Services;
 using restapi.Settings;
 
 namespace QLendApi
@@ -62,6 +53,7 @@ namespace QLendApi
             services.AddScoped<IIncomeInformationRepository, IncomeInformationRepository>();
             services.AddScoped<IRepaymentRecordRepository, RepaymentRecordRepository>();
             services.AddScoped<INoticeRepository, NoticeRepository>();
+            services.AddScoped<ILoanRecordService, LoanRecordService>();
 
             services.AddControllersWithViews();
 
