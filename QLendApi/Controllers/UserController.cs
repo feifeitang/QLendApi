@@ -763,33 +763,6 @@ namespace QLendApi.Controllers
             }
         }
 
-        // POST /api/user/loanConfirmSignature
-        [Authorize]
-        [Route("loanConfirmSignature")]
-        [HttpPost]
-        public async Task<ActionResult> LoanConfirmSignature([FromForm] LoanConfirmSignatureDto loanConfirmSignatureDto)
-        {
-            try
-            {
-                // get user info
-                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
-
-                foreignWorker.Signature2 = await loanConfirmSignatureDto.Signature2.GetBytes();
-
-                await foreignWorkerRepository.UpdateAsync(foreignWorker);
-
-                return StatusCode(201);
-            }
-            catch (System.Exception ex)
-            {
-                return BadRequest(new BaseResponse
-                {
-                    StatusCode = 90050,
-                    Message = $"loanConfirmSignature api error:{ex}"
-                });
-            }
-        }
-
         // POST /api/user/bankAccount
         [Authorize]
         [Route("bankAccount")]

@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using QLendApi.lib;
 using QLendApi.Models;
 using QLendApi.Repositories;
 
@@ -29,7 +30,7 @@ namespace QLendApi.Services
             }
             else
             {
-                return loanRecords.Where(e => e.State != 5 && CheckAppiyTimeIsVaild(e.CreateTime)).SingleOrDefault();
+                return loanRecords.Where(e => e.State < LoanState.ApplyFinish && CheckAppiyTimeIsVaild(e.CreateTime)).SingleOrDefault();
             }
         }
 

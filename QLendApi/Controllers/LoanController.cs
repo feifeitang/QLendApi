@@ -7,6 +7,7 @@ using System;
 using QLendApi.Services;
 using QLendApi.Responses;
 using QLendApi.lib;
+using QLendApi.Extensions;
 
 namespace QLendApi.Controllers
 {
@@ -119,6 +120,55 @@ namespace QLendApi.Controllers
                 {
                     StatusCode = 90080,
                     Message = $"loan apply api error:{ex}"
+                });
+            }
+        }
+
+        // POST /api/loan/confirm
+        [Authorize]
+        [Route("confirm")]
+        [HttpPost]
+        public async Task<ActionResult> Confirm([FromForm] ConfirmDto confirmDto)
+        {
+            try
+            {
+                // get user info
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+                var loanRecord = await loanRecordRepository.GetByLoanNumber(confirmDto.LoanNumber);
+
+                if (foreignWorker.Id != loanRecord.Id)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10030,
+                        Message = "id not equal"
+                    });
+                }
+
+                if (loanRecord.State != LoanState.PermitLoan)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10030,
+                        Message = "loan state not correct"
+                    });
+                }
+
+                foreignWorker.Signature2 = await confirmDto.Signature2.GetBytes();
+                loanRecord.State = LoanState.ConfirmLoan;
+
+                await foreignWorkerRepository.UpdateAsync(foreignWorker);
+                await loanRecordRepository.UpdateAsync(loanRecord);
+
+                return StatusCode(201);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90050,
+                    Message = $"loanConfirmSignature api error:{ex}"
                 });
             }
         }
