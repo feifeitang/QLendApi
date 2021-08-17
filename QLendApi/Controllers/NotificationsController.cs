@@ -37,17 +37,17 @@ namespace QLendApi.Controllers
         public async Task<IActionResult> UpdateInstallation(
             [Required] DeviceInstallation deviceInstallation)
         {
-            var foreignWorker = await foreignWorkerRepository.GetByIdAsync(deviceInstallation.UserId);
+            // var foreignWorker = await foreignWorkerRepository.GetByIdAsync(deviceInstallation.UserId);
 
-            if (foreignWorker.DeviceTag == null)
-            {
-                // add national info into tag ?
-                foreignWorker.DeviceTag = "user_" + foreignWorker.Id;
+            // if (foreignWorker.DeviceTag == null)
+            // {
+            //     // add national info into tag ?
+            //     foreignWorker.DeviceTag = "user_" + foreignWorker.Id;
 
-                await foreignWorkerRepository.UpdateAsync(foreignWorker);
-            }
+            //     await foreignWorkerRepository.UpdateAsync(foreignWorker);
+            // }
             
-            deviceInstallation.Tags.Add(foreignWorker.DeviceTag);
+            // deviceInstallation.Tags.Add(foreignWorker.DeviceTag);
 
             var success = await _notificationService
                 .CreateOrUpdateInstallationAsync(deviceInstallation, HttpContext.RequestAborted);
