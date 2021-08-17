@@ -173,6 +173,42 @@ namespace QLendApi.Controllers
             }
         }
 
+        // POST /api/loan/cancel
+        [Route("cancel")]
+        [HttpPost]
+        public async Task<ActionResult> Cancel(LoanCancelDto loanCancelDto)
+        {
+            try
+            {
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+                var loanRecord = await this.loanRecordRepository.GetByLoanNumber(loanCancelDto.LoanNumber);
+
+                if (foreignWorker.Id != loanRecord.Id)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10030,
+                        Message = "id not equal"
+                    });
+                }
+
+                loanRecord.State = LoanState.CancelLoan;
+
+                await loanRecordRepository.UpdateAsync(loanRecord);
+
+                return Ok();
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90100,
+                    Message = $"loan cancel api error:{ex}"
+                });
+            }
+        }
+
         // GET /api/loan/list
         [Route("list")]
         [HttpGet]
