@@ -31,8 +31,11 @@ namespace QLendApi.Models
         public string Idno { get; set; }
         public DateTime CreateTime { get; set; }
 
+        [JsonIgnore]
         public virtual ForeignWorker IdNavigation { get; set; }
+        [JsonIgnore]
         public virtual CreditSide IdnoNavigation { get; set; }
+        [JsonIgnore]
         public virtual ICollection<RepaymentRecord> RepaymentRecords { get; set; }
     }
 }
