@@ -27,7 +27,8 @@ namespace QLendApi.lib
         public const int ApplyFinish = 5;
         public const int PermitLoan = 6;
         public const int ConfirmLoan = 7;
-        public const int RemittanceFinish = 8;
+        public const int BankAccountFinish = 8;
+        public const int RemittanceFinish = 9;
         public const int CancelLoan = 0;
         public const int RejectLoan = -1;
     }
