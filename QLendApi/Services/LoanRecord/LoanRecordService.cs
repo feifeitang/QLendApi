@@ -29,7 +29,7 @@ namespace QLendApi.Services
             }
             else
             {
-                return loanRecords.Where(e => e.State != 5 && CheckAppiyTimeIsVaild(e.CreateTime)).Single();
+                return loanRecords.Where(e => e.State != 5 && CheckAppiyTimeIsVaild(e.CreateTime)).SingleOrDefault();
             }
         }
 
