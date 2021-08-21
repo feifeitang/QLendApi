@@ -54,6 +54,7 @@ namespace QLendApi
             services.AddScoped<IRepaymentRecordRepository, RepaymentRecordRepository>();
             services.AddScoped<INoticeRepository, NoticeRepository>();
             services.AddScoped<ILoanRecordService, LoanRecordService>();
+            services.AddScoped<ISmsService, SmsService>();
 
             services.AddControllersWithViews();
            // services.AddControllers().AddNewtonsoftJson();
@@ -70,6 +71,10 @@ namespace QLendApi
 
             services.AddOptions<NotificationHubOptions>()
                 .Configure(Configuration.GetSection("NotificationHub").Bind)
+                .ValidateDataAnnotations();
+
+            services.AddOptions<SmsServiceOptions>()
+                .Configure(Configuration.GetSection("SmsService").Bind)
                 .ValidateDataAnnotations();
         }
 
