@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace QLendApi.Dtos
 {
-    public record SendOtpDto
+    public record OtpDto
     {
         [Required]
         public int Id { get; init; }

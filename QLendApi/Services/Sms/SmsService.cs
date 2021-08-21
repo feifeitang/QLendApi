@@ -1,5 +1,7 @@
 using System;
+using System.IO;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -29,9 +31,21 @@ namespace QLendApi.Services
 
                 WebResponse response = request.GetResponse();
 
-                Console.WriteLine(((HttpWebResponse)response).StatusDescription);
+                Stream receiveStream = response.GetResponseStream();
+
+                Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
+
+                StreamReader readStream = new StreamReader(receiveStream, encode);
+
+                string data = readStream.ReadToEnd();
+
+                Console.WriteLine("\r\nResponse stream received.");
+
+                Console.WriteLine(data);
 
                 response.Close();
+
+                receiveStream.Close();
 
                 return true;
             }
