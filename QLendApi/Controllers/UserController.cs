@@ -30,6 +30,7 @@ namespace QLendApi.Controllers
         private readonly ILoanRecordRepository loanRecordRepository;
         private readonly INoticeRepository noticeRepository;
         private readonly INotificationService _notificationService;
+        private readonly ISmsService smsService;
 
         private readonly AppSettings _appSettings;
 
@@ -43,7 +44,8 @@ namespace QLendApi.Controllers
             IOptions<AppSettings> appSettings,
             IForeignWorkerService foreignWorkerService,
             INoticeRepository noticeRepository,
-            INotificationService _notificationService)
+            INotificationService _notificationService,
+            ISmsService smsService)
         {
             this.foreignWorkerRepository = foreignWorkerRepository;
 
