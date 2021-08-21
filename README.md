@@ -6,6 +6,13 @@ dotnet user-secrets set ConnectionStrings:DatabaseAlias "Server={HOST},{PORT};Da
 
 dotnet user-secrets set MssqlSettings:Password '{PASSWORD}'
 
+dotnet user-secrets set "SmsService:UserName" '{UserName}'
+
+dotnet user-secrets set "SmsService:Password" '{password}'
+
+dotnet user-secrets set "NotificationHub:Name" '{Name}'
+dotnet user-secrets set "NotificationHub:ConnectionString" '{ConnectionString}'
+
 dotnet ef dbcontext scaffold Name=ConnectionStrings:DatabaseAlias Microsoft.EntityFrameworkCore.SqlServer -o Models
 
 

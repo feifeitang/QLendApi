@@ -30,6 +30,7 @@ namespace QLendApi.Controllers
         private readonly ILoanRecordRepository loanRecordRepository;
         private readonly INoticeRepository noticeRepository;
         private readonly INotificationService _notificationService;
+        private readonly ISmsService smsService;
 
         private readonly AppSettings _appSettings;
         private readonly double _expireMins;
@@ -44,7 +45,8 @@ namespace QLendApi.Controllers
             IOptions<AppSettings> appSettings,
             IForeignWorkerService foreignWorkerService,
             INoticeRepository noticeRepository,
-            INotificationService _notificationService)
+            INotificationService _notificationService,
+            ISmsService smsService)
         {
             this.foreignWorkerRepository = foreignWorkerRepository;
 
@@ -61,6 +63,8 @@ namespace QLendApi.Controllers
             this.foreignWorkerService = foreignWorkerService;
 
             this._notificationService = _notificationService;
+
+            this.smsService = smsService;
 
             this._expireMins = 1.5;
         }
@@ -152,6 +156,8 @@ namespace QLendApi.Controllers
 
                 Random rnd = new Random();
                 int OTP = rnd.Next(100000, 999999);
+
+                smsService.Send(foreignWorker.PhoneNumber, $"QLend OTP number is {OTP}");
 
                 foreignWorker.OTP = OTP;
                 foreignWorker.OTPSendTIme = DateTime.UtcNow;
