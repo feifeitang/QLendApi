@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using QLendApi.Dtos;
 using QLendApi.Repositories;
 using QLendApi.Responses;
+using QLendApi.Services;
 
 namespace QLendApi.Controllers
 {
@@ -12,24 +13,26 @@ namespace QLendApi.Controllers
     public class SmsController : ControllerBase
     {
         private readonly IForeignWorkerRepository foreignWorkerRepository;
+        private readonly ISmsService smsService;
         private readonly double _expireMins;
 
-        public SmsController(IForeignWorkerRepository foreignWorkerRepository)
+        public SmsController(IForeignWorkerRepository foreignWorkerRepository, ISmsService smsService)
         {
             this.foreignWorkerRepository = foreignWorkerRepository;
+            this.smsService = smsService;
 
             this._expireMins = 1.5;
         }
 
-        // POST /api/user/sendOtp
-        [Route("sendOtp")]
+        // POST /api/sms/otp
+        [Route("otp")]
         [HttpPost]
-        public async Task<ActionResult> SendOtp(SendOtpDto sendOtpDto)
+        public async Task<ActionResult> Otp(OtpDto otpDto)
         {
             try
             {
                 // check user exist, and get user data
-                var foreignWorker = await foreignWorkerRepository.GetByIdAsync(sendOtpDto.Id);
+                var foreignWorker = await foreignWorkerRepository.GetByIdAsync(otpDto.Id);
 
                 if (foreignWorker == null)
                 {
@@ -42,6 +45,8 @@ namespace QLendApi.Controllers
 
                 Random rnd = new Random();
                 int OTP = rnd.Next(100000, 999999);
+
+                smsService.Send("0912", $"QLend OTP number is {OTP}");
 
                 foreignWorker.OTP = OTP;
                 foreignWorker.OTPSendTIme = DateTime.UtcNow;
@@ -60,7 +65,7 @@ namespace QLendApi.Controllers
             }
         }
 
-        // POST /api/user/checkOtp
+        // POST /api/sms/checkOtp
         [Route("checkOtp")]
         [HttpPost]
         public async Task<ActionResult> CheckOtp(CheckOtpDto checkOtpDto)
@@ -123,6 +128,6 @@ namespace QLendApi.Controllers
                 res = false;
 
             return res;
-        } 
+        }
     }
 }
