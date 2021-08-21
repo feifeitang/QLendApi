@@ -56,6 +56,8 @@ namespace QLendApi
             services.AddScoped<ILoanRecordService, LoanRecordService>();
 
             services.AddControllersWithViews();
+           // services.AddControllers().AddNewtonsoftJson();
+           
 
             services.AddSwaggerGen(c =>
             {
