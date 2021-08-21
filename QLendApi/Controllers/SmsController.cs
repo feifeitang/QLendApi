@@ -46,7 +46,7 @@ namespace QLendApi.Controllers
                 Random rnd = new Random();
                 int OTP = rnd.Next(100000, 999999);
 
-                smsService.Send("0912", $"QLend OTP number is {OTP}");
+                smsService.Send(foreignWorker.PhoneNumber, $"QLend OTP number is {OTP}");
 
                 foreignWorker.OTP = OTP;
                 foreignWorker.OTPSendTIme = DateTime.UtcNow;
