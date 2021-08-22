@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QLendApi.Models;
 
 namespace QLendApi.Migrations
 {
     [DbContext(typeof(QLendDBContext))]
-    partial class QLendDBContextModelSnapshot : ModelSnapshot
+    [Migration("20210822122730_repaymentRecord_add_BarCode")]
+    partial class repaymentRecord_add_BarCode
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -559,14 +561,14 @@ namespace QLendApi.Migrations
                         .HasColumnType("date")
                         .HasComment("實際還款日");
 
-                    b.Property<string>("BarCode1")
-                        .HasColumnType("char(20)");
+                    b.Property<byte[]>("BarCode1")
+                        .HasColumnType("varbinary(max)");
 
-                    b.Property<string>("BarCode2")
-                        .HasColumnType("char(20)");
+                    b.Property<byte[]>("BarCode2")
+                        .HasColumnType("varbinary(max)");
 
-                    b.Property<string>("BarCode3")
-                        .HasColumnType("char(20)");
+                    b.Property<byte[]>("BarCode3")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("LoanNumber")
                         .IsRequired()

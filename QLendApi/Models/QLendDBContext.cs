@@ -467,9 +467,6 @@ namespace QLendApi.Models
 
                 entity.Property(e => e.RepaymentAmount).HasComment("還款金額");
 
-                entity.Property(e => e.RepaymentBarCode)
-                    .HasColumnType("image")
-                    .HasComment("還款條碼");
 
                 entity.Property(e => e.RepaymentDate)
                     .HasColumnType("date")
