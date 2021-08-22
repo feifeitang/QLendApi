@@ -15,6 +15,10 @@ dotnet user-secrets set "NotificationHub:ConnectionString" '{ConnectionString}'
 
 dotnet ef dbcontext scaffold Name=ConnectionStrings:DatabaseAlias Microsoft.EntityFrameworkCore.SqlServer -o Models
 
+dotnet user-secrets set "Ecpay:HashKey" ''
+dotnet user-secrets set "Ecpay:HashIV" ''
+dotnet user-secrets set "Ecpay:MerchantID" ''
+
 
 ## migrations
 
