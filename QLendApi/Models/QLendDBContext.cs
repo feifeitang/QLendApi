@@ -26,6 +26,7 @@ namespace QLendApi.Models
         public virtual DbSet<LoanRecord> LoanRecords { get; set; }
         public virtual DbSet<RepaymentRecord> RepaymentRecords { get; set; }
         public virtual DbSet<Notice> Notices { get; set; }
+        public virtual DbSet<Payment> Payment { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
