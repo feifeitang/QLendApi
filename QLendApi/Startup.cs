@@ -31,6 +31,8 @@ namespace QLendApi
 
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
 
+            services.Configure<EcpaySettings>(Configuration.GetSection("EcpaySettings"));
+
             var Mssqlsettings = Configuration.GetSection(nameof(MssqlSettings))
                 .Get<MssqlSettings>();
             services.AddDbContext<QLendDBContext>((options) =>
@@ -55,6 +57,8 @@ namespace QLendApi
             services.AddScoped<INoticeRepository, NoticeRepository>();
             services.AddScoped<ILoanRecordService, LoanRecordService>();
             services.AddScoped<ISmsService, SmsService>();
+            services.AddScoped<IEcpayService, EcpayService>();
+            services.AddScoped<IPaymentRepository, PaymentRepository>();
 
             services.AddControllersWithViews();
 

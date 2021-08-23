@@ -26,6 +26,7 @@ namespace QLendApi.Models
         public virtual DbSet<LoanRecord> LoanRecords { get; set; }
         public virtual DbSet<RepaymentRecord> RepaymentRecords { get; set; }
         public virtual DbSet<Notice> Notices { get; set; }
+        public virtual DbSet<Payment> Payment { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -467,9 +468,6 @@ namespace QLendApi.Models
 
                 entity.Property(e => e.RepaymentAmount).HasComment("還款金額");
 
-                entity.Property(e => e.RepaymentBarCode)
-                    .HasColumnType("image")
-                    .HasComment("還款條碼");
 
                 entity.Property(e => e.RepaymentDate)
                     .HasColumnType("date")
