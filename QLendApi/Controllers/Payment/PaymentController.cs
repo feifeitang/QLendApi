@@ -1,5 +1,8 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using QLendApi.Dtos;
 using QLendApi.Models;
 using QLendApi.Repositories;
 using QLendApi.Responses;
@@ -21,9 +24,33 @@ namespace QLendApi.Controllers
         // POST /api/payment/Create
         [Route("Create")]
         [HttpPost]
-        public Task<ActionResult<PaymentCreateResponse>> Create()
+        public async Task<ActionResult<PaymentCreateResponse>> Create()
         {
-            throw new System.NotImplementedException();
+            try
+            {
+                var createRes = await this.ecpayService.create(2000);
+                if (!createRes)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 90310,
+                        Message = $"payment ecpayService error"
+                    });
+                }
+                return Ok(new PaymentCreateResponse
+                {
+                    StatusCode = 10000,
+                    Message = "success",
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90300,
+                    Message = $"payment create api error:{ex}"
+                });
+            }
         }
 
         [Authorize]
@@ -38,9 +65,12 @@ namespace QLendApi.Controllers
         // POST /api/payment/ReceiveBarCode
         [Route("ReceiveBarCode")]
         [HttpPost]
-        public Task<ActionResult> ReceiveBarCode()
+        public async Task<ActionResult> ReceiveBarCode(EcpayReceivePaymentInfoDto ecpayReceivePaymentInfoDto)
         {
-            throw new System.NotImplementedException();
+            string json = JsonConvert.SerializeObject(ecpayReceivePaymentInfoDto);
+            Console.WriteLine(json);
+
+            return Ok();
         }
 
         // POST /api/payment/CallBack

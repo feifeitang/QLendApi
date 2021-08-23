@@ -4,7 +4,7 @@ namespace QLendApi.Services
 {
     public interface IEcpayService : IPaymentService
     {
-        bool ReceivePaymentResult();
-        bool ReceivePaymentInfo();
+        Task<bool> ReceivePaymentResult();
+        Task<bool> ReceivePaymentInfo();
     }
 }

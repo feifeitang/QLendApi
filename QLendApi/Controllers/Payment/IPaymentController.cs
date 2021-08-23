@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using QLendApi.Dtos;
 using QLendApi.Responses;
 
 namespace QLendApi.Controllers
@@ -8,7 +9,7 @@ namespace QLendApi.Controllers
     {
         Task<ActionResult<PaymentCreateResponse>> Create();
         Task<ActionResult<PaymentGetBarCodeResponse>> GetBarCode();
-        Task<ActionResult> ReceiveBarCode();
+        Task<ActionResult> ReceiveBarCode(EcpayReceivePaymentInfoDto ecpayReceivePaymentInfoDto);
         Task<ActionResult> CallBack();
     }
 }

@@ -1,7 +1,9 @@
+using System.Threading.Tasks;
+
 namespace QLendApi.Services
 {
     public interface IPaymentService
     {
-        bool create(int amount);
+        Task<bool> create(int amount);
     }
 }
