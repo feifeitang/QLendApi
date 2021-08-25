@@ -4,6 +4,6 @@ namespace QLendApi.Services
 {
     public interface IPaymentService
     {
-        Task<bool> create(int amount);
+        Task<string> create(int amount);
     }
 }

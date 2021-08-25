@@ -45,13 +45,15 @@ namespace QLendApi.Services
             this.paymentRepository = paymentRepository;
         }
 
-        public async Task<bool> create(int amount)
+        public async Task<string> create(int amount)
         {
             List<string> enErrors = new List<string>();
 
             var CurrentDate = DateTime.Now;
 
             var TradeNo = "QLend" + CurrentDate.ToString("yyyyMMddHHmmss");
+
+            var postResult = "";
 
             EcpayCreateOrderDto ecpayCreateOrderDto = new EcpayCreateOrderDto();
 
@@ -96,7 +98,7 @@ namespace QLendApi.Services
                     // need to change to real RepaymentNumber
                 };
 
-                var postResult = await FormDataPostAsync(ecpayCreateOrderDto);
+                postResult = await FormDataPostAsync(ecpayCreateOrderDto);
 
                 Console.WriteLine("postResult {0}", postResult);
 
@@ -106,7 +108,7 @@ namespace QLendApi.Services
             {
                 enErrors.Add(e.Message);
                 _logger.LogError(e, "Unexpected error create ecpay order");
-                return false;
+                return "";
             }
             finally
             {
@@ -117,7 +119,7 @@ namespace QLendApi.Services
                     Console.WriteLine(szErrorMessage);
                 }
             }
-            return true;
+            return postResult;
         }
 
         public async Task<bool> ReceivePaymentInfo()
@@ -202,7 +204,7 @@ namespace QLendApi.Services
             }
             return builder.ToString().ToUpper();
         }
-        private async Task<bool> FormDataPostAsync(EcpayCreateOrderDto apiData)
+        private async Task<string> FormDataPostAsync(EcpayCreateOrderDto apiData)
         {
             using (HttpClientHandler handler = new HttpClientHandler())
             {
@@ -261,11 +263,11 @@ namespace QLendApi.Services
                                 String strResult = await response.Content.ReadAsStringAsync();
                                 Console.WriteLine("strResult {0}", strResult);
 
-                                return true;
+                                return strResult;
                             }
                             else
                             {
-                                return false;
+                                return "";
                                 // fooAPIResult = new APIResult
                                 // {
                                 //     Success = false,
@@ -276,7 +278,7 @@ namespace QLendApi.Services
                         }
                         else
                         {
-                            return false;
+                            return "";
                             // fooAPIResult = new APIResult
                             // {
                             //     Success = false,
@@ -292,7 +294,7 @@ namespace QLendApi.Services
                 }
             }
 
-            return true;
+            return "";
         }
         public static byte[] ObjectToByteArray(Object obj)
         {
