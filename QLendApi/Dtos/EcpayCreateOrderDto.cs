@@ -16,6 +16,8 @@ namespace QLendApi.Dtos
         [Required]
         public int TotalAmount { get; set; }
         [Required]
+        public int StoreExpireDate { get; set; }
+        [Required]
         public string TradeDesc { get; set; }
         [Required]
         public string ItemName { get; set; }

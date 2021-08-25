@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -64,13 +65,29 @@ namespace QLendApi.Controllers
 
         // POST /api/payment/ReceiveBarCode
         [Route("ReceiveBarCode")]
+        [Consumes("application/x-www-form-urlencoded")]
         [HttpPost]
-        public async Task<ActionResult> ReceiveBarCode(EcpayReceivePaymentInfoDto ecpayReceivePaymentInfoDto)
+        public IActionResult ReceiveBarCode([FromForm] EcpayCreateOrderDto ecpayReceivePaymentInfoDto)
         {
-            string json = JsonConvert.SerializeObject(ecpayReceivePaymentInfoDto);
-            Console.WriteLine(json);
+            try
+            {
+                foreach (PropertyInfo prop in ecpayReceivePaymentInfoDto.GetType().GetProperties())
+                {
+                    Console.WriteLine($"{prop.Name}: {prop.GetValue(ecpayReceivePaymentInfoDto, null)}");
+                }
+                string json = JsonConvert.SerializeObject(ecpayReceivePaymentInfoDto);
+                Console.WriteLine(json);
 
-            return Ok();
+                return Ok("0|1");
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90300,
+                    Message = $"payment create api error:{ex}"
+                });
+            }
         }
 
         // POST /api/payment/CallBack
