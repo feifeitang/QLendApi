@@ -224,7 +224,10 @@ namespace QLendApi.Controllers
                 foreignWorker.Sex = personalInfoDto.Sex;
                 foreignWorker.Nationality = personalInfoDto.Nationality;
                 foreignWorker.BirthDate = personalInfoDto.BirthDate;
-                foreignWorker.PassportNumber = personalInfoDto.PassportNumber;
+                foreignWorker.FamilyMemberName = personalInfoDto.FamilyMemberName;
+                foreignWorker.FamilyMemberPhoneNumber = personalInfoDto.FamilyMemberPhoneNumber;
+                foreignWorker.FacebookAccount = personalInfoDto.FacebookAccount;
+                foreignWorker.CommunicationSoftwareAccount = personalInfoDto.CommunicationSoftwareAccount;
 
                 foreignWorker.Status = ForeignWorkStatus.PersonalInfoFinish;
 

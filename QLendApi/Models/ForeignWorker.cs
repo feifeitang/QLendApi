@@ -33,7 +33,8 @@ namespace QLendApi.Models
         public int? EducationBackground { get; set; }
         public int? TimeInTaiwan { get; set; }
         public string UserName { get; set; }
-        public string PassportNumber { get; set; }
+        
+        // public string PassportNumber { get; set; }
         public byte[] Signature { get; set; }
         public int? CreditScore { get; set; }
         public int? DefaultRisk { get; set; }
@@ -52,6 +53,10 @@ namespace QLendApi.Models
         public int? IncomeNumber { get; set; }
         public int? EmployerNumber { get; set; }
         public byte[] Signature2 { get; set; }
+        public string FamilyMemberName { get; set; }
+        public string FamilyMemberPhoneNumber { get; set; }
+        public string FacebookAccount { get; set; }
+        public string CommunicationSoftwareAccount { get; set; }
 
         public virtual Employer EmployerNumberNavigation { get; set; }
         public virtual IncomeInformation IncomeNumberNavigation { get; set; }
