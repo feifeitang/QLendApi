@@ -283,13 +283,13 @@ namespace QLendApi.Models
                     .IsUnicode(false)
                     .IsFixedLength(true)
                     .HasComment("國籍");
-
+/*
                 entity.Property(e => e.PassportNumber)
                     .HasMaxLength(9)
                     .IsUnicode(false)
                     .IsFixedLength(true)
                     .HasComment("護照號碼");
-
+*/
                 entity.Property(e => e.Password)
                     .IsRequired()
                     .HasMaxLength(20)
