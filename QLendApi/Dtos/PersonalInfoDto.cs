@@ -30,11 +30,17 @@ namespace QLendApi.Dtos
         [Required]
         [StringLength(9, MinimumLength = 9)]
         public string PassportNumber { get; init; }
+
+        [Required]
+        public string FamilyMemberName { get; set; }
         
+        [Required]
+        public string FamilyMemberPhoneNumber { get; set; }
 
+        [Required]
+        public string FacebookAccount { get; set; }
 
-
-
-        
+        [Required]
+        public string CommunicationSoftwareAccount { get; set; }        
     }
 }

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QLendApi.Models;
 
 namespace QLendApi.Migrations
 {
     [DbContext(typeof(QLendDBContext))]
-    partial class QLendDBContextModelSnapshot : ModelSnapshot
+    [Migration("20210822131718_repaymentRecord_fix_barCode_type_and_add_payment_table")]
+    partial class repaymentRecord_fix_barCode_type_and_add_payment_table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -257,9 +259,6 @@ namespace QLendApi.Migrations
                         .HasColumnType("date")
                         .HasComment("出生日期");
 
-                    b.Property<string>("CommunicationSoftwareAccount")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int?>("CreditScore")
                         .HasColumnType("int")
                         .HasComment("信評分數 1~5");
@@ -285,15 +284,6 @@ namespace QLendApi.Migrations
                         .HasColumnType("char(20)")
                         .IsFixedLength(true)
                         .HasComment("英文名字");
-
-                    b.Property<string>("FacebookAccount")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FamilyMemberName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FamilyMemberPhoneNumber")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("ImmediateFamilyNumber")
                         .HasColumnType("int")
@@ -329,6 +319,13 @@ namespace QLendApi.Migrations
 
                     b.Property<DateTime?>("OTPSendTIme")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("PassportNumber")
+                        .HasMaxLength(9)
+                        .IsUnicode(false)
+                        .HasColumnType("char(9)")
+                        .IsFixedLength(true)
+                        .HasComment("護照號碼");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -545,57 +542,6 @@ namespace QLendApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Notice");
-                });
-
-            modelBuilder.Entity("QLendApi.Models.Payment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("BarCode1")
-                        .HasColumnType("char(20)");
-
-                    b.Property<string>("BarCode2")
-                        .HasColumnType("char(20)");
-
-                    b.Property<string>("BarCode3")
-                        .HasColumnType("char(20)");
-
-                    b.Property<DateTime?>("CreateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("MerchantTradeNo")
-                        .HasColumnType("char(20)");
-
-                    b.Property<string>("PaymentInfoURL")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ReceivePayTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("RepaymentNumber")
-                        .HasColumnType("char(11)");
-
-                    b.Property<string>("ReturnURL")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TradeNo")
-                        .HasColumnType("char(20)");
-
-                    b.Property<DateTime?>("UpdateTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Payment");
                 });
 
             modelBuilder.Entity("QLendApi.Models.RepaymentRecord", b =>
