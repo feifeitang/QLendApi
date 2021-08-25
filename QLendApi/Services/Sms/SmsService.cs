@@ -27,6 +27,8 @@ namespace QLendApi.Services
             {
                 string requestUrl = $"https://api.kotsms.com.tw/kotsmsapi-1.php?username={_userName}&password={_password}&smbody={content}&dstaddr={PhoneNumber}";
 
+                Console.WriteLine("requestUrl {0}", requestUrl);
+
                 WebRequest request = WebRequest.Create(requestUrl);
 
                 WebResponse response = request.GetResponse();
