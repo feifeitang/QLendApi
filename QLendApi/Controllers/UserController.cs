@@ -227,6 +227,7 @@ namespace QLendApi.Controllers
                 foreignWorker.FamilyMemberName = personalInfoDto.FamilyMemberName;
                 foreignWorker.FamilyMemberPhoneNumber = personalInfoDto.FamilyMemberPhoneNumber;
                 foreignWorker.FacebookAccount = personalInfoDto.FacebookAccount;
+                foreignWorker.CommunicationSoftware = personalInfoDto.CommunicationSoftware;
                 foreignWorker.CommunicationSoftwareAccount = personalInfoDto.CommunicationSoftwareAccount;
 
                 foreignWorker.Status = ForeignWorkStatus.PersonalInfoFinish;

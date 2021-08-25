@@ -41,6 +41,9 @@ namespace QLendApi.Dtos
         public string FacebookAccount { get; set; }
 
         [Required]
+        public string CommunicationSoftware { get; set; }
+
+        [Required]
         public string CommunicationSoftwareAccount { get; set; }        
     }
 }
