@@ -21,7 +21,7 @@ namespace QLendApi.Controllers
             this.foreignWorkerRepository = foreignWorkerRepository;
             this.smsService = smsService;
 
-            this._expireMins = 1.5;
+            this._expireMins = 2;
         }
 
         // POST /api/sms/otp
