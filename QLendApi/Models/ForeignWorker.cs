@@ -56,6 +56,7 @@ namespace QLendApi.Models
         public string FamilyMemberName { get; set; }
         public string FamilyMemberPhoneNumber { get; set; }
         public string FacebookAccount { get; set; }
+        public string CommunicationSoftware { get; set; }
         public string CommunicationSoftwareAccount { get; set; }
 
         public virtual Employer EmployerNumberNavigation { get; set; }
