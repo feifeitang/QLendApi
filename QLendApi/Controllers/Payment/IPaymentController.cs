@@ -9,7 +9,7 @@ namespace QLendApi.Controllers
     {
         Task<ActionResult<PaymentCreateResponse>> Create();
         Task<ActionResult<PaymentGetBarCodeResponse>> GetBarCode();
-        IActionResult ReceiveBarCode([FromForm] EcpayCreateOrderDto ecpayReceivePaymentInfoDto);
+        IActionResult ReceiveBarCode([FromForm] EcpayReceivePaymentInfoDto ecpayReceivePaymentInfoDto);
         Task<ActionResult> CallBack();
     }
 }
