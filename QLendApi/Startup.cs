@@ -80,6 +80,10 @@ namespace QLendApi
             services.AddOptions<SmsServiceOptions>()
                 .Configure(Configuration.GetSection("SmsService").Bind)
                 .ValidateDataAnnotations();
+
+            services.AddOptions<EcpayServiceOptions>()
+                .Configure(Configuration.GetSection("Ecpay").Bind)
+                .ValidateDataAnnotations();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
