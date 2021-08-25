@@ -63,14 +63,14 @@ namespace QLendApi.Services
                 ecpayCreateOrderDto.MerchantTradeNo = TradeNo;//廠商的交易編號
                 ecpayCreateOrderDto.MerchantTradeDate = CurrentDate.ToString("yyyy/MM/dd HH:mm:ss");//廠商的交易時間
                 ecpayCreateOrderDto.TotalAmount = amount;//交易總金額
-                ecpayCreateOrderDto.TradeDesc = "交易描述";//交易描述
+                ecpayCreateOrderDto.TradeDesc = "desc";//交易描述
                 ecpayCreateOrderDto.ChoosePayment = "BARCODE";
                 ecpayCreateOrderDto.PaymentType = "aio";
 
                 ecpayCreateOrderDto.EncryptType = 1;
 
                 //訂單的商品資料
-                ecpayCreateOrderDto.ItemName = "商品";
+                ecpayCreateOrderDto.ItemName = "item";
 
                 ecpayCreateOrderDto.StoreExpireDate = 1;
 
@@ -179,11 +179,7 @@ namespace QLendApi.Services
 
             }
 
-            Console.WriteLine("init arr {0}", Arr);
-
             Arr.Sort();
-
-            Console.WriteLine("after arr {0}", Arr);
 
             var s = String.Join("&", Arr);
 
@@ -191,17 +187,11 @@ namespace QLendApi.Services
 
             Console.WriteLine("newStr {0}", newStr);
 
-            var str3 = newStr.ToLower();
-
-            Console.WriteLine("str3 {0}", str3);
-
-            var encode = System.Web.HttpUtility.UrlEncode(str3);
-
-            Console.WriteLine("encode {0}", encode);
+            var urlEncode = System.Web.HttpUtility.UrlEncode(newStr).ToLower();
 
             SHA256 mySHA256 = SHA256.Create();
 
-            byte[] bytesString = Encoding.UTF8.GetBytes(str3);
+            byte[] bytesString = Encoding.UTF8.GetBytes(urlEncode);
 
             byte[] hashValue = mySHA256.ComputeHash(bytesString);
 
