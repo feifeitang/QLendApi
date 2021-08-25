@@ -67,7 +67,7 @@ namespace QLendApi.Controllers
         [Route("ReceiveBarCode")]
         [Consumes("application/x-www-form-urlencoded")]
         [HttpPost]
-        public IActionResult ReceiveBarCode([FromForm] EcpayCreateOrderDto ecpayReceivePaymentInfoDto)
+        public IActionResult ReceiveBarCode([FromForm] EcpayReceivePaymentInfoDto ecpayReceivePaymentInfoDto)
         {
             try
             {
@@ -78,7 +78,7 @@ namespace QLendApi.Controllers
                 string json = JsonConvert.SerializeObject(ecpayReceivePaymentInfoDto);
                 Console.WriteLine(json);
 
-                return Ok("0|1");
+                return Ok("1|O");
             }
             catch (System.Exception ex)
             {
