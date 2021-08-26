@@ -22,7 +22,7 @@ namespace QLendApi.Models
         public int PayWay { get; set; }
         public int RemittanceWay { get; set; }
         public byte[] FrontSalaryPassbook { get; set; }
-        public byte[] InsideSalarybook { get; set; }
+        public byte[] PaySlip { get; set; }
 
         public virtual ICollection<ForeignWorker> ForeignWorkers { get; set; }
     }

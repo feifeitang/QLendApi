@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QLendApi.Models;
 
 namespace QLendApi.Migrations
 {
     [DbContext(typeof(QLendDBContext))]
-    partial class QLendDBContextModelSnapshot : ModelSnapshot
+    [Migration("20210826081439_IncomeInformationInsideSalaryBookModifyToPaySlip")]
+    partial class IncomeInformationInsideSalaryBookModifyToPaySlip
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -310,9 +312,6 @@ namespace QLendApi.Migrations
                         .HasColumnType("int")
                         .HasComment("工作性質 1:社福移工 2:產業移工 3:其他");
 
-                    b.Property<byte[]>("LocalIdCard")
-                        .HasColumnType("varbinary(max)");
-
                     b.Property<int?>("Marriage")
                         .HasColumnType("int")
                         .HasComment("婚姻狀態 1:單身 2:已婚");
@@ -335,12 +334,6 @@ namespace QLendApi.Migrations
 
                     b.Property<DateTime?>("OTPSendTIme")
                         .HasColumnType("datetime2");
-
-                    b.Property<byte[]>("Passport")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("PassportNumber")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
                         .IsRequired()

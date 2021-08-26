@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace QLendApi.Dtos
 {
-    public record ArcDto
+    public record PersonalNationalInfoDto
     {
         [Required]
         public int Id { get; init; }
@@ -13,5 +13,11 @@ namespace QLendApi.Dtos
 
         [Required]
         public IFormFile BackArc { get; init; }
+
+        [Required]
+        public IFormFile Passport { get; init; }
+
+        [Required]
+        public IFormFile LocalIdCard { get; init; }
     }
 }
