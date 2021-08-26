@@ -133,11 +133,11 @@ namespace QLendApi.Controllers
         // POST /api/user/initArc
         [Route("initArc")]
         [HttpPost]
-        public async Task<ActionResult> InitArc([FromForm] ArcDto arcDto)
+        public async Task<ActionResult> PersonalNationalInfo([FromForm] PersonalNationalInfoDto personalNationalInfoDto)
         {
             try
             {
-                var foreignWorker = await foreignWorkerRepository.GetByIdAsync(arcDto.Id);
+                var foreignWorker = await foreignWorkerRepository.GetByIdAsync(personalNationalInfoDto.Id);
 
                 if (foreignWorker == null)
                 {
@@ -169,8 +169,10 @@ namespace QLendApi.Controllers
                     });
                 }
 
-                cert.FrontArc = await arcDto.FrontArc.GetBytes();
-                cert.BackArc = await arcDto.BackArc.GetBytes();
+                cert.FrontArc = await personalNationalInfoDto.FrontArc.GetBytes();
+                cert.BackArc = await personalNationalInfoDto.BackArc.GetBytes();
+                foreignWorker.Passport = await personalNationalInfoDto.BackArc.GetBytes();
+                foreignWorker.LocalIdCard = await personalNationalInfoDto.BackArc.GetBytes();
 
                 await certificateRepository.UpdateAsync(cert);
 
@@ -500,24 +502,8 @@ namespace QLendApi.Controllers
                     incomeInfo.LatePay = incomeInfoDto.LatePay;
                     incomeInfo.PayWay = incomeInfoDto.PayWay;
                     incomeInfo.RemittanceWay = incomeInfoDto.RemittanceWay;
-
-                    if (incomeInfoDto.FrontSalaryPassbook != null)
-                    {
-                        incomeInfo.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
-                    }
-                    else
-                    {
-                        incomeInfo.FrontSalaryPassbook = null;
-                    }
-
-                    if (incomeInfoDto.InsideSalarybook != null)
-                    {
-                        incomeInfo.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes();
-                    }
-                    else
-                    {
-                        incomeInfo.InsideSalarybook = null;
-                    }
+                    incomeInfo.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
+                    incomeInfo.PaySlip = await incomeInfoDto.PaySlip.GetBytes();
 
                     await incomeInformationRepository.UpdateAsync(incomeInfo);
                 }
@@ -530,26 +516,10 @@ namespace QLendApi.Controllers
                         AvgMonthlyIncome = incomeInfoDto.AvgMonthlyIncome,
                         LatePay = incomeInfoDto.LatePay,
                         PayWay = incomeInfoDto.PayWay,
-                        RemittanceWay = incomeInfoDto.RemittanceWay
+                        RemittanceWay = incomeInfoDto.RemittanceWay,
+                        FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes(),
+                        PaySlip = await incomeInfoDto.PaySlip.GetBytes()
                     };
-
-                    if (incomeInfoDto.FrontSalaryPassbook != null)
-                    {
-                        incomeInfo.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
-                    }
-                    else
-                    {
-                        incomeInfo.FrontSalaryPassbook = null;
-                    }
-
-                    if (incomeInfoDto.InsideSalarybook != null)
-                    {
-                        incomeInfo.InsideSalarybook = await incomeInfoDto.InsideSalarybook.GetBytes();
-                    }
-                    else
-                    {
-                        incomeInfo.InsideSalarybook = null;
-                    }
 
                     foreignWorker.IncomeNumber = incomeInfo.IncomeNumber;
 
