@@ -66,8 +66,8 @@ namespace QLendApi.Controllers
             }
         }
 
-        // POST /api/sms/otp
-        [Route("otp")]
+        // POST /api/sms/OtpByPhoneNumber
+        [Route("OtpByPhoneNumber")]
         [HttpPost]
         public async Task<ActionResult> OtpByPhoneNumber(OtpByPhoneNumberDto otpByPhoneNumberDto)
         {
