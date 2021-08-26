@@ -1,13 +1,10 @@
 using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using QLendApi.Dtos;
-using QLendApi.Models;
+using QLendApi.lib;
 using QLendApi.Repositories;
 using QLendApi.Responses;
 using QLendApi.Services;
@@ -58,9 +55,21 @@ namespace QLendApi.Controllers
         // POST /api/payment/GetBarCode
         [Route("GetBarCode")]
         [HttpPost]
-        public Task<ActionResult<PaymentGetBarCodeResponse>> GetBarCode()
+        public async Task<ActionResult<PaymentGetBarCodeResponse>> GetBarCode(string repaymentNumber)
         {
-            throw new System.NotImplementedException();
+            var payment = await this.paymentRepository.GetByRepaymentNumberAsync(repaymentNumber);
+
+            return Ok(new PaymentGetBarCodeResponse
+            {
+                StatusCode = ResponseStatusCode.Success,
+                Message = "success",
+                Data = new PaymentGetBarCodeResponse.PaymentGetBarCodeDataStruct
+                {
+                    BarCode1 = payment.BarCode1,
+                    BarCode2 = payment.BarCode2,
+                    BarCode3 = payment.BarCode3
+                }
+            });
         }
 
         // POST /api/payment/ReceiveBarCode
@@ -83,6 +92,8 @@ namespace QLendApi.Controllers
                 paymentRecord.BarCode1 = ecpayReceivePaymentInfoDto.Barcode1;
                 paymentRecord.BarCode2 = ecpayReceivePaymentInfoDto.Barcode2;
                 paymentRecord.BarCode3 = ecpayReceivePaymentInfoDto.Barcode3;
+
+                await this.paymentRepository.UpdateAsync(paymentRecord);
 
                 return Ok("1|O");
             }
