@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -15,49 +16,41 @@ namespace QLendApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class PaymentController : ControllerBase, IPaymentController
+    public class PaymentController : ControllerBase
     {
         private readonly IEcpayService ecpayService;
-        public PaymentController(IEcpayService ecpayService)
+        private readonly IPaymentRepository paymentRepository;
+        public PaymentController(IEcpayService ecpayService, IPaymentRepository paymentRepository)
         {
             this.ecpayService = ecpayService;
+            this.paymentRepository = paymentRepository;
         }
 
-        [Authorize]
-        // POST /api/payment/Create
+        // [Authorize]
+        // GET /api/payment/Create
         [Route("Create")]
-        [HttpPost]
-        public async Task<ActionResult<string>> Create()
+        [HttpGet]
+        public async Task<ActionResult> Create()
         {
             try
             {
-                var createRes = await this.ecpayService.create(2000);
-                if (createRes == "")
+                var content = await this.ecpayService.create(2000);
+                return new ContentResult
                 {
-                    return BadRequest(new BaseResponse
-                    {
-                        StatusCode = 90310,
-                        Message = $"payment ecpayService error"
-                    });
-                }
-
-                // var response = new HttpResponseMessage();
-                // response.Content = new StringContent(createRes);
-                // response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
-                return createRes;
-                // return Ok(new PaymentCreateResponse
-                // {
-                //     StatusCode = 10000,
-                //     Message = "success",
-                // });
+                    ContentType = "text/html",
+                    StatusCode = 200,
+                    Content = content
+                };
             }
             catch (System.Exception ex)
             {
-                return BadRequest(new BaseResponse
+                Console.WriteLine(ex);
+
+                return new ContentResult
                 {
-                    StatusCode = 90300,
-                    Message = $"payment create api error:{ex}"
-                });
+                    StatusCode = 400,
+                    Content = "<h1>Bad Request</h1>"
+                };
             }
         }
 
@@ -74,7 +67,7 @@ namespace QLendApi.Controllers
         [Route("ReceiveBarCode")]
         [Consumes("application/x-www-form-urlencoded")]
         [HttpPost]
-        public IActionResult ReceiveBarCode([FromForm] EcpayReceivePaymentInfoDto ecpayReceivePaymentInfoDto)
+        public async Task<IActionResult> ReceiveBarCode([FromForm] EcpayReceivePaymentInfoDto ecpayReceivePaymentInfoDto)
         {
             try
             {
@@ -83,7 +76,13 @@ namespace QLendApi.Controllers
                     Console.WriteLine($"{prop.Name}: {prop.GetValue(ecpayReceivePaymentInfoDto, null)}");
                 }
                 string json = JsonConvert.SerializeObject(ecpayReceivePaymentInfoDto);
-                Console.WriteLine(json);
+                Console.WriteLine("recevie ecpay barcode info {0}", json);
+
+                var paymentRecord = await this.paymentRepository.GetByMerchantTradeNoAsync(ecpayReceivePaymentInfoDto.MerchantTradeNo);
+
+                paymentRecord.BarCode1 = ecpayReceivePaymentInfoDto.Barcode1;
+                paymentRecord.BarCode2 = ecpayReceivePaymentInfoDto.Barcode2;
+                paymentRecord.BarCode3 = ecpayReceivePaymentInfoDto.Barcode3;
 
                 return Ok("1|O");
             }
