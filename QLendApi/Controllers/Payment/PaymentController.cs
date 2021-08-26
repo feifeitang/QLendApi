@@ -92,6 +92,8 @@ namespace QLendApi.Controllers
                 paymentRecord.BarCode1 = ecpayReceivePaymentInfoDto.Barcode1;
                 paymentRecord.BarCode2 = ecpayReceivePaymentInfoDto.Barcode2;
                 paymentRecord.BarCode3 = ecpayReceivePaymentInfoDto.Barcode3;
+                paymentRecord.TradeNo = ecpayReceivePaymentInfoDto.TradeNo;
+                paymentRecord.UpdateTime = DateTime.Now;
 
                 await this.paymentRepository.UpdateAsync(paymentRecord);
 
