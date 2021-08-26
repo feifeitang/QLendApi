@@ -374,9 +374,9 @@ namespace QLendApi.Models
                     .HasColumnType("image")
                     .HasComment("薪資存摺本正面照片");
 
-                entity.Property(e => e.InsideSalarybook)
+                entity.Property(e => e.PaySlip)
                     .HasColumnType("image")
-                    .HasComment("薪資存摺本內部照片");
+                    .HasComment("薪資條");
 
                 entity.Property(e => e.LatePay).HasComment("薪資如期撥入 1:3次以上 2:1~2次 3:從未延發");
 
