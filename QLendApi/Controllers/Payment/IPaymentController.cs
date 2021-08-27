@@ -1,3 +1,4 @@
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using QLendApi.Dtos;
@@ -7,7 +8,7 @@ namespace QLendApi.Controllers
 {
     public interface IPaymentController
     {
-        Task<ActionResult<PaymentCreateResponse>> Create();
+        Task<ActionResult<HttpResponseMessage>> Create();
         Task<ActionResult<PaymentGetBarCodeResponse>> GetBarCode();
         IActionResult ReceiveBarCode([FromForm] EcpayReceivePaymentInfoDto ecpayReceivePaymentInfoDto);
         Task<ActionResult> CallBack();

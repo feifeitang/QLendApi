@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using QLendApi.Dtos;
+using QLendApi.lib;
 using QLendApi.Repositories;
 using QLendApi.Responses;
 using QLendApi.Services;
@@ -54,6 +55,55 @@ namespace QLendApi.Controllers
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
                 return StatusCode(201);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90002,
+                    Message = $"sendOtp api error:{ex}"
+                });
+            }
+        }
+
+        // POST /api/sms/OtpByPhoneNumber
+        [Route("OtpByPhoneNumber")]
+        [HttpPost]
+        public async Task<ActionResult> OtpByPhoneNumber(OtpByPhoneNumberDto otpByPhoneNumberDto)
+        {
+            try
+            {
+                // check user exist, and get user data
+                var foreignWorker = await foreignWorkerRepository.GetByPhoneNumberAsync(otpByPhoneNumberDto.PhoneNumber);
+
+                if (foreignWorker == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10003,
+                        Message = "user not found"
+                    });
+                }
+
+                Random rnd = new Random();
+                int OTP = rnd.Next(100000, 999999);
+
+                smsService.Send(foreignWorker.PhoneNumber, $"QLend OTP number is {OTP}");
+
+                foreignWorker.OTP = OTP;
+                foreignWorker.OTPSendTIme = DateTime.UtcNow;
+
+                await foreignWorkerRepository.UpdateAsync(foreignWorker);
+
+                return Ok(new OtpByPhoneNumberResponse
+                {
+                    StatusCode = ResponseStatusCode.Success,
+                    Message = "success",
+                    Data = new OtpByPhoneNumberResponse.DataStruct
+                    {
+                        Id = foreignWorker.Id
+                    }
+                });
             }
             catch (System.Exception ex)
             {

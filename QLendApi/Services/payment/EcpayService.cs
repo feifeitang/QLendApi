@@ -1,23 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
-using ECPay.Payment.Integration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using QLendApi.Dtos;
 using QLendApi.Models;
 using QLendApi.Repositories;
 using restapi.Settings;
 using System.Security.Cryptography;
 using System.Text;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Net.Http;
-using System.Net.Http.Headers;
 
 namespace QLendApi.Services
 {
@@ -45,13 +37,13 @@ namespace QLendApi.Services
             this.paymentRepository = paymentRepository;
         }
 
-        public async Task<bool> create(int amount)
+        public async Task<string> create(int amount)
         {
-            List<string> enErrors = new List<string>();
-
             var CurrentDate = DateTime.Now;
 
             var TradeNo = "QLend" + CurrentDate.ToString("yyyyMMddHHmmss");
+
+            string htmlPage = null;
 
             EcpayCreateOrderDto ecpayCreateOrderDto = new EcpayCreateOrderDto();
 
@@ -96,28 +88,16 @@ namespace QLendApi.Services
                     // need to change to real RepaymentNumber
                 };
 
-                var postResult = await FormDataPostAsync(ecpayCreateOrderDto);
-
-                Console.WriteLine("postResult {0}", postResult);
+                htmlPage = GenHtmlPage(ecpayCreateOrderDto);
 
                 await this.paymentRepository.CreateAsync(paymentData);
             }
             catch (Exception e)
             {
-                enErrors.Add(e.Message);
                 _logger.LogError(e, "Unexpected error create ecpay order");
-                return false;
+                return null;
             }
-            finally
-            {
-                // 顯示錯誤訊息。
-                if (enErrors.Count() > 0)
-                {
-                    string szErrorMessage = String.Join("\\r\\n", enErrors);
-                    Console.WriteLine(szErrorMessage);
-                }
-            }
-            return true;
+            return htmlPage;
         }
 
         public async Task<bool> ReceivePaymentInfo()
@@ -130,42 +110,6 @@ namespace QLendApi.Services
             throw new System.NotImplementedException();
         }
 
-        private async void RequestToEcpay(EcpayCreateOrderDto data)
-        {
-            WebRequest request = WebRequest.Create(_ecpaySettings.OrderCreateUrl);
-
-            request.Method = "POST";
-
-            request.ContentType = "application/x-www-form-urlencoded";
-
-            byte[] byteArray = ObjectToByteArray(data);
-
-            request.ContentLength = byteArray.Length;
-
-            Stream dataStream = await request.GetRequestStreamAsync();
-
-            await dataStream.WriteAsync(byteArray, 0, byteArray.Length);
-
-            dataStream.Close();
-
-            Console.WriteLine("dataStream {0}", dataStream);
-
-            WebResponse response = await request.GetResponseAsync();
-
-            Stream receiveStream = response.GetResponseStream();
-
-            Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
-
-            StreamReader readStream = new StreamReader(receiveStream, encode);
-
-            string resData = await readStream.ReadToEndAsync();
-
-            Console.WriteLine("\r\nResponse stream received.");
-
-            Console.WriteLine("resData {0}", resData);
-
-            response.Close();
-        }
         private string GenCheckMacValue(EcpayCreateOrderDto ecpayCreateOrderDto)
         {
             List<string> Arr = new List<string>();
@@ -185,8 +129,6 @@ namespace QLendApi.Services
 
             var newStr = $"HashKey={this._HashKey}&{s}&HashIV={this._HashIV}";
 
-            Console.WriteLine("newStr {0}", newStr);
-
             var urlEncode = System.Web.HttpUtility.UrlEncode(newStr).ToLower();
 
             SHA256 mySHA256 = SHA256.Create();
@@ -202,104 +144,28 @@ namespace QLendApi.Services
             }
             return builder.ToString().ToUpper();
         }
-        private async Task<bool> FormDataPostAsync(EcpayCreateOrderDto apiData)
+        private string GenHtmlPage(EcpayCreateOrderDto apiData)
         {
-            using (HttpClientHandler handler = new HttpClientHandler())
+            try
             {
-                using (HttpClient client = new HttpClient(handler))
+                var form = "";
+
+                foreach (PropertyInfo prop in apiData.GetType().GetProperties())
                 {
-                    try
-                    {
-                        HttpResponseMessage response = null;
-
-                        // Accept 用於宣告客戶端要求服務端回應的文件型態 (底下兩種方法皆可任選其一來使用)
-                        //client.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
-                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                        // Content-Type 用於宣告遞送給對方的文件型態
-                        client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/x-www-form-urlencoded");
-
-                        //// 方法一： 使用字串名稱用法
-                        var formData = new FormUrlEncodedContent(new[] {
-                           new KeyValuePair<string, string>("MerchantID", apiData.MerchantID),
-                           new KeyValuePair<string, string>("TotalAmount", apiData.TotalAmount.ToString()),
-                           new KeyValuePair<string, string>("MerchantTradeNo", apiData.MerchantTradeNo),
-                           new KeyValuePair<string, string>("MerchantTradeDate", apiData.MerchantTradeDate),
-                           new KeyValuePair<string, string>("PaymentType", apiData.PaymentType),
-                           new KeyValuePair<string, string>("StoreExpireDate", apiData.StoreExpireDate.ToString()),
-                           new KeyValuePair<string, string>("TradeDesc", apiData.TradeDesc),
-                           new KeyValuePair<string, string>("ItemName", apiData.ItemName),
-                           new KeyValuePair<string, string>("ReturnURL", apiData.ReturnURL),
-                           new KeyValuePair<string, string>("ChoosePayment", apiData.ChoosePayment),
-                           new KeyValuePair<string, string>("CheckMacValue", apiData.CheckMacValue),
-                           new KeyValuePair<string, string>("EncryptType", apiData.EncryptType.ToString()),
-                           new KeyValuePair<string, string>("PaymentInfoURL", apiData.PaymentInfoURL),
-                        });
-
-                        string json = JsonConvert.SerializeObject(apiData);
-                        Console.WriteLine("json {0}", json);
-
-                        // 方法二： 強型別用法
-                        // https://docs.microsoft.com/zh-tw/dotnet/csharp/language-reference/keywords/nameof
-                        //         Dictionary<string, string> formDataDictionary = new Dictionary<string, string>()
-                        // {
-                        //     {nameof(APIData.Ma), apiData.Id.ToString() },
-                        //     {nameof(APIData.Name), apiData.Name },
-                        //     {nameof(APIData.Filename), apiData.Filename }
-                        // };
-
-                        // https://msdn.microsoft.com/zh-tw/library/system.net.http.formurlencodedcontent(v=vs.110).aspx
-                        // var formData = new FormUrlEncodedContent(formDataDictionary);
-
-                        response = await client.PostAsync(this._ecpaySettings.OrderCreateUrl, formData);
-
-                        if (response != null)
-                        {
-                            if (response.IsSuccessStatusCode == true)
-                            {
-                                // 取得呼叫完成 API 後的回報內容
-                                String strResult = await response.Content.ReadAsStringAsync();
-                                Console.WriteLine("strResult {0}", strResult);
-
-                                return true;
-                            }
-                            else
-                            {
-                                return false;
-                                // fooAPIResult = new APIResult
-                                // {
-                                //     Success = false,
-                                //     Message = string.Format("Error Code:{0}, Error Message:{1}", response.StatusCode, response.RequestMessage),
-                                //     Payload = null,
-                                // };
-                            }
-                        }
-                        else
-                        {
-                            return false;
-                            // fooAPIResult = new APIResult
-                            // {
-                            //     Success = false,
-                            //     Message = "應用程式呼叫 API 發生異常",
-                            //     Payload = null,
-                            // };
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("ex {0}", ex);
-                    }
+                    form += $"<input name='{prop.Name}' type='hidden' value='{prop.GetValue(apiData, null)}' />";
                 }
-            }
+                form += "<button type='hidden' id='submit'>submit</button>";
 
-            return true;
-        }
-        public static byte[] ObjectToByteArray(Object obj)
-        {
-            // proper way to serialize object
-            var objToString = System.Text.Json.JsonSerializer.Serialize(obj);
-            // convert that that to string with ascii you can chose what ever encoding want
-            return System.Text.Encoding.UTF8.GetBytes(objToString);
+                var js = "(function () {document.getElementById('submit').click();})()";
+                var html = $"<html xmlns='http://www.w3.org/1999/xhtml'><body><form action='{this._ecpaySettings.OrderCreateUrl}' method='post' ref='form'>{form}</form><script language='javascript' type='text/javascript'>{js}</script></body></html>";
+
+                return html;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ex {0}", ex);
+                return null;
+            }
         }
     }
 }

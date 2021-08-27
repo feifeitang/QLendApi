@@ -22,6 +22,6 @@ namespace QLendApi.Dtos
 
         public IFormFile FrontSalaryPassbook { get; init; }
         
-        public IFormFile InsideSalarybook { get; init; }
+        public IFormFile PaySlip { get; init; }
     }
 }
