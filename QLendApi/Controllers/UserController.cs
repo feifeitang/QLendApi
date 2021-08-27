@@ -171,8 +171,8 @@ namespace QLendApi.Controllers
 
                 cert.FrontArc = await personalNationalInfoDto.FrontArc.GetBytes();
                 cert.BackArc = await personalNationalInfoDto.BackArc.GetBytes();
-                foreignWorker.Passport = await personalNationalInfoDto.BackArc.GetBytes();
-                foreignWorker.LocalIdCard = await personalNationalInfoDto.BackArc.GetBytes();
+                foreignWorker.Passport = await personalNationalInfoDto.Passport.GetBytes();
+                foreignWorker.LocalIdCard = await personalNationalInfoDto.LocalIdCard.GetBytes();
 
                 await certificateRepository.UpdateAsync(cert);
 
