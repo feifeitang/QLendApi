@@ -28,10 +28,6 @@ namespace QLendApi.Dtos
         public DateTime? BirthDate { get; init; }
 
         [Required]
-        [StringLength(9, MinimumLength = 9)]
-        public string PassportNumber { get; init; }
-
-        [Required]
         public string FamilyMemberName { get; set; }
         
         [Required]
