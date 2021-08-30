@@ -529,15 +529,7 @@ namespace QLendApi.Controllers
                 }
 
                 var loanRecord = await loanRecordRepository.GetByLoanNumber(incomeInfoDto.LoanNumber);
-
-                if(loanRecord == null)
-                {
-                    return BadRequest(new BaseResponse
-                    {
-                        StatusCode = 30090,
-                        Message = "null"
-                    });
-                }
+       
                 loanRecord.State = LoanState.IncomeInfoFinish;
                 loanRecord.CreateTime = DateTime.UtcNow;
 
