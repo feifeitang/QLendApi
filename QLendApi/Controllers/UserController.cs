@@ -658,10 +658,33 @@ namespace QLendApi.Controllers
                 //get user info
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
+                var loanRecord = await loanRecordRepository.GetByLoanNumber(bankAccountDto.LoanNumber);
+
+                if (foreignWorker.Id != loanRecord.Id)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10030,
+                        Message = "id not equal"
+                    });
+                }
+
+                if (loanRecord.State != LoanState.ConfirmLoan)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10030,
+                        Message = "loan state not correct"
+                    });
+                }
+
                 foreignWorker.BankNumber = bankAccountDto.BankNumber;
                 foreignWorker.AccountNumber = bankAccountDto.AccountNumber;
+                loanRecord.State = LoanState.BankAccountFinish;
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
+                await loanRecordRepository.UpdateAsync(loanRecord);
+
                 return StatusCode(201);
             }
             catch (System.Exception ex)
