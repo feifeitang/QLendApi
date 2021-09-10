@@ -209,8 +209,8 @@ namespace QLendApi.Controllers
             }
         }
 
-        // GET /api/loan/list
-        [Route("list")]
+        // GET /api/loan/list/{status}
+        [Route("list/{status}")]
         [HttpGet]
         public async Task<ActionResult<LoanListResponse>> list(int status)
         {
@@ -222,12 +222,15 @@ namespace QLendApi.Controllers
 
                 return Ok(new LoanListResponse
                 {
+                                        
                     StatusCode = 10000,
                     Message = "success",
+                    
                     Data = new LoanListResponse.LoanListDataStruct
-                    {
+                    {                       
                         LoanRecords = loanRecord
                     }
+                    
                 });
             }
             catch (System.Exception ex)

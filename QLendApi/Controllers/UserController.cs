@@ -414,7 +414,7 @@ namespace QLendApi.Controllers
             }
         }
 
-        // POST /api/user/info
+        // GET /api/user/info
         [Authorize]
         [Route("info")]
         [HttpGet]
@@ -681,6 +681,7 @@ namespace QLendApi.Controllers
                 foreignWorker.BankNumber = bankAccountDto.BankNumber;
                 foreignWorker.AccountNumber = bankAccountDto.AccountNumber;
                 loanRecord.State = LoanState.BankAccountFinish;
+               // loanRecord.Status = 0;
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
                 await loanRecordRepository.UpdateAsync(loanRecord);
