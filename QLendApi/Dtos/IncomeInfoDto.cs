@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 
@@ -25,5 +26,8 @@ namespace QLendApi.Dtos
         
         [Required]
         public IFormFile PaySlip { get; init; }
+
+        [Required]
+        public DateTime PayDay { get; init; }
     }
 }
