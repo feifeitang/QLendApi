@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QLendApi.Models;
 
 namespace QLendApi.Migrations
 {
     [DbContext(typeof(QLendDBContext))]
-    partial class QLendDBContextModelSnapshot : ModelSnapshot
+    [Migration("20210911044949_deletePayDay")]
+    partial class deletePayDay
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -440,9 +442,6 @@ namespace QLendApi.Migrations
                     b.Property<int>("LatePay")
                         .HasColumnType("int")
                         .HasComment("薪資如期撥入 1:3次以上 2:1~2次 3:從未延發");
-
-                    b.Property<int>("PayDay")
-                        .HasColumnType("int");
 
                     b.Property<byte[]>("PaySlip")
                         .HasColumnType("image")
