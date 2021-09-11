@@ -28,6 +28,6 @@ namespace QLendApi.Dtos
         public IFormFile PaySlip { get; init; }
 
         [Required]
-        public DateTime PayDay { get; init; }
+        public int PayDay { get; init; }
     }
 }
