@@ -47,7 +47,6 @@ namespace QLendApi.Repositories
         public async Task UpdateAsync(ForeignWorker foreignWorker)
         {
             _context.ForeignWorkers.Update(foreignWorker);
-
             await _context.SaveChangesAsync();
         }
 

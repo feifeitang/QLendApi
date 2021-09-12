@@ -17,10 +17,15 @@ namespace QLendApi.Controllers
     {
         private readonly IEcpayService ecpayService;
         private readonly IPaymentRepository paymentRepository;
-        public PaymentController(IEcpayService ecpayService, IPaymentRepository paymentRepository)
+        private readonly IRepaymentRecordRepository repaymentRecordRepository;
+        public PaymentController(
+            IEcpayService ecpayService,
+            IPaymentRepository paymentRepository,
+            IRepaymentRecordRepository repaymentRecordRepository)
         {
             this.ecpayService = ecpayService;
             this.paymentRepository = paymentRepository;
+            this.repaymentRecordRepository = repaymentRecordRepository;
         }
 
         // [Authorize]
@@ -97,7 +102,7 @@ namespace QLendApi.Controllers
 
                 await this.paymentRepository.UpdateAsync(paymentRecord);
 
-                return Ok("1|O");
+                return Ok("1|OK");
             }
             catch (System.Exception ex)
             {
@@ -111,10 +116,39 @@ namespace QLendApi.Controllers
 
         // POST /api/payment/CallBack
         [Route("CallBack")]
+        [Consumes("application/x-www-form-urlencoded")]
         [HttpPost]
-        public Task<ActionResult> CallBack()
+        public async Task<ActionResult> CallBack(EcpayReceivePaymentResultDto ecpayReceivePaymentResultDto)
         {
-            throw new System.NotImplementedException();
+            try
+            {
+                bool b = await this.ecpayService.ReceivePaymentResult(ecpayReceivePaymentResultDto);
+                
+                if (b != true)
+                {
+                    return Ok("0|checkMacValue not correct");
+                }
+
+                var payment = await this.paymentRepository.GetByMerchantTradeNoAsync(ecpayReceivePaymentResultDto.MerchantTradeNo);
+
+                var repaymentRecord = await this.repaymentRecordRepository.GetByRepaymentNumberAsync(payment.RepaymentNumber);
+
+                repaymentRecord.ActualRepaymentDate = DateTime.ParseExact(ecpayReceivePaymentResultDto.PaymentDate, "yyyy/MM/dd", null);
+                repaymentRecord.ActualRepaymentAmount = ecpayReceivePaymentResultDto.TradeAmt;
+                repaymentRecord.State = 1;
+
+                await this.repaymentRecordRepository.UpdateAsync(repaymentRecord);
+
+                return Ok("1|OK");
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90300,
+                    Message = $"payment callback api error:{ex}"
+                });
+            }
         }
     }
 }

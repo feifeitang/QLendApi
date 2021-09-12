@@ -7,14 +7,25 @@ namespace QLendApi.Repositories
 {
     public class RepaymentRecordRepository : IRepaymentRecordRepository
     {
-        private readonly QLendDBContext _conetxt;
+        private readonly QLendDBContext _context;
         public RepaymentRecordRepository(QLendDBContext context)
         {
-            _conetxt = context;
+            _context = context;
         }
         public async Task<RepaymentRecord[]> GetByLoanNumberAsync(string loanNumber)
         {
-            return await _conetxt.RepaymentRecords.Where(el => el.LoanNumber == loanNumber).ToArrayAsync();
+            return await _context.RepaymentRecords.Where(el => el.LoanNumber == loanNumber).ToArrayAsync();
+        }
+
+        public async Task<RepaymentRecord> GetByRepaymentNumberAsync(string repaymentNumber)
+        {
+            return await _context.RepaymentRecords.FindAsync(repaymentNumber);
+        }
+
+        public async Task UpdateAsync(RepaymentRecord repaymentRecord)
+        {
+            _context.RepaymentRecords.Update(repaymentRecord);
+            await _context.SaveChangesAsync();
         }
     }
 }
