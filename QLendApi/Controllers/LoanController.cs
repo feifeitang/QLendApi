@@ -222,13 +222,15 @@ namespace QLendApi.Controllers
 
                 return Ok(new LoanListResponse
                 {
-                                        
+                    
+                                      
                     StatusCode = 10000,
                     Message = "success",
                     
                     Data = new LoanListResponse.LoanListDataStruct
                     {                       
                         LoanRecords = loanRecord
+                        
                     }
                     
                 });

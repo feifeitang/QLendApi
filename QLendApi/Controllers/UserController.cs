@@ -327,7 +327,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10008,
-                        Message = "account or password error"
+                        Message = "Account or password error"
                     });
                 }
 
@@ -344,7 +344,7 @@ namespace QLendApi.Controllers
                         return BadRequest(new NotFinishSignupResponse
                         {
                             StatusCode = 10009,
-                            Message = "sign up process not finish",
+                            Message = "Sign up process not finish",
                             Data = new NotFinishSignupResponse.DataStruct
                             {
                                 NextStatus = foreignWorker.Status + 1,
@@ -682,7 +682,7 @@ namespace QLendApi.Controllers
                 foreignWorker.BankNumber = bankAccountDto.BankNumber;
                 foreignWorker.AccountNumber = bankAccountDto.AccountNumber;
                 loanRecord.State = LoanState.BankAccountFinish;
-               // loanRecord.Status = 0;
+                loanRecord.Status = 1;
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
                 await loanRecordRepository.UpdateAsync(loanRecord);
