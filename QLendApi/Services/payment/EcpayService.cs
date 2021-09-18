@@ -49,26 +49,26 @@ namespace QLendApi.Services
 
             try
             {
-                /* 服務參數 */
+                // 服務參數
                 ecpayCreateOrderDto.MerchantID = _MerchantID;
                 ecpayCreateOrderDto.ReturnURL = _ecpaySettings.ReceivePaymentResultUrl;
-                ecpayCreateOrderDto.MerchantTradeNo = TradeNo;//廠商的交易編號
+                ecpayCreateOrderDto.MerchantTradeNo = TradeNo;  // 廠商的交易編號
                 ecpayCreateOrderDto.MerchantTradeDate = CurrentDate.ToString("yyyy/MM/dd HH:mm:ss");//廠商的交易時間
-                ecpayCreateOrderDto.TotalAmount = amount;//交易總金額
-                ecpayCreateOrderDto.TradeDesc = "desc";//交易描述
+                ecpayCreateOrderDto.TotalAmount = amount;  // 交易總金額
+                ecpayCreateOrderDto.TradeDesc = "desc";  // 交易描述
                 ecpayCreateOrderDto.ChoosePayment = "BARCODE";
                 ecpayCreateOrderDto.PaymentType = "aio";
 
                 ecpayCreateOrderDto.EncryptType = 1;
 
-                //訂單的商品資料
+                // 訂單的商品資料
                 ecpayCreateOrderDto.ItemName = "item";
 
                 ecpayCreateOrderDto.StoreExpireDate = 1;
 
                 ecpayCreateOrderDto.PaymentInfoURL = _ecpaySettings.ReceivePaymentInfoUrl;
 
-                var _CheckMacValue = GenCheckMacValue(ecpayCreateOrderDto);
+                var _CheckMacValue = GenCheckMacValueForCreate(ecpayCreateOrderDto);
 
                 Console.WriteLine("CheckMacValue {0}", _CheckMacValue);
 
@@ -84,8 +84,7 @@ namespace QLendApi.Services
                     PaymentInfoURL = _ecpaySettings.ReceivePaymentInfoUrl,
                     Status = 0,
                     CreateTime = CurrentDate,
-                    RepaymentNumber = "tmp"
-                    // need to change to real RepaymentNumber
+                    RepaymentNumber = "tmp"  // need to change to real RepaymentNumber
                 };
 
                 htmlPage = GenHtmlPage(ecpayCreateOrderDto);
@@ -105,12 +104,23 @@ namespace QLendApi.Services
             throw new System.NotImplementedException();
         }
 
-        public async Task<bool> ReceivePaymentResult()
+        public async Task<bool> ReceivePaymentResult(EcpayReceivePaymentResultDto ecpayReceivePaymentResultDto)
         {
-            throw new System.NotImplementedException();
+            var _CheckMacValue = GenCheckMacValueForResult(ecpayReceivePaymentResultDto);
+            Console.WriteLine("CheckMacValue {0}", _CheckMacValue);
+            if (_CheckMacValue != ecpayReceivePaymentResultDto.CheckMacValue)
+            {
+                return false;
+            }
+
+            var payment = await this.paymentRepository.GetByMerchantTradeNoAsync(ecpayReceivePaymentResultDto.MerchantTradeNo);
+            payment.Status = 1;
+            await this.paymentRepository.UpdateAsync(payment);
+
+            return true;
         }
 
-        private string GenCheckMacValue(EcpayCreateOrderDto ecpayCreateOrderDto)
+        private string GenCheckMacValueForCreate(EcpayCreateOrderDto ecpayCreateOrderDto)
         {
             List<string> Arr = new List<string>();
 
@@ -119,6 +129,41 @@ namespace QLendApi.Services
                 if (prop.Name != "CheckMacValue")
                 {
                     Arr.Add($"{prop.Name}={prop.GetValue(ecpayCreateOrderDto, null)}");
+                }
+
+            }
+
+            Arr.Sort();
+
+            var s = String.Join("&", Arr);
+
+            var newStr = $"HashKey={this._HashKey}&{s}&HashIV={this._HashIV}";
+
+            var urlEncode = System.Web.HttpUtility.UrlEncode(newStr).ToLower();
+
+            SHA256 mySHA256 = SHA256.Create();
+
+            byte[] bytesString = Encoding.UTF8.GetBytes(urlEncode);
+
+            byte[] hashValue = mySHA256.ComputeHash(bytesString);
+
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < hashValue.Length; i++)
+            {
+                builder.Append(hashValue[i].ToString("x2"));
+            }
+            return builder.ToString().ToUpper();
+        }
+
+        private string GenCheckMacValueForResult(EcpayReceivePaymentResultDto ecpayReceivePaymentResultDto)
+        {
+            List<string> Arr = new List<string>();
+
+            foreach (PropertyInfo prop in ecpayReceivePaymentResultDto.GetType().GetProperties())
+            {
+                if (prop.Name != "CheckMacValue")
+                {
+                    Arr.Add($"{prop.Name}={prop.GetValue(ecpayReceivePaymentResultDto, null)}");
                 }
 
             }
