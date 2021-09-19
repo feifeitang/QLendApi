@@ -40,7 +40,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10003,
-                        Message = "user not found"
+                        Message = "User not found"
                     });
                 }
 
@@ -81,7 +81,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10003,
-                        Message = "user not found"
+                        Message = "User not found"
                     });
                 }
 
@@ -130,7 +130,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10003,
-                        Message = "user not found"
+                        Message = "User not found"
                     });
                 }
 
@@ -140,7 +140,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10004,
-                        Message = "otp code expire"
+                        Message = "Otp code expire"
                     });
                 }
 
@@ -149,7 +149,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10005,
-                        Message = "otp code not equal"
+                        Message = "Otp code not equal"
                     });
                 }
 

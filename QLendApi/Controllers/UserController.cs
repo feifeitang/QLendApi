@@ -113,7 +113,7 @@ namespace QLendApi.Controllers
                 return Ok(new SignUpResponse
                 {
                     StatusCode = ResponseStatusCode.Success,
-                    Message = "success",
+                    Message = "Success",
                     Data = new SignUpResponse.DataStruct
                     {
                         Id = foreignWorker.Id
@@ -144,7 +144,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10003,
-                        Message = "user not found"
+                        Message = "User not found"
                     });
                 }
 
@@ -154,7 +154,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10006,
-                        Message = "status not correct"
+                        Message = "Status not correct"
                     });
                 }
 
@@ -165,7 +165,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10007,
-                        Message = "certificate not found"
+                        Message = "Certificate not found"
                     });
                 }
 
@@ -207,7 +207,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10003,
-                        Message = "user not found"
+                        Message = "User not found"
                     });
                 }
 
@@ -217,7 +217,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10006,
-                        Message = "status not correct"
+                        Message = "Status not correct"
                     });
                 }
 
@@ -263,7 +263,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10003,
-                        Message = "user not found"
+                        Message = "User not found"
                     });
                 }
 
@@ -273,7 +273,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10006,
-                        Message = "status not correct"
+                        Message = "Status not correct"
                     });
                 }
 
@@ -285,7 +285,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10007,
-                        Message = "certificate not found"
+                        Message = "Certificate not found"
                     });
                 }
 
@@ -392,7 +392,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10003,
-                        Message = "user not found"
+                        Message = "User not found"
                     });
                 }
 
@@ -402,7 +402,12 @@ namespace QLendApi.Controllers
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
-                return StatusCode(201);
+                //return StatusCode(201);
+                return Ok(new BaseResponse
+                {
+                    StatusCode = 201,
+                    Message = "Success"                   
+                });
             }
             catch (System.Exception ex)
             {
@@ -682,7 +687,7 @@ namespace QLendApi.Controllers
                 foreignWorker.BankNumber = bankAccountDto.BankNumber;
                 foreignWorker.AccountNumber = bankAccountDto.AccountNumber;
                 loanRecord.State = LoanState.BankAccountFinish;
-                loanRecord.Status = 1;
+                //loanRecord.Status = 1;
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
                 await loanRecordRepository.UpdateAsync(loanRecord);
