@@ -225,7 +225,7 @@ namespace QLendApi.Controllers
                     
                                       
                     StatusCode = 10000,
-                    Message = "success",
+                    Message = "Success",
                     
                     Data = new LoanListResponse.LoanListDataStruct
                     {                       
