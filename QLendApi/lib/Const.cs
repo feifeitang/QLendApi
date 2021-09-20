@@ -24,10 +24,10 @@ namespace QLendApi.lib
         public const int LoanSurveyInfoFinish = 2;
         public const int IncomeInfoFinish = 3;
         public const int LoanSurveyArcFinish = 4;
-        public const int ApplyFinish = 6;
+        public const int ApplyFinish = 5;
         public const int PermitLoan = 6;
         public const int ConfirmLoan = 7;
-        public const int BankAccountFinish = 9;
+        public const int BankAccountFinish = 8;
         public const int RemittanceFinish = 9;
         public const int CancelLoan = 0;
         public const int RejectLoan = -1;
