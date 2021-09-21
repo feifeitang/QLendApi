@@ -671,7 +671,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10030,
-                        Message = "id not equal"
+                        Message = "Id not equal"
                     });
                 }
 
@@ -680,7 +680,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10030,
-                        Message = "loan state not correct"
+                        Message = "Loan state not correct"
                     });
                 }
 
