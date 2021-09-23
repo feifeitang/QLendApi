@@ -5,7 +5,7 @@ namespace QLendApi.Services
 {
     public interface IEcpayService
     {
-        Task<string> create(int amount);
+        Task<string> create(string repaymentNumber);
         Task<bool> ReceivePaymentResult(EcpayReceivePaymentResultDto ecpayReceivePaymentResultDto);
         Task<bool> ReceivePaymentInfo();
     }
