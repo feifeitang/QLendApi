@@ -30,13 +30,13 @@ namespace QLendApi.Controllers
 
         // [Authorize]
         // GET /api/payment/Create
-        [Route("Create")]
+        [Route("Create/{repaymentNumber}")]
         [HttpGet]
-        public async Task<ActionResult> Create()
+        public async Task<ActionResult> Create(string repaymentNumber)
         {
             try
             {
-                var content = await this.ecpayService.create(2000);
+                var content = await this.ecpayService.create(repaymentNumber);
                 return new ContentResult
                 {
                     ContentType = "text/html",
@@ -93,6 +93,7 @@ namespace QLendApi.Controllers
                 Console.WriteLine("recevie ecpay barcode info {0}", json);
 
                 var paymentRecord = await this.paymentRepository.GetByMerchantTradeNoAsync(ecpayReceivePaymentInfoDto.MerchantTradeNo);
+                var repaymentRecord = await this.repaymentRecordRepository.GetByRepaymentNumberAsync(paymentRecord.RepaymentNumber);
 
                 paymentRecord.BarCode1 = ecpayReceivePaymentInfoDto.Barcode1;
                 paymentRecord.BarCode2 = ecpayReceivePaymentInfoDto.Barcode2;
@@ -100,7 +101,12 @@ namespace QLendApi.Controllers
                 paymentRecord.TradeNo = ecpayReceivePaymentInfoDto.TradeNo;
                 paymentRecord.UpdateTime = DateTime.Now;
 
+                repaymentRecord.BarCode1 = ecpayReceivePaymentInfoDto.Barcode1;
+                repaymentRecord.BarCode2 = ecpayReceivePaymentInfoDto.Barcode2;
+                repaymentRecord.BarCode3 = ecpayReceivePaymentInfoDto.Barcode3;
+
                 await this.paymentRepository.UpdateAsync(paymentRecord);
+                await this.repaymentRecordRepository.UpdateAsync(repaymentRecord);
 
                 return Ok("1|OK");
             }

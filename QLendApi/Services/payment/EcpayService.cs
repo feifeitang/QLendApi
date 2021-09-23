@@ -21,8 +21,14 @@ namespace QLendApi.Services
         readonly ILogger<EcpayService> _logger;
         private readonly EcpaySettings _ecpaySettings;
         private readonly IPaymentRepository paymentRepository;
-        public EcpayService(IOptions<EcpayServiceOptions> options, ILogger<EcpayService> logger,
-        IOptions<EcpaySettings> ecpaySettings, IPaymentRepository paymentRepository)
+        private readonly IRepaymentRecordRepository repaymentRecordRepository;
+        public EcpayService(
+            IOptions<EcpayServiceOptions> options,
+            ILogger<EcpayService> logger,
+            IOptions<EcpaySettings> ecpaySettings,
+            IPaymentRepository paymentRepository,
+            IRepaymentRecordRepository repaymentRecordRepository
+        )
         {
             this._logger = logger;
 
@@ -35,13 +41,17 @@ namespace QLendApi.Services
             this._ecpaySettings = ecpaySettings.Value;
 
             this.paymentRepository = paymentRepository;
+
+            this.repaymentRecordRepository = repaymentRecordRepository;
         }
 
-        public async Task<string> create(int amount)
+        public async Task<string> create(string repaymentNumber)
         {
             var CurrentDate = DateTime.Now;
 
             var TradeNo = "QLend" + CurrentDate.ToString("yyyyMMddHHmmss");
+
+            var repaymentRecord = await this.repaymentRecordRepository.GetByRepaymentNumberAsync(repaymentNumber);
 
             string htmlPage = null;
 
@@ -54,7 +64,7 @@ namespace QLendApi.Services
                 ecpayCreateOrderDto.ReturnURL = _ecpaySettings.ReceivePaymentResultUrl;
                 ecpayCreateOrderDto.MerchantTradeNo = TradeNo;  // 廠商的交易編號
                 ecpayCreateOrderDto.MerchantTradeDate = CurrentDate.ToString("yyyy/MM/dd HH:mm:ss");//廠商的交易時間
-                ecpayCreateOrderDto.TotalAmount = amount;  // 交易總金額
+                ecpayCreateOrderDto.TotalAmount = repaymentRecord.RepaymentAmount;  // 交易總金額
                 ecpayCreateOrderDto.TradeDesc = "desc";  // 交易描述
                 ecpayCreateOrderDto.ChoosePayment = "BARCODE";
                 ecpayCreateOrderDto.PaymentType = "aio";
@@ -79,12 +89,12 @@ namespace QLendApi.Services
                 Payment paymentData = new()
                 {
                     MerchantTradeNo = TradeNo,
-                    Amount = amount,
+                    Amount = repaymentRecord.RepaymentAmount,
                     ReturnURL = _ecpaySettings.ReceivePaymentResultUrl,
                     PaymentInfoURL = _ecpaySettings.ReceivePaymentInfoUrl,
                     Status = 0,
                     CreateTime = CurrentDate,
-                    RepaymentNumber = "tmp"  // need to change to real RepaymentNumber
+                    RepaymentNumber = repaymentRecord.RepaymentNumber  // need to change to real RepaymentNumber
                 };
 
                 htmlPage = GenHtmlPage(ecpayCreateOrderDto);
