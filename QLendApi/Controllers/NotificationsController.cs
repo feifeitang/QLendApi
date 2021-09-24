@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Threading;
@@ -46,7 +47,9 @@ namespace QLendApi.Controllers
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
             }
-            
+
+            deviceInstallation.Tags.Clear();
+
             deviceInstallation.Tags.Add(foreignWorker.DeviceTag);
 
             var success = await _notificationService
