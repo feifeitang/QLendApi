@@ -28,10 +28,6 @@ namespace QLendApi.Services
 
             WebRequest request = WebRequest.Create(requestUrl);
 
-            WebProxy proxy = new WebProxy("http://34.80.51.122:3128");
-
-            request.Proxy = proxy;
-
             WebResponse response = request.GetResponse();
 
             Stream receiveStream = response.GetResponseStream();
