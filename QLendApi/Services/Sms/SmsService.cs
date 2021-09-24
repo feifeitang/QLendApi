@@ -31,7 +31,15 @@ namespace QLendApi.Services
 
                 WebRequest request = WebRequest.Create(requestUrl);
                 
-                request.Proxy="34.80.51.122:3128";
+                WebProxy myProxy=new WebProxy();
+                
+                myProxy=(WebProxy)request.Proxy;
+                
+                Uri newUri=new Uri("http://34.80.51.122:3128");
+
+                myProxy.Address=newUri;
+                
+                request.Proxy=myProxy;
 
                 WebResponse response = request.GetResponse();
 
