@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using QLendApi.Dtos;
@@ -21,51 +20,33 @@ namespace QLendApi.Services
             _userName = options.Value.UserName;
             _password = options.Value.Password;
         }
-        public bool Send(string PhoneNumber, string content)
+        public void Send(string PhoneNumber, string content)
         {
-            try
-            {
-                string requestUrl = $"https://api.kotsms.com.tw/kotsmsapi-1.php?username={_userName}&password={_password}&smbody={content}&dstaddr={PhoneNumber}";
+            string requestUrl = $"https://api.kotsms.com.tw/kotsmsapi-1.php?username={_userName}&password={_password}&smbody={content}&dstaddr={PhoneNumber}";
 
-                Console.WriteLine("requestUrl {0}", requestUrl);
+            Console.WriteLine("requestUrl {0}", requestUrl);
 
-                WebRequest request = WebRequest.Create(requestUrl);
-                
-                WebProxy myProxy=new WebProxy();
-                
-                myProxy=(WebProxy)request.Proxy;
-                
-                Uri newUri=new Uri("http://34.80.51.122:3128");
+            WebRequest request = WebRequest.Create(requestUrl);
 
-                myProxy.Address=newUri;
-                
-                request.Proxy=myProxy;
+            WebProxy proxy = new WebProxy("http://34.80.51.122:3128");
 
-                WebResponse response = request.GetResponse();
+            request.Proxy = proxy;
 
-                Stream receiveStream = response.GetResponseStream();
+            WebResponse response = request.GetResponse();
 
-                Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
+            Stream receiveStream = response.GetResponseStream();
 
-                StreamReader readStream = new StreamReader(receiveStream, encode);
+            Encoding encode = System.Text.Encoding.GetEncoding("utf-8");
 
-                string data = readStream.ReadToEnd();
+            StreamReader readStream = new StreamReader(receiveStream, encode);
 
-                Console.WriteLine("\r\nResponse stream received.");
+            string data = readStream.ReadToEnd();
 
-                Console.WriteLine(data);
+            Console.WriteLine("\r\n Send SMS Response: {0}", data);
 
-                response.Close();
+            response.Close();
 
-                receiveStream.Close();
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Unexpected error sending notification");
-                return false;
-            }
+            receiveStream.Close();
         }
     }
 }
