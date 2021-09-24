@@ -30,6 +30,8 @@ namespace QLendApi.Services
                 Console.WriteLine("requestUrl {0}", requestUrl);
 
                 WebRequest request = WebRequest.Create(requestUrl);
+                
+                request.Proxy="34.80.51.122:3128";
 
                 WebResponse response = request.GetResponse();
 
