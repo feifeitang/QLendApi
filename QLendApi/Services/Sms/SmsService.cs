@@ -22,7 +22,7 @@ namespace QLendApi.Services
         }
         public void Send(string PhoneNumber, string content)
         {
-            string requestUrl = $"https://api.kotsms.com.tw/kotsmsapi-1.php?username={_userName}&password={_password}&smbody={content}&dstaddr={PhoneNumber}";
+            string requestUrl = $"https://api.kotsms.com.tw/kotsmsapi-1.php?username={_userName}&apikey={_password}&smbody={content}&dstaddr={PhoneNumber}";
 
             Console.WriteLine("requestUrl {0}", requestUrl);
 
