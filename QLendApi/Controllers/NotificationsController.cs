@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Threading;
@@ -48,12 +50,21 @@ namespace QLendApi.Controllers
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
             }
 
-            deviceInstallation.Tags.Clear();
+            var d = new DeviceInstallation
+            {
+                InstallationId = deviceInstallation.InstallationId,
+                Platform = deviceInstallation.Platform,
+                PushChannel = deviceInstallation.PushChannel,
+                UserId = deviceInstallation.UserId,
+                Tags = new List<string>()
+            };
 
-            deviceInstallation.Tags.Add(foreignWorker.DeviceTag);
+            d.Tags.Add(foreignWorker.DeviceTag);
+
+            // deviceInstallation.Tags.Add(foreignWorker.DeviceTag);
 
             var success = await _notificationService
-                .CreateOrUpdateInstallationAsync(deviceInstallation, HttpContext.RequestAborted);
+                .CreateOrUpdateInstallationAsync(d, HttpContext.RequestAborted);
 
             if (!success)
                 return new UnprocessableEntityResult();
