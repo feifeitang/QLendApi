@@ -6,9 +6,9 @@ namespace QLendApi.Responses
     {
         public class LoanDetailDataStruct
         {
-            public LoanRecord LoanRecords { get; set; }
+            public LoanRecord LoanRecord { get; set; }
             public RepaymentRecord[] RepaymentRecords { get; set; }
-            
+
         }
 
         public LoanDetailDataStruct Data { get; init; }

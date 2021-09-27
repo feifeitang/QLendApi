@@ -273,7 +273,7 @@ namespace QLendApi.Controllers
                     Message = "Success",
                     Data = new LoanDetailResponse.LoanDetailDataStruct
                     {
-                        LoanRecords = loanRecord,
+                        LoanRecord = loanRecord,
                         RepaymentRecords = repaymentRecords
                     }
                 });
