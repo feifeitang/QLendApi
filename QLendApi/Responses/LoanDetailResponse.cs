@@ -8,6 +8,7 @@ namespace QLendApi.Responses
         {
             public LoanRecord LoanRecords { get; set; }
             public RepaymentRecord[] RepaymentRecords { get; set; }
+            
         }
 
         public LoanDetailDataStruct Data { get; init; }
