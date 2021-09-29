@@ -28,8 +28,38 @@ namespace QLendApi.Controllers
             this.repaymentRecordRepository = repaymentRecordRepository;
         }
 
+        [Authorize]
+        // Get /api/payment/GetBarCodeCreateTime/{repaymentNumber}
+        [Route("/api/payment/GetBarCodeCreateTime/{repaymentNumber}")]
+        [HttpGet]
+        public async Task<ActionResult> GetBarCodeCreateTime(string repaymentNumber){
+            try
+            {
+                // bool b = await this.repaymentRecordRepository.GetByRepaymentNumberAsync(repaymentNumber);
+                var repaymentRecord = await this.repaymentRecordRepository.GetByRepaymentNumberAsync(repaymentNumber);
+
+                return Ok(new GetBarCodeCreateTimeResponse
+                {
+                    StatusCode = ResponseStatusCode.Success,
+                    Message = "success",
+                    Data = new GetBarCodeCreateTimeResponse.GetBarCodeCreateTimeDataStruct
+                    {
+                        BarCodeCreateTime = repaymentRecord.BarCodeCreateTime
+                    }
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90300,
+                    Message = $"precreate api error:{ex}"
+                });
+            }
+        }
+
         // [Authorize]
-        // GET /api/payment/Create
+        // GET /api/payment/Create/{repaymentNumber}
         [Route("Create/{repaymentNumber}")]
         [HttpGet]
         public async Task<ActionResult> Create(string repaymentNumber)
@@ -104,6 +134,7 @@ namespace QLendApi.Controllers
                 repaymentRecord.BarCode1 = ecpayReceivePaymentInfoDto.Barcode1;
                 repaymentRecord.BarCode2 = ecpayReceivePaymentInfoDto.Barcode2;
                 repaymentRecord.BarCode3 = ecpayReceivePaymentInfoDto.Barcode3;
+                repaymentRecord.BarCodeCreateTime = DateTime.Now;
 
                 await this.paymentRepository.UpdateAsync(paymentRecord);
                 await this.repaymentRecordRepository.UpdateAsync(repaymentRecord);

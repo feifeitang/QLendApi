@@ -22,6 +22,7 @@ namespace QLendApi.Controllers
         private readonly IRepaymentRecordRepository repaymentRecordRepository;
         private readonly ILoanRecordService loanRecordService;
         static int sn = 0;
+        // private readonly double _expireHours;
 
         public LoanController(
             ILoanRecordRepository loanRecordRepository,
