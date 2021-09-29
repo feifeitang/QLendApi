@@ -32,10 +32,10 @@ namespace QLendApi.Controllers
         // Get /api/payment/GetBarCodeCreateTime/{repaymentNumber}
         [Route("/api/payment/GetBarCodeCreateTime/{repaymentNumber}")]
         [HttpGet]
-        public async Task<ActionResult> GetBarCodeCreateTime(string repaymentNumber){
+        public async Task<ActionResult> GetBarCodeCreateTime(string repaymentNumber)
+        {
             try
             {
-                // bool b = await this.repaymentRecordRepository.GetByRepaymentNumberAsync(repaymentNumber);
                 var repaymentRecord = await this.repaymentRecordRepository.GetByRepaymentNumberAsync(repaymentNumber);
 
                 if (repaymentRecord.BarCodeCreateTime != null)
@@ -81,6 +81,17 @@ namespace QLendApi.Controllers
         {
             try
             {
+                var repaymentRecord = await this.repaymentRecordRepository.GetByRepaymentNumberAsync(repaymentNumber);
+
+                if (repaymentRecord == null)
+                {
+                    return new ContentResult
+                    {
+                        StatusCode = 400,
+                        Content = "<h1>Bad Request</h1>"
+                    };
+                }
+
                 var content = await this.ecpayService.create(repaymentNumber);
                 return new ContentResult
                 {
@@ -175,7 +186,7 @@ namespace QLendApi.Controllers
             try
             {
                 bool b = await this.ecpayService.ReceivePaymentResult(ecpayReceivePaymentResultDto);
-                
+
                 if (b != true)
                 {
                     return Ok("0|checkMacValue not correct");

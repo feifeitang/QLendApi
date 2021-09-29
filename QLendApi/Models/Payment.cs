@@ -29,7 +29,6 @@ namespace QLendApi.Models
         public DateTime? CreateTime { get; set; }
         public DateTime? UpdateTime { get; set; }
         public DateTime? ReceivePayTime { get; set; }
-        [Column(TypeName = "char(11)")]
         public string RepaymentNumber { get; set; }
     }
 }
