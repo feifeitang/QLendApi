@@ -38,22 +38,37 @@ namespace QLendApi.Controllers
                 // bool b = await this.repaymentRecordRepository.GetByRepaymentNumberAsync(repaymentNumber);
                 var repaymentRecord = await this.repaymentRecordRepository.GetByRepaymentNumberAsync(repaymentNumber);
 
-                return Ok(new GetBarCodeCreateTimeResponse
+                if (repaymentRecord.BarCodeCreateTime != null)
                 {
-                    StatusCode = ResponseStatusCode.Success,
-                    Message = "success",
-                    Data = new GetBarCodeCreateTimeResponse.GetBarCodeCreateTimeDataStruct
+                    return Ok(new GetBarCodeCreateTimeResponse
                     {
-                        BarCodeCreateTime = repaymentRecord.BarCodeCreateTime
-                    }
-                });
+                        StatusCode = ResponseStatusCode.Success,
+                        Message = "success",
+                        Data = new GetBarCodeCreateTimeResponse.GetBarCodeCreateTimeDataStruct
+                        {
+                            BarCodeCreateTime = repaymentRecord.BarCodeCreateTime
+                        }
+                    });
+                }
+                else
+                {
+                    return Ok(new GetBarCodeCreateTimeResponse
+                    {
+                        StatusCode = ResponseStatusCode.Success,
+                        Message = "success",
+                        Data = new GetBarCodeCreateTimeResponse.GetBarCodeCreateTimeDataStruct
+                        {
+                            BarCodeCreateTime = null
+                        }
+                    });
+                }
             }
             catch (System.Exception ex)
             {
                 return BadRequest(new BaseResponse
                 {
                     StatusCode = 90300,
-                    Message = $"precreate api error:{ex}"
+                    Message = $"GetBarCodeCreateTime api error:{ex}"
                 });
             }
         }
