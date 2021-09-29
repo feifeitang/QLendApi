@@ -29,45 +29,24 @@ namespace QLendApi.Controllers
         }
 
         [Authorize]
-        // Get /api/payment/PreCreate/{repaymentNumber}
-        [Route("/api/payment/PreCreate/{repaymentNumber}")]
+        // Get /api/payment/GetBarCodeCreateTime/{repaymentNumber}
+        [Route("/api/payment/GetBarCodeCreateTime/{repaymentNumber}")]
         [HttpGet]
-        public async Task<ActionResult> PreCreate(string repaymentNumber){
+        public async Task<ActionResult> GetBarCodeCreateTime(string repaymentNumber){
             try
             {
                 // bool b = await this.repaymentRecordRepository.GetByRepaymentNumberAsync(repaymentNumber);
                 var repaymentRecord = await this.repaymentRecordRepository.GetByRepaymentNumberAsync(repaymentNumber);
 
-                if (repaymentRecord == null)
+                return Ok(new GetBarCodeCreateTimeResponse
                 {
-                    return Ok(new PreCreateResponse
+                    StatusCode = ResponseStatusCode.Success,
+                    Message = "success",
+                    Data = new GetBarCodeCreateTimeResponse.GetBarCodeCreateTimeDataStruct
                     {
-                        StatusCode = ResponseStatusCode.Success,
-                        Message = "success",
-                        Data = new PreCreateResponse.PreCreateDataStruct
-                        {
-                            NextApi = "Create"
-                        }
-                    });
-                }
-                else
-                {
-                    var barCodeCreateTime = repaymentRecord.BarCodeCreateTime;
-                    var now = DateTime.UtcNow;
-
-                    if (barCodeCreateTime == now)
-                    {
-                        return Ok(new PreCreateResponse
-                        {
-                            StatusCode = ResponseStatusCode.Success,
-                            Message = "success",
-                            Data = new PreCreateResponse.PreCreateDataStruct
-                            {
-                                NextApi = "GetBarCode"
-                            }
-                        });
+                        BarCodeCreateTime = repaymentRecord.BarCodeCreateTime
                     }
-                }
+                });
             }
             catch (System.Exception ex)
             {
@@ -155,7 +134,7 @@ namespace QLendApi.Controllers
                 repaymentRecord.BarCode1 = ecpayReceivePaymentInfoDto.Barcode1;
                 repaymentRecord.BarCode2 = ecpayReceivePaymentInfoDto.Barcode2;
                 repaymentRecord.BarCode3 = ecpayReceivePaymentInfoDto.Barcode3;
-                repaymentRecord.BarCodeCreateTime = paymentRecord.CreateTime;
+                repaymentRecord.BarCodeCreateTime = DateTime.Now;
 
                 await this.paymentRepository.UpdateAsync(paymentRecord);
                 await this.repaymentRecordRepository.UpdateAsync(repaymentRecord);
@@ -207,21 +186,6 @@ namespace QLendApi.Controllers
                     Message = $"payment callback api error:{ex}"
                 });
             }
-        }
-
-        private bool CheckTimeIsVaild(DateTime createTime)
-        {
-            // createTime need add _expirehours
-            var expireTime = createTime.AddHours(this._expireHours);
-            DateTime currentTime = DateTime.UtcNow;
-            int result = DateTime.Compare(expireTime, currentTime);
-
-            bool res = true;
-
-            if (result < 0)
-                res = false;
-
-            return res;
         }
     }
 }

@@ -27,11 +27,5 @@ namespace QLendApi.Repositories
             _context.RepaymentRecords.Update(repaymentRecord);
             await _context.SaveChangesAsync();
         }
-
-        // public async Task<bool> ReceiveRepaymentResult(string repaymentNumber)
-        // {
-        //     // bool b = await this.repaymentRecordRepository.GetByRepaymentNumberAsync(repaymentNumber);
-        //     if (_context.RepaymentRecords.Where(el => el.RepaymentNumber == repaymentNumber).ToArrayAsync();)
-        // }
     }
 }
