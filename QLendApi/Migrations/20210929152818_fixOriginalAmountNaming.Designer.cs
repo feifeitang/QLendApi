@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QLendApi.Models;
 
 namespace QLendApi.Migrations
 {
     [DbContext(typeof(QLendDBContext))]
-    partial class QLendDBContextModelSnapshot : ModelSnapshot
+    [Migration("20210929152818_fixOriginalAmountNaming")]
+    partial class fixOriginalAmountNaming
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -594,7 +596,7 @@ namespace QLendApi.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("RepaymentNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("char(11)");
 
                     b.Property<string>("ReturnURL")
                         .HasColumnType("nvarchar(max)");

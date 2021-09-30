@@ -23,6 +23,8 @@ namespace QLendApi.Models
         public int State { get; set; }
         public string LoanNumber { get; set; }
         public DateTime? BarCodeCreateTime { get; set; }
+        public int OriginalAmount { get; set; }
+        
 
         public virtual LoanRecord LoanNumberNavigation { get; set; }
     }

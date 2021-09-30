@@ -32,28 +32,43 @@ namespace QLendApi.Controllers
         // Get /api/payment/GetBarCodeCreateTime/{repaymentNumber}
         [Route("/api/payment/GetBarCodeCreateTime/{repaymentNumber}")]
         [HttpGet]
-        public async Task<ActionResult> GetBarCodeCreateTime(string repaymentNumber){
+        public async Task<ActionResult> GetBarCodeCreateTime(string repaymentNumber)
+        {
             try
             {
-                // bool b = await this.repaymentRecordRepository.GetByRepaymentNumberAsync(repaymentNumber);
                 var repaymentRecord = await this.repaymentRecordRepository.GetByRepaymentNumberAsync(repaymentNumber);
 
-                return Ok(new GetBarCodeCreateTimeResponse
+                if (repaymentRecord.BarCodeCreateTime != null)
                 {
-                    StatusCode = ResponseStatusCode.Success,
-                    Message = "success",
-                    Data = new GetBarCodeCreateTimeResponse.GetBarCodeCreateTimeDataStruct
+                    return Ok(new GetBarCodeCreateTimeResponse
                     {
-                        BarCodeCreateTime = repaymentRecord.BarCodeCreateTime
-                    }
-                });
+                        StatusCode = ResponseStatusCode.Success,
+                        Message = "success",
+                        Data = new GetBarCodeCreateTimeResponse.GetBarCodeCreateTimeDataStruct
+                        {
+                            BarCodeCreateTime = repaymentRecord.BarCodeCreateTime
+                        }
+                    });
+                }
+                else
+                {
+                    return Ok(new GetBarCodeCreateTimeResponse
+                    {
+                        StatusCode = ResponseStatusCode.Success,
+                        Message = "success",
+                        Data = new GetBarCodeCreateTimeResponse.GetBarCodeCreateTimeDataStruct
+                        {
+                            BarCodeCreateTime = null
+                        }
+                    });
+                }
             }
             catch (System.Exception ex)
             {
                 return BadRequest(new BaseResponse
                 {
                     StatusCode = 90300,
-                    Message = $"precreate api error:{ex}"
+                    Message = $"GetBarCodeCreateTime api error:{ex}"
                 });
             }
         }
@@ -66,6 +81,17 @@ namespace QLendApi.Controllers
         {
             try
             {
+                var repaymentRecord = await this.repaymentRecordRepository.GetByRepaymentNumberAsync(repaymentNumber);
+
+                if (repaymentRecord == null)
+                {
+                    return new ContentResult
+                    {
+                        StatusCode = 400,
+                        Content = "<h1>Bad Request</h1>"
+                    };
+                }
+
                 var content = await this.ecpayService.create(repaymentNumber);
                 return new ContentResult
                 {
@@ -160,7 +186,7 @@ namespace QLendApi.Controllers
             try
             {
                 bool b = await this.ecpayService.ReceivePaymentResult(ecpayReceivePaymentResultDto);
-                
+
                 if (b != true)
                 {
                     return Ok("0|checkMacValue not correct");
