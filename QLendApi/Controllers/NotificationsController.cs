@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using QLendApi.Dtos;
 using QLendApi.Models;
 using QLendApi.Repositories;
+using QLendApi.Responses;
 using QLendApi.Services;
 using QLendApi.Settings;
 
@@ -41,43 +42,62 @@ namespace QLendApi.Controllers
         public async Task<IActionResult> UpdateInstallation(
             [Required] DeviceInstallation deviceInstallation)
         {
-            // Console.WriteLine("deviceInstallation {0}", deviceInstallation);
-            string json = JsonConvert.SerializeObject(deviceInstallation);
-            Console.WriteLine("deviceInstallation {0}", json);
-
-            
-            var foreignWorker = await foreignWorkerRepository.GetByIdAsync(deviceInstallation.UserId);
-
-            if (foreignWorker.DeviceTag == null)
+            try
             {
-                // add national info into tag ?
-                foreignWorker.DeviceTag = "user_" + foreignWorker.Id;
+                // Console.WriteLine("deviceInstallation {0}", deviceInstallation);
+                string json = JsonConvert.SerializeObject(deviceInstallation);
+                Console.WriteLine("deviceInstallation {0}", json);
 
-                await foreignWorkerRepository.UpdateAsync(foreignWorker);
+                var foreignWorker = await foreignWorkerRepository.GetByIdAsync(deviceInstallation.UserId);
+
+                if (foreignWorker == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10003,
+                        Message = "User not found"
+                    });
+                }
+
+                if (foreignWorker.DeviceTag == null)
+                {
+                    // add national info into tag ?
+                    foreignWorker.DeviceTag = "user_" + foreignWorker.Id;
+
+                    await foreignWorkerRepository.UpdateAsync(foreignWorker);
+                }
+
+                var d = new DeviceInstallation
+                {
+                    InstallationId = deviceInstallation.InstallationId,
+                    Platform = deviceInstallation.Platform,
+                    PushChannel = deviceInstallation.PushChannel,
+                    UserId = deviceInstallation.UserId,
+                    Tags = new List<string>()
+                };
+
+                d.Tags.Add(foreignWorker.DeviceTag);
+                Console.WriteLine("deviceTag {0}", d);
+
+
+                // deviceInstallation.Tags.Add(foreignWorker.DeviceTag);
+
+                var success = await _notificationService
+                    .CreateOrUpdateInstallationAsync(d, HttpContext.RequestAborted);
+
+                if (!success)
+                    return new UnprocessableEntityResult();
+
+                return new OkResult();
             }
-
-            var d = new DeviceInstallation
+            catch (System.Exception ex)
             {
-                InstallationId = deviceInstallation.InstallationId,
-                Platform = deviceInstallation.Platform,
-                PushChannel = deviceInstallation.PushChannel,
-                UserId = deviceInstallation.UserId,
-                Tags = new List<string>()
-            };
-
-            d.Tags.Add(foreignWorker.DeviceTag);
-            Console.WriteLine("deviceTag {0}", d);
-
-
-            // deviceInstallation.Tags.Add(foreignWorker.DeviceTag);
-
-            var success = await _notificationService
-                .CreateOrUpdateInstallationAsync(d, HttpContext.RequestAborted);
-
-            if (!success)
-                return new UnprocessableEntityResult();
-
-            return new OkResult();
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90300,
+                    Message = $"updateInstallation api error:{ex}"
+                });
+            }
         }
 
         // [HttpDelete()]
