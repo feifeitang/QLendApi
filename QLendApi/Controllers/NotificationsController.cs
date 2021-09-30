@@ -40,6 +40,8 @@ namespace QLendApi.Controllers
         public async Task<IActionResult> UpdateInstallation(
             [Required] DeviceInstallation deviceInstallation)
         {
+            Console.WriteLine("deviceInstallation {0}", deviceInstallation);
+            
             var foreignWorker = await foreignWorkerRepository.GetByIdAsync(deviceInstallation.UserId);
 
             if (foreignWorker.DeviceTag == null)
@@ -60,6 +62,8 @@ namespace QLendApi.Controllers
             };
 
             d.Tags.Add(foreignWorker.DeviceTag);
+            Console.WriteLine("deviceTag {0}", d);
+
 
             // deviceInstallation.Tags.Add(foreignWorker.DeviceTag);
 
