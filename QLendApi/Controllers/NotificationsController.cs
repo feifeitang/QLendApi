@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using QLendApi.Dtos;
 using QLendApi.Models;
 using QLendApi.Repositories;
@@ -40,7 +41,10 @@ namespace QLendApi.Controllers
         public async Task<IActionResult> UpdateInstallation(
             [Required] DeviceInstallation deviceInstallation)
         {
-            Console.WriteLine("deviceInstallation {0}", deviceInstallation);
+            // Console.WriteLine("deviceInstallation {0}", deviceInstallation);
+            string json = JsonConvert.SerializeObject(deviceInstallation);
+            Console.WriteLine("deviceInstallation {0}", json);
+
             
             var foreignWorker = await foreignWorkerRepository.GetByIdAsync(deviceInstallation.UserId);
 
