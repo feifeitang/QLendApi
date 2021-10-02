@@ -27,10 +27,10 @@ namespace QLendApi.Controllers
             this.paymentRepository = paymentRepository;
             this.repaymentRecordRepository = repaymentRecordRepository;
         }
-
+/*
         [Authorize]
-        // Get /api/payment/GetBarCodeCreateTime/{repaymentNumber}
-        [Route("/api/payment/GetBarCodeCreateTime/{repaymentNumber}")]
+        // Get /api/payment/getBarCodeCreateTime/{repaymentNumber}
+        [Route("/api/payment/getBarCodeCreateTime/{repaymentNumber}")]
         [HttpGet]
         public async Task<ActionResult> GetBarCodeCreateTime(string repaymentNumber)
         {
@@ -67,11 +67,12 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90300,
-                    Message = $"GetBarCodeCreateTime api error:{ex}"
+                    StatusCode = 90100,
+                    Message = $"getBarCodeCreateTime api error:{ex}"
                 });
             }
         }
+*/
 
         // [Authorize]
         // GET /api/payment/Create/{repaymentNumber}
@@ -118,19 +119,30 @@ namespace QLendApi.Controllers
         [HttpPost]
         public async Task<ActionResult<PaymentGetBarCodeResponse>> GetBarCode(string repaymentNumber)
         {
-            var payment = await this.paymentRepository.GetByRepaymentNumberAsync(repaymentNumber);
-
-            return Ok(new PaymentGetBarCodeResponse
+            try
             {
-                StatusCode = ResponseStatusCode.Success,
-                Message = "success",
-                Data = new PaymentGetBarCodeResponse.PaymentGetBarCodeDataStruct
+                var payment = await this.paymentRepository.GetByRepaymentNumberAsync(repaymentNumber);
+
+                return Ok(new PaymentGetBarCodeResponse
                 {
-                    BarCode1 = payment.BarCode1,
-                    BarCode2 = payment.BarCode2,
-                    BarCode3 = payment.BarCode3
-                }
-            });
+                    StatusCode = ResponseStatusCode.Success,
+                    Message = "success",
+                    Data = new PaymentGetBarCodeResponse.PaymentGetBarCodeDataStruct
+                    {
+                        BarCode1 = payment.BarCode1,
+                        BarCode2 = payment.BarCode2,
+                        BarCode3 = payment.BarCode3
+                    }
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90200,
+                    Message = $"getBarCode api error:{ex}"
+                });
+            }
         }
 
         // POST /api/payment/ReceiveBarCode
@@ -172,7 +184,7 @@ namespace QLendApi.Controllers
                 return BadRequest(new BaseResponse
                 {
                     StatusCode = 90300,
-                    Message = $"payment create api error:{ex}"
+                    Message = $"receiveBarCode api error:{ex}"
                 });
             }
         }
@@ -208,8 +220,8 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90300,
-                    Message = $"payment callback api error:{ex}"
+                    StatusCode = 90400,
+                    Message = $"payment callBack api error:{ex}"
                 });
             }
         }

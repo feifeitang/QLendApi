@@ -77,7 +77,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10001,
-                        Message = "Exist UINo"
+                        Message = "exist uino"
                     });
                 }
 
@@ -87,7 +87,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10002,
-                        Message = "Exist Phone Number"
+                        Message = "exist phone number"
                     });
                 }
 
@@ -113,7 +113,7 @@ namespace QLendApi.Controllers
                 return Ok(new SignUpResponse
                 {
                     StatusCode = ResponseStatusCode.Success,
-                    Message = "Success",
+                    Message = "success",
                     Data = new SignUpResponse.DataStruct
                     {
                         Id = foreignWorker.Id
@@ -144,7 +144,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10003,
-                        Message = "User not found"
+                        Message = "user not found"
                     });
                 }
 
@@ -153,8 +153,8 @@ namespace QLendApi.Controllers
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10006,
-                        Message = "Status not correct"
+                        StatusCode = 10004,
+                        Message = "status not correct"
                     });
                 }
 
@@ -164,8 +164,8 @@ namespace QLendApi.Controllers
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10007,
-                        Message = "Certificate not found"
+                        StatusCode = 10005,
+                        Message = "certificate not found"
                     });
                 }
 
@@ -186,7 +186,7 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90004,
+                    StatusCode = 90002,
                     Message = $"initArc api error:{ex}"
                 });
             }
@@ -207,7 +207,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10003,
-                        Message = "User not found"
+                        Message = "user not found"
                     });
                 }
 
@@ -216,8 +216,8 @@ namespace QLendApi.Controllers
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10006,
-                        Message = "Status not correct"
+                        StatusCode = 10004,
+                        Message = "status not correct"
                     });
                 }
 
@@ -242,7 +242,7 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90005,
+                    StatusCode = 90003,
                     Message = $"personalInfo api error:{ex}"
                 });
             }
@@ -263,7 +263,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10003,
-                        Message = "User not found"
+                        Message = "user not found"
                     });
                 }
 
@@ -272,8 +272,8 @@ namespace QLendApi.Controllers
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10006,
-                        Message = "Status not correct"
+                        StatusCode = 10004,
+                        Message = "status not correct"
                     });
                 }
 
@@ -284,8 +284,8 @@ namespace QLendApi.Controllers
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10007,
-                        Message = "Certificate not found"
+                        StatusCode = 10005,
+                        Message = "certificate not found"
                     });
                 }
 
@@ -326,8 +326,8 @@ namespace QLendApi.Controllers
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10008,
-                        Message = "Account or password error"
+                        StatusCode = 10006,
+                        Message = "account or password error"
                     });
                 }
 
@@ -343,8 +343,8 @@ namespace QLendApi.Controllers
                     {
                         return BadRequest(new NotFinishSignupResponse
                         {
-                            StatusCode = 10009,
-                            Message = "Sign up process not finish",
+                            StatusCode = 10007,
+                            Message = "sign up process not finish",
                             Data = new NotFinishSignupResponse.DataStruct
                             {
                                 NextStatus = foreignWorker.Status + 1,
@@ -352,6 +352,12 @@ namespace QLendApi.Controllers
                             }
                         });
                     }
+
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10008,
+                        Message = "wait for approve"
+                    });
                 }
 
 
@@ -372,7 +378,7 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90007,
+                    StatusCode = 90005,
                     Message = $"login api error:{ex}"
                 });
             }
@@ -392,7 +398,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10003,
-                        Message = "User not found"
+                        Message = "user not found"
                     });
                 }
 
@@ -406,14 +412,14 @@ namespace QLendApi.Controllers
                 return Ok(new BaseResponse
                 {
                     StatusCode = 201,
-                    Message = "Success"                   
+                    Message = "success"                   
                 });
             }
             catch (System.Exception ex)
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90008,
+                    StatusCode = 90006,
                     Message = $"password api error:{ex}"
                 });
             }
@@ -443,7 +449,7 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90009,
+                    StatusCode = 90007,
                     Message = $"info api error:{ex}"
                 });
             }
@@ -480,7 +486,7 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90010,
+                    StatusCode = 90008,
                     Message = $"loanSurveyInfo api error:{ex}"
                 });
             }
@@ -548,7 +554,7 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90020,
+                    StatusCode = 90009,
                     Message = $"incomeInfo api error:{ex}"
                 });
             }
@@ -586,7 +592,7 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90030,
+                    StatusCode = 90010,
                     Message = $"loanSurveyArc api error:{ex}"
                 });
             }
@@ -647,7 +653,7 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90040,
+                    StatusCode = 90020,
                     Message = $"loanApplySignature api error:{ex}"
                 });
             }
@@ -670,8 +676,8 @@ namespace QLendApi.Controllers
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10030,
-                        Message = "Id not equal"
+                        StatusCode = 10009,
+                        Message = "id not equal"
                     });
                 }
 
@@ -679,8 +685,8 @@ namespace QLendApi.Controllers
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10030,
-                        Message = "Loan state not correct"
+                        StatusCode = 10010,
+                        Message = "loan state not correct"
                     });
                 }
 
@@ -698,7 +704,7 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90060,
+                    StatusCode = 90030,
                     Message = $"bankAccount api error:{ex}"
                 });
             }
