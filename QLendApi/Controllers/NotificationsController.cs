@@ -55,7 +55,7 @@ namespace QLendApi.Controllers
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10003,
-                        Message = "User not found"
+                        Message = "user not found"
                     });
                 }
 
@@ -94,8 +94,8 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90300,
-                    Message = $"updateInstallation api error:{ex}"
+                    StatusCode = 90900,
+                    Message = $"notifications installations api error:{ex}"
                 });
             }
         }
@@ -125,19 +125,30 @@ namespace QLendApi.Controllers
         public async Task<IActionResult> RequestPush(
             [Required] NotificationRequest notificationRequest)
         {
-            if ((notificationRequest.Silent &&
+            try
+            {
+                if ((notificationRequest.Silent &&
                 string.IsNullOrWhiteSpace(notificationRequest?.Action)) ||
                 (!notificationRequest.Silent &&
                 string.IsNullOrWhiteSpace(notificationRequest?.Text)))
                 return new BadRequestResult();
 
-            var success = await _notificationService
-                .RequestNotificationAsync(notificationRequest, HttpContext.RequestAborted);
+                var success = await _notificationService
+                    .RequestNotificationAsync(notificationRequest, HttpContext.RequestAborted);
 
-            if (!success)
-                return new UnprocessableEntityResult();
+                if (!success)
+                    return new UnprocessableEntityResult();
 
-            return new OkResult();
+                return new OkResult();
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 91000,
+                    Message = $"notifications requests api error:{ex}"
+                });
+            }
         }
     }
 }

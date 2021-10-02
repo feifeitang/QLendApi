@@ -56,7 +56,7 @@ namespace QLendApi.Controllers
                 return Ok(new EditRecordResponse
                 {
                     StatusCode = 10000,
-                    Message = "Success",
+                    Message = "success",
                     Data = new EditRecordResponse.EditRecordDataStruct
                     {
                         LoanRecord = loanRecord
@@ -67,7 +67,7 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90070,
+                    StatusCode = 90040,
                     Message = $"editRecord api error:{ex}"
                 });
             }
@@ -87,8 +87,8 @@ namespace QLendApi.Controllers
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10010,
-                        Message = "Nationaality is null"
+                        StatusCode = 10020,
+                        Message = "nationaality is null"
                     });
                 }
 
@@ -108,7 +108,7 @@ namespace QLendApi.Controllers
                 return Ok(new LoanApplyResponse
                 {
                     StatusCode = 10000,
-                    Message = "Success",
+                    Message = "success",
                     Data = new LoanApplyResponse.LoanApplyDataStruct
                     {
                         LoanNumber = loanRecord.LoanNumber
@@ -119,7 +119,7 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90080,
+                    StatusCode = 90050,
                     Message = $"loan apply api error:{ex}"
                 });
             }
@@ -142,8 +142,8 @@ namespace QLendApi.Controllers
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10030,
-                        Message = "Id not equal"
+                        StatusCode = 10009,
+                        Message = "id not equal"
                     });
                 }
 
@@ -151,8 +151,8 @@ namespace QLendApi.Controllers
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10030,
-                        Message = "Loan state not correct"
+                        StatusCode = 10010,
+                        Message = "loan state not correct"
                     });
                 }
 
@@ -168,8 +168,8 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90050,
-                    Message = $"loanConfirmSignature api error:{ex}"
+                    StatusCode = 90060,
+                    Message = $"loan confirm api error:{ex}"
                 });
             }
         }
@@ -189,8 +189,8 @@ namespace QLendApi.Controllers
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10030,
-                        Message = "Id not equal"
+                        StatusCode = 10009,
+                        Message = "id not equal"
                     });
                 }
 
@@ -204,7 +204,7 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90100,
+                    StatusCode = 90070,
                     Message = $"loan cancel api error:{ex}"
                 });
             }
@@ -226,7 +226,7 @@ namespace QLendApi.Controllers
                     
                                       
                     StatusCode = 10000,
-                    Message = "Success",
+                    Message = "success",
                     
                     Data = new LoanListResponse.LoanListDataStruct
                     {                       
@@ -240,7 +240,7 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90090,
+                    StatusCode = 90080,
                     Message = $"loan list api error:{ex}"
                 });
             }
@@ -261,8 +261,8 @@ namespace QLendApi.Controllers
                 {
                     return BadRequest(new BaseResponse
                     {
-                        StatusCode = 10030,
-                        Message = "Id not equal"
+                        StatusCode = 10090,
+                        Message = "id not equal"
                     });
                 }
 
@@ -271,7 +271,7 @@ namespace QLendApi.Controllers
                 return Ok(new LoanDetailResponse
                 {
                     StatusCode = 10000,
-                    Message = "Success",
+                    Message = "success",
                     Data = new LoanDetailResponse.LoanDetailDataStruct
                     {
                         LoanRecord = loanRecord,
