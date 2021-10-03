@@ -61,6 +61,7 @@ namespace QLendApi.Controllers
 
                 if (foreignWorker.DeviceTag == null)
                 {
+                    Console.WriteLine("DeviceTag == null");
                     // add national info into tag ?
                     foreignWorker.DeviceTag = "user_" + foreignWorker.Id;
 
@@ -77,13 +78,13 @@ namespace QLendApi.Controllers
                 };
 
                 d.Tags.Add(foreignWorker.DeviceTag);
-                Console.WriteLine("deviceTag {0}", d);
-
-
-                // deviceInstallation.Tags.Add(foreignWorker.DeviceTag);
+                string dString = JsonConvert.SerializeObject(d);
+                Console.WriteLine("deviceTag {0}", dString);
 
                 var success = await _notificationService
                     .CreateOrUpdateInstallationAsync(d, HttpContext.RequestAborted);
+
+                Console.WriteLine("success {0}", success);
 
                 if (!success)
                     return new UnprocessableEntityResult();
