@@ -42,7 +42,7 @@ namespace QLendApi.Controllers
             {
                 return BadRequest(new BaseResponse
                 {
-                    StatusCode = 90200,
+                    StatusCode = 90800,
                     Message = $"notice list api error:{ex}"
                 });
             }
