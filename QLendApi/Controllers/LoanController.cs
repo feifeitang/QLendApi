@@ -8,6 +8,8 @@ using QLendApi.Services;
 using QLendApi.Responses;
 using QLendApi.lib;
 using QLendApi.Extensions;
+using System.Threading;
+using QLendApi.Settings;
 
 namespace QLendApi.Controllers
 {
@@ -21,6 +23,8 @@ namespace QLendApi.Controllers
         private readonly ICertificateRepository certificateRepository;
         private readonly IRepaymentRecordRepository repaymentRecordRepository;
         private readonly ILoanRecordService loanRecordService;
+        private readonly INoticeRepository noticeRepository;
+        private readonly INotificationService _notificationService;
         static int sn = 0;
         // private readonly double _expireHours;
 
@@ -29,7 +33,9 @@ namespace QLendApi.Controllers
             IForeignWorkerRepository foreignWorkerRepository,
             ICertificateRepository certificateRepository,
             IRepaymentRecordRepository repaymentRecordRepository,
-            ILoanRecordService loanRecordService)
+            ILoanRecordService loanRecordService,
+            INoticeRepository noticeRepository,
+            INotificationService _notificationService)
         {
             this.loanRecordRepository = loanRecordRepository;
 
@@ -40,6 +46,10 @@ namespace QLendApi.Controllers
             this.repaymentRecordRepository = repaymentRecordRepository;
 
             this.loanRecordService = loanRecordService;
+
+            this._notificationService = _notificationService;
+
+            this.noticeRepository = noticeRepository;
         }
 
         //GET /api/loan/editRecord
@@ -162,6 +172,33 @@ namespace QLendApi.Controllers
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
                 await loanRecordRepository.UpdateAsync(loanRecord);
 
+                var Content = "We haved received your application. Please wait for the result.";
+
+                Notice notice = new()
+                {
+                    Content = Content,
+                    Status = NoticeStatus.Success,
+                    Link = null,
+                    CreateTime = DateTime.UtcNow,
+                    ForeignWorkerId = foreignWorker.Id
+                };
+
+                await noticeRepository.CreateAsync(notice);
+
+                CancellationTokenSource source = new CancellationTokenSource();
+                CancellationToken token = source.Token;
+
+                NotificationRequest notificationRequest = new()
+                {
+                    Title = "QLend",
+                    Text = Content,
+                    Action = Content,
+                    Tags = new string[] { foreignWorker.DeviceTag },
+                    Silent = false
+                };
+
+                await _notificationService.RequestNotificationAsync(notificationRequest, token);
+
                 return StatusCode(201);
             }
             catch (System.Exception ex)
@@ -223,17 +260,17 @@ namespace QLendApi.Controllers
 
                 return Ok(new LoanListResponse
                 {
-                    
-                                      
+
+
                     StatusCode = 10000,
                     Message = "success",
-                    
+
                     Data = new LoanListResponse.LoanListDataStruct
-                    {                       
+                    {
                         LoanRecords = loanRecord
-                        
+
                     }
-                    
+
                 });
             }
             catch (System.Exception ex)
