@@ -330,6 +330,7 @@ namespace QLendApi.Controllers
                         Message = "account or password error"
                     });
                 }
+              
 
                 var foreignWorkerState = (int)(foreignWorker.State == null ? ForeignWorkState.Failure : foreignWorker.State);
 
@@ -655,6 +656,37 @@ namespace QLendApi.Controllers
                 {
                     StatusCode = 90020,
                     Message = $"loanApplySignature api error:{ex}"
+                });
+            }
+        }
+
+         // GET /api/user/getIncomeinfo
+        [Authorize]
+        [Route("getIncomeinfo")]
+        [HttpGet]
+        public async Task<ActionResult> GetIncomeInfo()
+        {
+            try
+            {
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+                var incomeInfo = await incomeInformationRepository.GetByIncomeNumberAsync(foreignWorker.IncomeNumber);
+
+                return Ok(new IncomeInfoResponse
+                {
+                    StatusCode = ResponseStatusCode.Success,
+                    Message = "success",
+                    Data = new IncomeInfoResponse.DataStruct
+                    {
+                        PayDay = incomeInfo.PayDay
+                    }
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90007,
+                    Message = $"info api error:{ex}"
                 });
             }
         }

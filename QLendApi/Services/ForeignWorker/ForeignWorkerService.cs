@@ -45,7 +45,7 @@ namespace QLendApi.Services
             {
                 return foreignWorker;
             }
-
+            
             return null;
         }
 
