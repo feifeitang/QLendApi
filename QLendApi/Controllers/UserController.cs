@@ -617,9 +617,36 @@ namespace QLendApi.Controllers
                 loanRecord.State = LoanState.ApplyFinish;
                 loanRecord.CreateTime = DateTime.UtcNow;
 
+                var Content = "We haved received your application. Please wait for the result.";
+
+                Notice notice = new()
+                {
+                    Content = Content,
+                    Status = NoticeStatus.Success,
+                    Link = null,
+                    CreateTime = DateTime.UtcNow,
+                    ForeignWorkerId = foreignWorker.Id
+                };
+
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
                 await loanRecordRepository.UpdateAsync(loanRecord);
+
+                await noticeRepository.CreateAsync(notice);
+
+                CancellationTokenSource source = new CancellationTokenSource();
+                CancellationToken token = source.Token;
+
+                NotificationRequest notificationRequest = new()
+                {
+                    Title = "QLend",
+                    Text = Content,
+                    Action = Content,
+                    Tags = new string[] { foreignWorker.DeviceTag },
+                    Silent = false
+                };
+
+                await _notificationService.RequestNotificationAsync(notificationRequest, token);
 
                 return StatusCode(201);
             }
