@@ -307,7 +307,12 @@ namespace QLendApi.Controllers
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
                 await certificateRepository.UpdateAsync(certificate);
 
-                return StatusCode(201);
+               // return StatusCode(201);
+               return Ok(new BaseResponse
+                {
+                    StatusCode = 10000,
+                    Message = "success",
+                });
             }
             catch (System.Exception ex)
             {
