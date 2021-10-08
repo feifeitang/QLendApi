@@ -130,8 +130,8 @@ namespace QLendApi.Controllers
             }
         }
 
-        // POST /api/user/initArc
-        [Route("initArc")]
+        // POST /api/user/personalNationalInfo
+        [Route("personalNationalInfo")]
         [HttpPost]
         public async Task<ActionResult> PersonalNationalInfo([FromForm] PersonalNationalInfoDto personalNationalInfoDto)
         {
@@ -169,12 +169,14 @@ namespace QLendApi.Controllers
                     });
                 }
 
-                cert.FrontArc = await personalNationalInfoDto.FrontArc.GetBytes();
-                cert.BackArc = await personalNationalInfoDto.BackArc.GetBytes();
-                foreignWorker.Passport = await personalNationalInfoDto.Passport.GetBytes();
-                foreignWorker.LocalIdCard = await personalNationalInfoDto.LocalIdCard.GetBytes();
-
-                await certificateRepository.UpdateAsync(cert);
+                if (cert.FrontArc == null || cert.BackArc == null || foreignWorker.Passport == null || foreignWorker.LocalIdCard == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10011,
+                        Message = "image not upload finish"
+                    });
+                }
 
                 foreignWorker.Status = ForeignWorkStatus.InitArcFinish;
 
@@ -236,7 +238,7 @@ namespace QLendApi.Controllers
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
-                
+
                 //return StatusCode(201);
                 return Ok(new BaseResponse
                 {
@@ -307,8 +309,8 @@ namespace QLendApi.Controllers
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
                 await certificateRepository.UpdateAsync(certificate);
 
-               // return StatusCode(201);
-               return Ok(new BaseResponse
+                // return StatusCode(201);
+                return Ok(new BaseResponse
                 {
                     StatusCode = 10000,
                     Message = "success",
@@ -341,7 +343,6 @@ namespace QLendApi.Controllers
                         Message = "account or password error"
                     });
                 }
-              
 
                 var foreignWorkerState = (int)(foreignWorker.State == null ? ForeignWorkState.Failure : foreignWorker.State);
 
@@ -424,7 +425,7 @@ namespace QLendApi.Controllers
                 return Ok(new BaseResponse
                 {
                     StatusCode = 201,
-                    Message = "success"                   
+                    Message = "success"
                 });
             }
             catch (System.Exception ex)
@@ -553,7 +554,7 @@ namespace QLendApi.Controllers
                 }
 
                 var loanRecord = await loanRecordRepository.GetByLoanNumber(incomeInfoDto.LoanNumber);
-       
+
                 loanRecord.State = LoanState.IncomeInfoFinish;
                 loanRecord.CreateTime = DateTime.UtcNow;
 
@@ -671,7 +672,7 @@ namespace QLendApi.Controllers
             }
         }
 
-         // GET /api/user/getIncomeinfo
+        // GET /api/user/getIncomeinfo
         [Authorize]
         [Route("getIncomeinfo")]
         [HttpGet]
