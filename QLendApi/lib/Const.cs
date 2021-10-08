@@ -37,4 +37,12 @@ namespace QLendApi.lib
     {
         public const int Success = 1;
     }
+
+    public class ImageUploadType
+    {
+        public const int FrontArc = 1;
+        public const int BackArc = 2;
+        public const int Passport = 3;
+        public const int LocalIdCard = 4;
+    }
 }

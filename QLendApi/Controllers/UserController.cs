@@ -130,6 +130,78 @@ namespace QLendApi.Controllers
             }
         }
 
+        // POst /api/user/imageUpload
+        [Route("imageUpload")]
+        [HttpPost]
+        public async Task<ActionResult> ImageUpload([FromForm] ImageUploadDto imageUploadDto)
+        {
+            try
+            {
+                var foreignWorker = await foreignWorkerRepository.GetByIdAsync(imageUploadDto.Id);
+
+                if (foreignWorker == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10003,
+                        Message = "user not found"
+                    });
+                }
+
+                // check status
+                if (foreignWorker.Status != ForeignWorkStatus.Init)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10004,
+                        Message = "status not correct"
+                    });
+                }
+
+                var cert = await certificateRepository.GetByUINoAsync(foreignWorker.Uino);
+
+                if (cert == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10005,
+                        Message = "certificate not found"
+                    });
+                }
+
+                if (imageUploadDto.Type == ImageUploadType.FrontArc)
+                {
+                    cert.FrontArc = await imageUploadDto.FrontArc.GetBytes();
+                    await certificateRepository.UpdateAsync(cert);
+                }
+                else if (imageUploadDto.Type == ImageUploadType.BackArc)
+                {
+                    cert.BackArc = await imageUploadDto.BackArc.GetBytes();
+                    await certificateRepository.UpdateAsync(cert);
+                }
+                else if (imageUploadDto.Type == ImageUploadType.Passport)
+                {
+                    foreignWorker.Passport = await imageUploadDto.Passport.GetBytes();
+                    await foreignWorkerRepository.UpdateAsync(foreignWorker);
+                }
+                else if (imageUploadDto.Type == ImageUploadType.LocalIdCard)
+                {
+                    foreignWorker.LocalIdCard = await imageUploadDto.LocalIdCard.GetBytes();
+                    await foreignWorkerRepository.UpdateAsync(foreignWorker);
+                }
+
+                return StatusCode(201);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 92000,
+                    Message = $"imageUpload api error:{ex}"
+                });
+            }
+        }
+
         // POST /api/user/personalNationalInfo
         [Route("personalNationalInfo")]
         [HttpPost]
@@ -189,7 +261,7 @@ namespace QLendApi.Controllers
                 return BadRequest(new BaseResponse
                 {
                     StatusCode = 90002,
-                    Message = $"initArc api error:{ex}"
+                    Message = $"personalNationalInfo api error:{ex}"
                 });
             }
         }
