@@ -205,7 +205,7 @@ namespace QLendApi.Controllers
         // POST /api/user/personalNationalInfo
         [Route("personalNationalInfo")]
         [HttpPost]
-        public async Task<ActionResult> PersonalNationalInfo([FromForm] PersonalNationalInfoDto personalNationalInfoDto)
+        public async Task<ActionResult> PersonalNationalInfo(PersonalNationalInfoDto personalNationalInfoDto)
         {
             try
             {
