@@ -54,7 +54,12 @@ namespace QLendApi.Controllers
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
-                return StatusCode(201);
+               // return StatusCode(201);
+               return Ok(new BaseResponse
+                {
+                    StatusCode = ResponseStatusCode.Success,
+                    Message = "success"
+                });
             }
             catch (System.Exception ex)
             {
