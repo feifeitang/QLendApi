@@ -98,26 +98,28 @@ namespace QLendApi.Controllers
                         Message = "not a member"
                     });
                 }
-
-                Random rnd = new Random();
-                int OTP = rnd.Next(100000, 999999);
-
-                smsService.Send(foreignWorker.PhoneNumber, $"QLend OTP number is {OTP}");
-
-                foreignWorker.OTP = OTP;
-                foreignWorker.OTPSendTIme = DateTime.UtcNow;
-
-                await foreignWorkerRepository.UpdateAsync(foreignWorker);
-
-                return Ok(new OtpByPhoneNumberResponse
+                else
                 {
-                    StatusCode = ResponseStatusCode.Success,
-                    Message = "success",
-                    Data = new OtpByPhoneNumberResponse.DataStruct
+                    Random rnd = new Random();
+                    int OTP = rnd.Next(100000, 999999);
+
+                    smsService.Send(foreignWorker.PhoneNumber, $"QLend OTP number is {OTP}");
+
+                    foreignWorker.OTP = OTP;
+                    foreignWorker.OTPSendTIme = DateTime.UtcNow;
+
+                    await foreignWorkerRepository.UpdateAsync(foreignWorker);
+
+                    return Ok(new OtpByPhoneNumberResponse
                     {
-                        Id = foreignWorker.Id
-                    }
-                });
+                        StatusCode = ResponseStatusCode.Success,
+                        Message = "success",
+                        Data = new OtpByPhoneNumberResponse.DataStruct
+                        {
+                            Id = foreignWorker.Id
+                        }
+                    });
+                }              
             }
             catch (System.Exception ex)
             {
