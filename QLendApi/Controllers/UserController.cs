@@ -506,7 +506,7 @@ namespace QLendApi.Controllers
                 //return StatusCode(201);
                 return Ok(new BaseResponse
                 {
-                    StatusCode = 201,
+                    StatusCode = ResponseStatusCode.Success,
                     Message = "success"
                 });
             }
