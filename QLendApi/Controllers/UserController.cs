@@ -742,7 +742,12 @@ namespace QLendApi.Controllers
 
                 await _notificationService.RequestNotificationAsync(notificationRequest, token);
 
-                return StatusCode(201);
+                //return StatusCode(201);
+                return Ok(new BaseResponse
+                {
+                    StatusCode = ResponseStatusCode.Success,
+                    Message = "success"
+                });
             }
             catch (System.Exception ex)
             {
