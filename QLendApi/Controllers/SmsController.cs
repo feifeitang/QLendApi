@@ -89,6 +89,15 @@ namespace QLendApi.Controllers
                         Message = "user not found"
                     });
                 }
+                else if(foreignWorker.State == ForeignWorkState.Pending || 
+                    foreignWorker.State == ForeignWorkState.Failure)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10050,
+                        Message = "not a member"
+                    });
+                }
 
                 Random rnd = new Random();
                 int OTP = rnd.Next(100000, 999999);
