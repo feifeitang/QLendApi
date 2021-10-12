@@ -90,7 +90,7 @@ namespace QLendApi.Controllers
                     });
                 }
                 else if(foreignWorker.State == ForeignWorkState.Pending || 
-                    foreignWorker.State == ForeignWorkState.Failure)
+                    foreignWorker.State == ForeignWorkState.Failure || foreignWorker.State == null)
                 {
                     return BadRequest(new BaseResponse
                     {
