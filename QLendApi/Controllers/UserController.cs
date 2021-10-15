@@ -305,7 +305,7 @@ namespace QLendApi.Controllers
                     });
                 }
 
-                foreignWorker.UserName = personalInfoDto.UserName;
+               // foreignWorker.UserName = personalInfoDto.UserName;
                 foreignWorker.EnglishName = personalInfoDto.EnglishName;
                 foreignWorker.Sex = personalInfoDto.Sex;
                 foreignWorker.Nationality = personalInfoDto.Nationality;
