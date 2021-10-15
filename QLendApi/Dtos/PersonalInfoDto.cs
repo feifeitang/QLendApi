@@ -7,11 +7,11 @@ namespace QLendApi.Dtos
     {
         [Required]
         public int Id { get; init; }
-
+/*
         [Required]
         [StringLength(20, MinimumLength = 4)]
         public string UserName { get; init; }
-        
+  */      
         [Required]
         [StringLength(20)]
         public string EnglishName { get; init; }
