@@ -846,6 +846,41 @@ namespace QLendApi.Controllers
             }
         }
 
+        // POST /api/user/updateArc
+        [Authorize]
+        [Route("updateArc")]
+        [HttpPost]
+        public async Task<ActionResult> UpdateArc([FromForm] UpdateArcDto updateArcDto)
+        {
+            try
+            {
+                // get user info
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+                var cert = await certificateRepository.GetByUINoAsync(foreignWorker.Uino);
+
+                cert.FrontArc = await updateArcDto.FrontArc.GetBytes();
+                cert.BackArc = await updateArcDto.BackArc.GetBytes();               
+
+                await certificateRepository.UpdateAsync(cert);
+
+                 return Ok(new BaseResponse
+                {
+                    StatusCode = ResponseStatusCode.Success,
+                    Message = "success"
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90002,
+                    Message = $"updateArc api error:{ex}"
+                });
+            }
+        }
+
+
         private string generateJwtToken(ForeignWorker foreignWorker)
         {
             // generate token that is valid for 7 days
