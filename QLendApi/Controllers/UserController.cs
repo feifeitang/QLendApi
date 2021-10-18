@@ -824,7 +824,7 @@ namespace QLendApi.Controllers
                 foreignWorker.BankNumber = bankAccountDto.BankNumber;
                 foreignWorker.AccountNumber = bankAccountDto.AccountNumber;
                 loanRecord.State = LoanState.BankAccountFinish;
-                //loanRecord.Status = 1;
+                loanRecord.Status = 0;
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
                 await loanRecordRepository.UpdateAsync(loanRecord);
