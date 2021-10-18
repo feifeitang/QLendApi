@@ -1,0 +1,19 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/qlend-app-api:$SHORT_SHA", "."]
+    waitFor: ['-']
+    id: 'build-image'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    args: ['gsutil', 'cp', '-r', 'gs://qlend-sandbox/qlend-app-api/appsettings.json', './deployments/charts/appsettings.json']
+    id: 'pull-config'
+  - name: gcr.io/cloud-builders/gcloud
+    args: ['container', 'clusters', 'get-credentials', 'qlend-sandbox', '--region', 'asia-east1']
+    id: 'prepare-credentials'
+  - name: 'gcr.io/$PROJECT_ID/helm'
+    args: ['--namespace=sandbox','upgrade','--install','qlend-app-api','deployments/charts','-f','deployments/charts/values.yaml','--set','image.tag=$SHORT_SHA,ingress.hosts[0].host=sandbox-app-api.qlend.tw' ]
+    env:
+    - 'CLOUDSDK_COMPUTE_ZONE=asia-east1'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=qlend-sandbox'
+    waitFor: ['build-image', 'pull-config', 'prepare-credentials']
+tags: ['cloud-builders-community']
+images: ["gcr.io/$PROJECT_ID/qlend-app-api"]

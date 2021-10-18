@@ -1,0 +1,12 @@
+{{- if .Values.config.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+data:
+  {{- $files := .Files }}
+  {{- range tuple "appsettings.json" }}
+  {{ . }}: |-
+{{ $files.Get . | indent 4 }}
+  {{- end }}
+{{- end }}
