@@ -8,7 +8,7 @@ image:
   repository: gcr.io/qlend-329115/qlend-app-api
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "7600dba"
 
 imagePullSecrets: []
 nameOverride: ""
