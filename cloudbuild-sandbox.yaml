@@ -17,3 +17,5 @@ steps:
     waitFor: ['build-image', 'pull-config', 'prepare-credentials']
 tags: ['cloud-builders-community']
 images: ["gcr.io/$PROJECT_ID/qlend-app-api"]
+options:
+  logging: CLOUD_LOGGING_ONLY
