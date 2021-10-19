@@ -5,9 +5,7 @@ namespace QLendApi.Dtos
 {
     public record UpdateArcDto
     {
-        [Required]
-        public int Id { get; init; }
-
+    
         [Required]
         public IFormFile FrontArc {get; init;}
 
