@@ -857,7 +857,25 @@ namespace QLendApi.Controllers
                 // get user info
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
+                if (foreignWorker == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10003,
+                        Message = "user not found"
+                    });
+                }
+
                 var cert = await certificateRepository.GetByUINoAsync(foreignWorker.Uino);
+
+                if (cert == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10005,
+                        Message = "certificate not found"
+                    });
+                }
 
                 cert.FrontArc = await updateArcDto.FrontArc.GetBytes();
                 cert.BackArc = await updateArcDto.BackArc.GetBytes();               
