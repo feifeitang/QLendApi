@@ -34,6 +34,20 @@ namespace QLendApi.Services
             }
         }
 
+        public async Task<LoanRecord> GetLimitRecordByForeignWorkerId(int id)
+        {
+            var loanRecords = await loanRecordRepository.GetByForeignWorkerIdAsync(id);
+
+            if (loanRecords == null)
+            {
+                return null;
+            }
+            else
+            {
+                return loanRecords.Where(e => e.Status == 0).SingleOrDefault();
+            }
+        }
+
         private bool CheckAppiyTimeIsVaild(DateTime createTime)
         {
             // createTime need add _expirehours

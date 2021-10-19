@@ -73,6 +73,37 @@ namespace QLendApi.Controllers
             }
         }
 
+        //GET /api/loan/limitRecord
+        [Route("limitRecord")]
+        [HttpGet]
+        public async Task<ActionResult<EditRecordResponse>> LimitRecord()
+        {
+            try
+            {
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+                var loanRecord = await loanRecordService.GetLimitRecordByForeignWorkerId(foreignWorker.Id);
+
+                return Ok(new LimitRecordResponse
+                {
+                    StatusCode = 10000,
+                    Message = "success",
+                    Data = new LimitRecordResponse.LimitRecordDataStruct
+                    {
+                        LoanRecord = loanRecord
+                    }
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90040,
+                    Message = $"limitRecord api error:{ex}"
+                });
+            }
+        }
+
         //POST /api/loan/apply
         [Route("apply")]
         [HttpPost]
