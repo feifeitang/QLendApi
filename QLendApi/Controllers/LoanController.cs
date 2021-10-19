@@ -203,7 +203,12 @@ namespace QLendApi.Controllers
 
                 await loanRecordRepository.UpdateAsync(loanRecord);
 
-                return Ok();
+                //return Ok();
+                 return Ok(new BaseResponse
+                {
+                    StatusCode = ResponseStatusCode.Success,
+                    Message = "success"
+                });
             }
             catch (System.Exception ex)
             {
