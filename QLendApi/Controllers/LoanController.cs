@@ -178,7 +178,7 @@ namespace QLendApi.Controllers
                     });
                 }
 
-                if (loanRecord.State != LoanState.PermitLoan)
+                if (loanRecord.State < LoanState.PermitLoan || loanRecord.State >= 8)
                 {
                     return BadRequest(new BaseResponse
                     {
