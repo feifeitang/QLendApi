@@ -44,7 +44,7 @@ namespace QLendApi.Services
             }
             else
             {
-                return loanRecords.Where(e => e.Status == 0).SingleOrDefault();
+                return loanRecords.Where(e => e.Status == 0 || e.State == LoanState.ApplyFinish).SingleOrDefault();
             }
         }
 
