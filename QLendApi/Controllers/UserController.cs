@@ -608,9 +608,10 @@ namespace QLendApi.Controllers
                     incomeInfo.LatePay = incomeInfoDto.LatePay;
                     incomeInfo.PayWay = incomeInfoDto.PayWay;
                     incomeInfo.RemittanceWay = incomeInfoDto.RemittanceWay;
+                    incomeInfo.PayDay = incomeInfoDto.PayDay;
                     incomeInfo.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
                     incomeInfo.PaySlip = await incomeInfoDto.PaySlip.GetBytes();
-                    incomeInfo.PayDay = incomeInfoDto.PayDay;
+                    
 
                     await incomeInformationRepository.UpdateAsync(incomeInfo);
                 }
