@@ -11,7 +11,7 @@ namespace QLendApi.Repositories
 
         Task<ForeignWorker> GetByUINoAsync(string uino);
 
-        Task<ForeignWorker> GetByPhoneNumberAsync(string phoneNumber);
+     //   Task<ForeignWorker> GetByPhoneNumberAsync(string phoneNumber);
 
         Task CreateAsync(ForeignWorker foreignWorker);
         
