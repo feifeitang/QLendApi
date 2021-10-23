@@ -120,7 +120,8 @@ namespace QLendApi.Controllers
                         Message = "success",
                         Data = new OtpByPhoneNumberResponse.DataStruct
                         {
-                            Id = foreignWorker.Id
+                            Id = foreignWorker.Id,
+                            UINo = foreignWorker.Uino
                         }
                     });
                 }              
