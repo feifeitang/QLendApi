@@ -486,7 +486,7 @@ namespace QLendApi.Controllers
         {
             try
             {
-                var foreignWorker = await foreignWorkerRepository.GetByPhoneNumberAsync(passwordDto.PhoneNumber);
+                var foreignWorker = await foreignWorkerRepository.GetByUINoAsync(passwordDto.UINo);
 
                 if (foreignWorker == null)
                 {
