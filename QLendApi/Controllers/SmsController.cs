@@ -79,8 +79,10 @@ namespace QLendApi.Controllers
             try
             {
                 // check user exist, and get user data
-                var foreignWorker = await foreignWorkerRepository.GetByPhoneNumberAsync(otpByPhoneNumberDto.PhoneNumber);
+                var foreignWorker = await foreignWorkerRepository.GetByUINoAsync(otpByPhoneNumberDto.UINo);
 
+                foreignWorker.PhoneNumber = otpByPhoneNumberDto.PhoneNumber;
+                
                 if (foreignWorker == null)
                 {
                     return BadRequest(new BaseResponse
@@ -100,10 +102,12 @@ namespace QLendApi.Controllers
                 }
                 else
                 {
+                  //  await foreignWorkerRepository.UpdateAsync(foreignWorker);
+
                     Random rnd = new Random();
                     int OTP = rnd.Next(100000, 999999);
 
-                    smsService.Send(foreignWorker.PhoneNumber, $"QLend OTP number is {OTP}");
+                    smsService.Send(otpByPhoneNumberDto.PhoneNumber, $"QLend OTP number is {OTP}");
 
                     foreignWorker.OTP = OTP;
                     foreignWorker.OTPSendTIme = DateTime.UtcNow;

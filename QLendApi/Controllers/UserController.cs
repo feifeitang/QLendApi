@@ -80,7 +80,7 @@ namespace QLendApi.Controllers
                         Message = "exist uino"
                     });
                 }
-
+/*
                 // check PhoneNumber if exist
                 if (foreignWorkerRepository.CheckPhoneNumberExist(signUp.PhoneNumber))
                 {
@@ -90,7 +90,7 @@ namespace QLendApi.Controllers
                         Message = "exist phone number"
                     });
                 }
-
+*/
                 Certificate certificate = new()
                 {
                     Uino = signUp.UINo
