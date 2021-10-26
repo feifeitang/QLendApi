@@ -16,6 +16,7 @@ using QLendApi.Services;
 using QLendApi.Responses;
 using QLendApi.Settings;
 using System.Threading;
+using Newtonsoft.Json;
 
 namespace QLendApi.Controllers
 {
@@ -33,6 +34,7 @@ namespace QLendApi.Controllers
         private readonly ISmsService smsService;
 
         private readonly AppSettings _appSettings;
+        private readonly Logger _logger;
 
         private int sn = 0;
 
@@ -62,6 +64,8 @@ namespace QLendApi.Controllers
             this.foreignWorkerService = foreignWorkerService;
 
             this._notificationService = _notificationService;
+
+            this._logger = new Logger();
         }
 
         // POST /api/user/signUp
@@ -71,6 +75,7 @@ namespace QLendApi.Controllers
         {
             try
             {
+                this._logger.Info("signUp", "start", JsonConvert.SerializeObject(signUp));
                 // check UINo if exist
                 if (certificateRepository.CheckUINoExist(signUp.UINo))
                 {
@@ -110,6 +115,8 @@ namespace QLendApi.Controllers
                 await certificateRepository.CreateAsync(certificate);
                 await foreignWorkerRepository.CreateAsync(foreignWorker);
 
+                this._logger.Info("signUp", "end, response foreignWorker id", foreignWorker.Id);
+
                 return Ok(new SignUpResponse
                 {
                     StatusCode = ResponseStatusCode.Success,
@@ -122,10 +129,11 @@ namespace QLendApi.Controllers
             }
             catch (System.Exception ex)
             {
+                this._logger.Error("signUp", "have error", JsonConvert.SerializeObject(ex));
                 return BadRequest(new BaseResponse
                 {
                     StatusCode = 90001,
-                    Message = $"signUp api error:{ex}"
+                    Message = "signUp api have exception error"
                 });
             }
         }
@@ -137,6 +145,8 @@ namespace QLendApi.Controllers
         {
             try
             {
+                this._logger.Info("imageUpload", "start, foreignWorker id", imageUploadDto.Id);
+
                 var foreignWorker = await foreignWorkerRepository.GetByIdAsync(imageUploadDto.Id);
 
                 if (foreignWorker == null)
@@ -151,6 +161,8 @@ namespace QLendApi.Controllers
                 // check status
                 if (foreignWorker.Status != ForeignWorkStatus.Init)
                 {
+                    this._logger.Warn("imageUpload", "foreignWorker status not correct foreignWorker id", imageUploadDto.Id);
+
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10004,
@@ -162,6 +174,7 @@ namespace QLendApi.Controllers
 
                 if (cert == null)
                 {
+                    this._logger.Warn("imageUpload", "certificate not found foreignWorker id", imageUploadDto.Id);
                     return BadRequest(new BaseResponse
                     {
                         StatusCode = 10005,
@@ -190,7 +203,7 @@ namespace QLendApi.Controllers
                     await foreignWorkerRepository.UpdateAsync(foreignWorker);
                 }
 
-               // return StatusCode(201);
+               this._logger.Info("imageUpload", "end, foreignWorker id", imageUploadDto.Id);
                return Ok(new BaseResponse
                 {
                     StatusCode = ResponseStatusCode.Success,
@@ -199,10 +212,11 @@ namespace QLendApi.Controllers
             }
             catch (System.Exception ex)
             {
+                this._logger.Error("imageUpload", "have error", JsonConvert.SerializeObject(ex));
                 return BadRequest(new BaseResponse
                 {
                     StatusCode = 92000,
-                    Message = $"imageUpload api error:{ex}"
+                    Message = "imageUpload have exception error"
                 });
             }
         }
@@ -214,6 +228,8 @@ namespace QLendApi.Controllers
         {
             try
             {
+                this._logger.Info("personalNationalInfo", "start, foreignWorker id", personalNationalInfoDto.Id);
+
                 var foreignWorker = await foreignWorkerRepository.GetByIdAsync(personalNationalInfoDto.Id);
 
                 if (foreignWorker == null)
@@ -259,7 +275,7 @@ namespace QLendApi.Controllers
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
-                //return StatusCode(201);
+                this._logger.Info("personalNationalInfo", "end, foreignWorker id", personalNationalInfoDto.Id);
                 return Ok(new BaseResponse
                 {
                     StatusCode = ResponseStatusCode.Success,
@@ -268,10 +284,12 @@ namespace QLendApi.Controllers
             }
             catch (System.Exception ex)
             {
+                this._logger.Error("personalNationalInfo", "have error", JsonConvert.SerializeObject(ex));
+
                 return BadRequest(new BaseResponse
                 {
                     StatusCode = 90002,
-                    Message = $"personalNationalInfo api error:{ex}"
+                    Message = "personalNationalInfo api have error"
                 });
             }
         }
@@ -283,6 +301,7 @@ namespace QLendApi.Controllers
         {
             try
             {
+                this._logger.Info("personalInfo", "start, foreignWorker id", personalInfoDto.Id);
                 // check user exist, and get user data
                 var foreignWorker = await foreignWorkerRepository.GetByIdAsync(personalInfoDto.Id);
 
@@ -321,7 +340,7 @@ namespace QLendApi.Controllers
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
 
-                //return StatusCode(201);
+                this._logger.Info("personalInfo", "end, foreignWorker id", personalInfoDto.Id);
                 return Ok(new BaseResponse
                 {
                     StatusCode = 10000,
@@ -330,10 +349,12 @@ namespace QLendApi.Controllers
             }
             catch (System.Exception ex)
             {
+                this._logger.Error("personalInfo", "have error", JsonConvert.SerializeObject(ex));
+
                 return BadRequest(new BaseResponse
                 {
                     StatusCode = 90003,
-                    Message = $"personalInfo api error:{ex}"
+                    Message = "personalInfo api error"
                 });
             }
         }
@@ -345,6 +366,7 @@ namespace QLendApi.Controllers
         {
             try
             {
+                this._logger.Info("arcInfo", "start, foreignWorker id", arcInfoDto.Id);
                 // check user exist, and get user data
                 var foreignWorker = await foreignWorkerRepository.GetByIdAsync(arcInfoDto.Id);
 
@@ -391,7 +413,7 @@ namespace QLendApi.Controllers
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
                 await certificateRepository.UpdateAsync(certificate);
 
-                // return StatusCode(201);
+                this._logger.Info("arcInfo", "end, foreignWorker id", arcInfoDto.Id);
                 return Ok(new BaseResponse
                 {
                     StatusCode = 10000,
@@ -400,10 +422,12 @@ namespace QLendApi.Controllers
             }
             catch (System.Exception ex)
             {
+                this._logger.Error("arcInfo", "have error", JsonConvert.SerializeObject(ex));
+
                 return BadRequest(new BaseResponse
                 {
                     StatusCode = 90006,
-                    Message = $"arcInfo api error:{ex}"
+                    Message = "arcInfo api error"
                 });
             }
         }
@@ -415,6 +439,8 @@ namespace QLendApi.Controllers
         {
             try
             {
+                this._logger.Info("login", "start, loginDto", JsonConvert.SerializeObject(loginDto));
+
                 var foreignWorker = await foreignWorkerService.GetInfoByAuthOrNull(loginDto.Uino, loginDto.Password);
 
                 if (foreignWorker == null)
@@ -459,6 +485,8 @@ namespace QLendApi.Controllers
                 // authentication successful so generate jwt token
                 var token = generateJwtToken(foreignWorker);
 
+                this._logger.Info("login", "end, token", token);
+
                 return Ok(new LoginResponse
                 {
                     StatusCode = ResponseStatusCode.Success,
@@ -471,10 +499,12 @@ namespace QLendApi.Controllers
             }
             catch (System.Exception ex)
             {
+                this._logger.Error("login", "have error", JsonConvert.SerializeObject(ex));
+
                 return BadRequest(new BaseResponse
                 {
                     StatusCode = 90005,
-                    Message = $"login api error:{ex}"
+                    Message = "login api error"
                 });
             }
         }
@@ -611,7 +641,7 @@ namespace QLendApi.Controllers
                     incomeInfo.PayDay = incomeInfoDto.PayDay;
                     incomeInfo.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
                     incomeInfo.PaySlip = await incomeInfoDto.PaySlip.GetBytes();
-                    
+
 
                     await incomeInformationRepository.UpdateAsync(incomeInfo);
                 }
@@ -826,13 +856,13 @@ namespace QLendApi.Controllers
                 foreignWorker.BankNumber = bankAccountDto.BankNumber;
                 foreignWorker.AccountNumber = bankAccountDto.AccountNumber;
                 loanRecord.State = LoanState.BankAccountFinish;
-               // loanRecord.Status = 0;
+                // loanRecord.Status = 0;
 
                 await foreignWorkerRepository.UpdateAsync(foreignWorker);
                 await loanRecordRepository.UpdateAsync(loanRecord);
 
-               // return StatusCode(201);
-                 return Ok(new BaseResponse
+                // return StatusCode(201);
+                return Ok(new BaseResponse
                 {
                     StatusCode = ResponseStatusCode.Success,
                     Message = "success"
@@ -880,12 +910,12 @@ namespace QLendApi.Controllers
                 }
 
                 cert.FrontArc = await updateArcDto.FrontArc.GetBytes();
-                cert.BackArc = await updateArcDto.BackArc.GetBytes(); 
-                cert.SelfileArc = await updateArcDto.SelfieArc.GetBytes();            
+                cert.BackArc = await updateArcDto.BackArc.GetBytes();
+                cert.SelfileArc = await updateArcDto.SelfieArc.GetBytes();
 
                 await certificateRepository.UpdateAsync(cert);
 
-                 return Ok(new BaseResponse
+                return Ok(new BaseResponse
                 {
                     StatusCode = ResponseStatusCode.Success,
                     Message = "success"
