@@ -880,7 +880,8 @@ namespace QLendApi.Controllers
                 }
 
                 cert.FrontArc = await updateArcDto.FrontArc.GetBytes();
-                cert.BackArc = await updateArcDto.BackArc.GetBytes();               
+                cert.BackArc = await updateArcDto.BackArc.GetBytes(); 
+                cert.SelfileArc = await updateArcDto.SelfieArc.GetBytes();            
 
                 await certificateRepository.UpdateAsync(cert);
 

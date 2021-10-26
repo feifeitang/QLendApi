@@ -12,6 +12,8 @@ namespace QLendApi.Dtos
         [Required]
         public IFormFile BackArc {get; init;}
 
+        [Required]
+        public IFormFile SelfieArc {get; init;}
 
     }
 }
