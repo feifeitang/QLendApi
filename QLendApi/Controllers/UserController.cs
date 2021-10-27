@@ -149,7 +149,7 @@ namespace QLendApi.Controllers
                 }
 
                 // check status
-                if (foreignWorker.Status != ForeignWorkStatus.Init)
+                if (foreignWorker.Status < ForeignWorkStatus.Init || foreignWorker.Status >=4)
                 {
                     return BadRequest(new BaseResponse
                     {
@@ -226,7 +226,7 @@ namespace QLendApi.Controllers
                 }
 
                 // check status
-                if (foreignWorker.Status != ForeignWorkStatus.Init)
+                if (foreignWorker.Status < ForeignWorkStatus.Init || foreignWorker.Status >=4)
                 {
                     return BadRequest(new BaseResponse
                     {
@@ -296,7 +296,7 @@ namespace QLendApi.Controllers
                 }
 
                 // check user status
-                if (foreignWorker.Status != ForeignWorkStatus.InitArcFinish)
+                if (foreignWorker.Status < ForeignWorkStatus.InitArcFinish || foreignWorker.Status >=4)
                 {
                     return BadRequest(new BaseResponse
                     {
@@ -358,7 +358,7 @@ namespace QLendApi.Controllers
                 }
 
                 // check user status
-                if (foreignWorker.Status != ForeignWorkStatus.PersonalInfoFinish)
+                if (foreignWorker.Status < ForeignWorkStatus.PersonalInfoFinish || foreignWorker.Status >=4)
                 {
                     return BadRequest(new BaseResponse
                     {
