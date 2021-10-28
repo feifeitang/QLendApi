@@ -159,7 +159,7 @@ namespace QLendApi.Controllers
                 }
 
                 // check status
-                if (foreignWorker.Status < ForeignWorkStatus.Init || foreignWorker.Status >=4)
+                if (foreignWorker.Status < ForeignWorkStatus.Init || foreignWorker.Status >=ForeignWorkStatus.Finish)
                 {
                     this._logger.Warn("imageUpload", "foreignWorker status not correct foreignWorker id", imageUploadDto.Id);
 
@@ -315,7 +315,7 @@ namespace QLendApi.Controllers
                 }
 
                 // check user status
-                if (foreignWorker.Status < ForeignWorkStatus.InitArcFinish || foreignWorker.Status >=4)
+                if (foreignWorker.Status < ForeignWorkStatus.InitArcFinish || foreignWorker.Status >= ForeignWorkStatus.Finish)
                 {
                     return BadRequest(new BaseResponse
                     {
@@ -380,7 +380,7 @@ namespace QLendApi.Controllers
                 }
 
                 // check user status
-                if (foreignWorker.Status < ForeignWorkStatus.PersonalInfoFinish || foreignWorker.Status >=4)
+                if (foreignWorker.Status < ForeignWorkStatus.PersonalInfoFinish || foreignWorker.Status >=ForeignWorkStatus.Finish)
                 {
                     return BadRequest(new BaseResponse
                     {
