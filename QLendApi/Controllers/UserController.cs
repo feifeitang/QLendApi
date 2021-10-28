@@ -313,7 +313,7 @@ namespace QLendApi.Controllers
                         Message = "user not found"
                     });
                 }
-/*
+
                 // check user status
                 if (foreignWorker.Status < ForeignWorkStatus.InitArcFinish || foreignWorker.Status >= ForeignWorkStatus.Finish)
                 {
@@ -323,7 +323,7 @@ namespace QLendApi.Controllers
                         Message = "status not correct"
                     });
                 }
-*/
+
                // foreignWorker.UserName = personalInfoDto.UserName;
                 foreignWorker.EnglishName = personalInfoDto.EnglishName;
                 foreignWorker.Sex = personalInfoDto.Sex;
