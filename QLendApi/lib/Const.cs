@@ -44,5 +44,7 @@ namespace QLendApi.lib
         public const int BackArc = 2;
         public const int Passport = 3;
         public const int LocalIdCard = 4;
+
+        public const int SelfieArc = 5;
     }
 }

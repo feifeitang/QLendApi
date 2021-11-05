@@ -909,11 +909,21 @@ namespace QLendApi.Controllers
                     });
                 }
 
-                cert.FrontArc = await updateArcDto.FrontArc.GetBytes();
-                cert.BackArc = await updateArcDto.BackArc.GetBytes();
-                cert.SelfileArc = await updateArcDto.SelfieArc.GetBytes();
-
-                await certificateRepository.UpdateAsync(cert);
+                if(updateArcDto.Type == ImageUploadType.FrontArc)
+                {
+                    cert.FrontArc = await updateArcDto.FrontArc.GetBytes();
+                    await certificateRepository.UpdateAsync(cert);
+                }
+                else if (updateArcDto.Type == ImageUploadType.BackArc)
+                {
+                    cert.BackArc = await updateArcDto.BackArc.GetBytes();
+                    await certificateRepository.UpdateAsync(cert);
+                }
+                else if( updateArcDto.Type == ImageUploadType.SelfieArc)
+                {
+                    cert.SelfileArc = await updateArcDto.SelfieArc.GetBytes();
+                    await certificateRepository.UpdateAsync(cert);
+                }
 
                 return Ok(new BaseResponse
                 {
