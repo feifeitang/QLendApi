@@ -8,13 +8,12 @@ namespace QLendApi.Dtos
         [Required]
         public int Type { get; init; }
     
-        [Required]
+       
         public IFormFile FrontArc {get; init;}
 
-        [Required]
         public IFormFile BackArc {get; init;}
 
-        [Required]
+    
         public IFormFile SelfieArc {get; init;}
 
     }
