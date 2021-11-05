@@ -5,16 +5,20 @@ namespace QLendApi.Dtos
 {
     public record LoanSurveyArcDto
     {
-        [Required]
-        public string LoanNumber { get; init; }
+     //   [Required]
+      //  public string LoanNumber { get; init; }
 
         [Required]
+        public int Type { get; init; }
+
+
+     //   [Required]
         public IFormFile FrontArc2 {get; init;}
 
-        [Required]
+     //   [Required]
         public IFormFile BackArc2 {get; init;}
 
-        [Required]
+      //  [Required]
         public IFormFile SelfieArc {get; init;}
     }
 }

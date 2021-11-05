@@ -688,7 +688,7 @@ namespace QLendApi.Controllers
 
         }
 
-        // POST /api/user/loanSurveyArc
+         // POST /api/user/loanSurveyArc
         [Authorize]
         [Route("loanSurveyArc")]
         [HttpPost]
@@ -701,19 +701,27 @@ namespace QLendApi.Controllers
 
                 var cert = await certificateRepository.GetByUINoAsync(foreignWorker.Uino);
 
-                cert.FrontArc2 = await loanSurveyArcDto.FrontArc2.GetBytes();
-                cert.BackArc2 = await loanSurveyArcDto.BackArc2.GetBytes();
-                cert.SelfileArc = await loanSurveyArcDto.SelfieArc.GetBytes();
+                  if(loanSurveyArcDto.Type == ImageUploadType.FrontArc2)
+                {
+                    cert.FrontArc = await loanSurveyArcDto.FrontArc2.GetBytes();
+                    await certificateRepository.UpdateAsync(cert);
+                }
+                else if (loanSurveyArcDto.Type == ImageUploadType.BackArc2)
+                {
+                    cert.BackArc = await loanSurveyArcDto.BackArc2.GetBytes();
+                    await certificateRepository.UpdateAsync(cert);
+                }
+                else if( loanSurveyArcDto.Type == ImageUploadType.SelfieArc)
+                {
+                    cert.SelfileArc = await loanSurveyArcDto.SelfieArc.GetBytes();
+                    await certificateRepository.UpdateAsync(cert);
+                }
 
-                var loanRecord = await loanRecordRepository.GetByLoanNumber(loanSurveyArcDto.LoanNumber);
-
-                loanRecord.State = LoanState.LoanSurveyArcFinish;
-                loanRecord.CreateTime = DateTime.UtcNow;
-
-                await certificateRepository.UpdateAsync(cert);
-                await loanRecordRepository.UpdateAsync(loanRecord);
-
-                return StatusCode(201);
+                return Ok(new BaseResponse
+                {
+                    StatusCode = ResponseStatusCode.Success,
+                    Message = "success"
+                });
             }
             catch (System.Exception ex)
             {
@@ -724,6 +732,51 @@ namespace QLendApi.Controllers
                 });
             }
         }
+
+        // POST /api/user/updateArcState
+        [Authorize]
+        [Route("updateArcState")]
+        [HttpPost]
+        public async Task<ActionResult> UpdateArcState(LoanSurveyArcStateDto loanSurveyArcStateDto)
+        {
+            try
+            {
+                // get user info
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+                if (foreignWorker == null)
+                {
+                    return BadRequest(new BaseResponse
+                    {
+                        StatusCode = 10003,
+                        Message = "user not found"
+                    });
+                }
+
+                var loanRecord = await loanRecordRepository.GetByLoanNumber(loanSurveyArcStateDto.LoanNumber);
+
+                loanRecord.State = LoanState.LoanSurveyArcFinish;
+                loanRecord.CreateTime = DateTime.UtcNow;
+               
+                await loanRecordRepository.UpdateAsync(loanRecord);
+         
+                return Ok(new BaseResponse
+                {
+                    StatusCode = ResponseStatusCode.Success,
+                    Message = "success"
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90002,
+                    Message = $"updateArc api error:{ex}"
+                });
+            }
+        }
+
+       
 
         // POST /api/user/loanApplySignature
         [Authorize]
