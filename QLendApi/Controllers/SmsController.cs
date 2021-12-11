@@ -81,8 +81,7 @@ namespace QLendApi.Controllers
                 // check user exist, and get user data
                 var foreignWorker = await foreignWorkerRepository.GetByUINoAsync(otpByPhoneNumberDto.UINo);
 
-                foreignWorker.PhoneNumber = otpByPhoneNumberDto.PhoneNumber;
-                
+                               
                 if (foreignWorker == null)
                 {
                     return BadRequest(new BaseResponse
@@ -104,6 +103,8 @@ namespace QLendApi.Controllers
                 {
                   //  await foreignWorkerRepository.UpdateAsync(foreignWorker);
 
+                    foreignWorker.PhoneNumber = otpByPhoneNumberDto.PhoneNumber;
+                    
                     Random rnd = new Random();
                     int OTP = rnd.Next(100000, 999999);
 
