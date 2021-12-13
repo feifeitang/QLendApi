@@ -703,12 +703,12 @@ namespace QLendApi.Controllers
 
                   if(loanSurveyArcDto.Type == ImageUploadType.FrontArc2)
                 {
-                    cert.FrontArc = await loanSurveyArcDto.FrontArc2.GetBytes();
+                    cert.FrontArc2 = await loanSurveyArcDto.FrontArc2.GetBytes();
                     await certificateRepository.UpdateAsync(cert);
                 }
                 else if (loanSurveyArcDto.Type == ImageUploadType.BackArc2)
                 {
-                    cert.BackArc = await loanSurveyArcDto.BackArc2.GetBytes();
+                    cert.BackArc2 = await loanSurveyArcDto.BackArc2.GetBytes();
                     await certificateRepository.UpdateAsync(cert);
                 }
                 else if( loanSurveyArcDto.Type == ImageUploadType.SelfieArc)
