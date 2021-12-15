@@ -24,6 +24,12 @@ namespace QLendApi.Models
         public string LoanNumber { get; set; }
         public DateTime? BarCodeCreateTime { get; set; }
         public int OriginalAmount { get; set; }
+        public DateTime? CheckTime { get; set; }
+        [Column(TypeName = "char(5)")]
+        public string RemitAccount { get; set; }
+        public int? Delay { get; set; }
+        public byte[] Receipt { get; set; }
+
         
 
         public virtual LoanRecord LoanNumberNavigation { get; set; }
