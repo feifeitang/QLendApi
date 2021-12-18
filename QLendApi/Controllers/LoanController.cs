@@ -210,6 +210,97 @@ namespace QLendApi.Controllers
             }
         }
 
+         // POST /api/loan/receipt
+        [Authorize]
+        [Route("receipt")]
+        [HttpPost]
+        public async Task<ActionResult> RemittanceReceipt([FromForm] RemittanceReceiptDto remittanceReceiptDto)
+        {
+            try
+            {
+                // get user info
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;                
+
+                var repaymentrecord = await repaymentRecordRepository.GetByRepaymentNumberAsync(remittanceReceiptDto.RepaymentNumber);       
+
+                if(repaymentrecord.State == 0)
+                {
+                    repaymentrecord.RemitAccount = remittanceReceiptDto.RemitAccount;
+                    repaymentrecord.Receipt = await remittanceReceiptDto.Receipt.GetBytes();
+
+                    await repaymentRecordRepository.UpdateAsync(repaymentrecord);
+
+                 //   repaymentrecord.State = RepaymentStatus.ReceiptUpload;
+                }
+                else
+                {
+                    return Ok(new BaseResponse
+                {
+                    StatusCode = 10004,
+                    Message = "Status not correct"
+                });
+                }               
+
+                return Ok(new BaseResponse
+                {
+                    StatusCode = ResponseStatusCode.Success,
+                    Message = "success"
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90555,
+                    Message = $"receipt api error:{ex}"
+                });
+            }
+        }
+
+        // POST /api/loan/remitState
+        [Authorize]
+        [Route("remitState")]
+        [HttpPost]
+        public async Task<ActionResult> RemitState(RemitStateDto remitStateDto)
+        {
+            try
+            {
+                // get user info
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;                
+
+                var repaymentrecord = await repaymentRecordRepository.GetByRepaymentNumberAsync(remitStateDto.RepaymentNumber);       
+
+                if(repaymentrecord.State == 0)
+                {
+                    repaymentrecord.State = RepaymentStatus.ReceiptUpload;
+                    await repaymentRecordRepository.UpdateAsync(repaymentrecord);                 
+                }
+                else
+                {
+                    return Ok(new BaseResponse
+                    {
+                        StatusCode = 10004,
+                        Message = "Status not correct"
+                    });
+                }               
+
+                return Ok(new BaseResponse
+                {
+                    StatusCode = ResponseStatusCode.Success,
+                    Message = "success"
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90555,
+                    Message = $"receipt api error:{ex}"
+                });
+            }
+        }
+
+
         // POST /api/loan/cancel
         [Route("cancel")]
         [HttpPost]

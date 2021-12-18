@@ -38,6 +38,11 @@ namespace QLendApi.lib
         public const int Success = 1;
     }
 
+    public class RepaymentStatus
+    {
+        public const int ReceiptUpload = 1;
+    }
+
     public class ImageUploadType
     {
         public const int FrontArc = 1;
