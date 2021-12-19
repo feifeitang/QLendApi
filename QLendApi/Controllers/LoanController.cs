@@ -230,7 +230,7 @@ namespace QLendApi.Controllers
 
                     await repaymentRecordRepository.UpdateAsync(repaymentrecord);
 
-                 //   repaymentrecord.State = RepaymentStatus.ReceiptUpload;
+                    repaymentrecord.State = RepaymentStatus.ReceiptUpload;
                 }
                 else
                 {
@@ -256,7 +256,7 @@ namespace QLendApi.Controllers
                 });
             }
         }
-
+/*
         // POST /api/loan/remitState
         [Authorize]
         [Route("remitState")]
@@ -299,6 +299,7 @@ namespace QLendApi.Controllers
                 });
             }
         }
+        */
 
 
         // POST /api/loan/cancel
