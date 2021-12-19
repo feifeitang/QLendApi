@@ -13,9 +13,10 @@ namespace QLendApi.Dtos
         [StringLength(5, MinimumLength = 5)]
         public string RemitAccount { get; set; }
 
+/*
         [Required]
         public DateTime? ActualRepaymentDate { get; set; }
-    
+  */  
         [Required]
         public IFormFile Receipt {get; init;}
     }

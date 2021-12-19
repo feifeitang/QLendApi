@@ -228,7 +228,10 @@ namespace QLendApi.Controllers
                     repaymentrecord.RemitAccount = remittanceReceiptDto.RemitAccount;
                     repaymentrecord.Receipt = await remittanceReceiptDto.Receipt.GetBytes();
                     repaymentrecord.State = RepaymentStatus.ReceiptUpload;
-                    repaymentrecord.ActualRepaymentDate= remittanceReceiptDto.ActualRepaymentDate;
+
+                    DateTime time = DateTime.UtcNow;
+                    DateTime? actual = new DateTime?(time);
+                    repaymentrecord.ActualRepaymentDate= actual;
 
                     await repaymentRecordRepository.UpdateAsync(repaymentrecord);               
                 }
