@@ -1013,7 +1013,8 @@ namespace QLendApi.Controllers
         private int GenerateIncomeNumber()
         {
             // Random rnd = new Random();           
-            int number = int.Parse(DateTime.UtcNow.ToString("yyddHHss") + string.Format("{0:d2}", sn));
+            int number = int.Parse(string.Format("{0:d10}", sn));        
+            //int.Parse(DateTime.UtcNow.ToString("yyddHss") + string.Format("{0:d10}", sn));
             sn++;
             return number;
         }
