@@ -650,7 +650,7 @@ namespace QLendApi.Controllers
                 {
                     IncomeInformation incomeInfo = new()
                     {
-                        IncomeNumber = GenerateIncomeNumber(),
+                        IncomeNumber = GenerateIncomeNumber(foreignWorker.Uino),
                         AvgMonthlyIncome = incomeInfoDto.AvgMonthlyIncome,
                         LatePay = incomeInfoDto.LatePay,
                         PayWay = incomeInfoDto.PayWay,
@@ -1010,10 +1010,12 @@ namespace QLendApi.Controllers
             return tokenHandler.WriteToken(token);
         }
 
-        private int GenerateIncomeNumber()
+        private int GenerateIncomeNumber(string arcNumber)
         {
-            // Random rnd = new Random();           
-            int number = int.Parse(DateTime.UtcNow.ToString("yyddHH") + string.Format("{0:d4}", sn));
+            // Random rnd = new Random();  
+            int number = int.Parse(DateTime.UtcNow.ToString("yyddHH") + arcNumber.Substring(6,4));
+
+           // int number = int.Parse(DateTime.UtcNow.ToString("yyddHH") + string.Format("{0:d4}", sn));
            // sn++;
             return number;
         }
