@@ -13,7 +13,7 @@ namespace QLendApi.Dtos
         public string UserName { get; init; }
   */      
         [Required]
-        [StringLength(20)]
+        [StringLength(30)]
         public string EnglishName { get; init; }
         
         [Required]
