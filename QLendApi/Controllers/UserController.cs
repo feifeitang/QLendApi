@@ -617,7 +617,7 @@ namespace QLendApi.Controllers
             }
 
         }
-
+/*
         //POST /api/user/incomeInfo
         [Authorize]
         [Route("incomeInfo")]
@@ -687,6 +687,156 @@ namespace QLendApi.Controllers
             }
 
         }
+        */
+
+        //POST /api/user/incomeInfo
+        [Authorize]
+        [Route("incomeInfo")]
+        [HttpPost]
+        public async Task<ActionResult> IncomeInfo(IncomeInfoDto incomeInfoDto)
+        {
+            try
+            {
+                // get user info
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+                // if incomeNumber exist
+                if (foreignWorker.IncomeNumber != null)
+                {
+                    var incomeInfo = await incomeInformationRepository.GetByIncomeNumberAsync(foreignWorker.IncomeNumber);
+
+                    incomeInfo.AvgMonthlyIncome = incomeInfoDto.AvgMonthlyIncome;
+                    incomeInfo.LatePay = incomeInfoDto.LatePay;
+                    incomeInfo.PayWay = incomeInfoDto.PayWay;
+                    incomeInfo.RemittanceWay = incomeInfoDto.RemittanceWay;
+                    incomeInfo.PayDay = incomeInfoDto.PayDay;
+                  //  incomeInfo.FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes();
+                  //  incomeInfo.PaySlip = await incomeInfoDto.PaySlip.GetBytes();
+
+                    await incomeInformationRepository.UpdateAsync(incomeInfo);
+                }
+                // if incomeNumber not exist
+                else
+                {
+                    IncomeInformation incomeInfo = new()
+                    {
+                        IncomeNumber = GenerateIncomeNumber(foreignWorker.Uino),
+                        AvgMonthlyIncome = incomeInfoDto.AvgMonthlyIncome,
+                        LatePay = incomeInfoDto.LatePay,
+                        PayWay = incomeInfoDto.PayWay,
+                        RemittanceWay = incomeInfoDto.RemittanceWay,
+                        PayDay = incomeInfoDto.PayDay,
+                    //    FrontSalaryPassbook = await incomeInfoDto.FrontSalaryPassbook.GetBytes(),
+                    //    PaySlip = await incomeInfoDto.PaySlip.GetBytes()
+                    };
+
+                    foreignWorker.IncomeNumber = incomeInfo.IncomeNumber;
+
+                    await incomeInformationRepository.CreateAsync(incomeInfo);
+                    await foreignWorkerRepository.UpdateAsync(foreignWorker);
+
+                }
+
+                var loanRecord = await loanRecordRepository.GetByLoanNumber(incomeInfoDto.LoanNumber);
+
+                loanRecord.State = LoanState.IncomeInfoFinish;
+                loanRecord.CreateTime = DateTime.UtcNow;
+
+                await loanRecordRepository.UpdateAsync(loanRecord);
+
+                return Ok(new BaseResponse
+                {
+                    StatusCode = ResponseStatusCode.Success,
+                    Message = "success"
+                });
+
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90009,
+                    Message = $"incomeInfo api error:{ex}"
+                });
+            }
+
+        }
+
+        //POST /api/user/incomeImage
+        [Authorize]
+        [Route("incomeImage")]
+        [HttpPost]
+        public async Task<ActionResult> IncomeImage([FromForm] IncomeImageDto incomeImageDto)
+        {
+            try
+            {
+                // get user info
+                var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
+
+                // if incomeNumber exist
+                if (foreignWorker.IncomeNumber != null)
+                {
+                    var incomeInfo = await incomeInformationRepository.GetByIncomeNumberAsync(foreignWorker.IncomeNumber);
+           
+                    if(incomeImageDto.type == ImageUploadType.FrontSalaryPassbook)
+                    {
+                        incomeInfo.FrontSalaryPassbook = await incomeImageDto.FrontSalaryPassbook.GetBytes();
+                        await incomeInformationRepository.UpdateAsync(incomeInfo);                 
+                    }
+                    else if (incomeImageDto.type == ImageUploadType.PaySlip)
+                    {
+                        incomeInfo.PaySlip = await incomeImageDto.PaySlip.GetBytes();
+                        await incomeInformationRepository.UpdateAsync(incomeInfo);
+                    }
+                }
+                // if incomeNumber not exist
+                else
+                {
+                    IncomeInformation incomeInfo = new IncomeInformation();
+                         
+                    incomeInfo.IncomeNumber = GenerateIncomeNumber(foreignWorker.Uino) ;                         
+                    //  FrontSalaryPassbook = await incomeImageDto.FrontSalaryPassbook.GetBytes(),
+                    // PaySlip = await incomeImageDto.PaySlip.GetBytes()
+                    
+                    if(incomeImageDto.type == ImageUploadType.FrontSalaryPassbook)
+                    {
+                        incomeInfo.FrontSalaryPassbook = await incomeImageDto.FrontSalaryPassbook.GetBytes();
+                    //    await incomeInformationRepository.UpdateAsync(incomeInfo);                 
+                    }
+                    else if (incomeImageDto.type == ImageUploadType.PaySlip)
+                    {
+                        incomeInfo.PaySlip = await incomeImageDto.PaySlip.GetBytes();
+                        // await incomeInformationRepository.UpdateAsync(incomeInfo);
+                    }
+
+                    foreignWorker.IncomeNumber = incomeInfo.IncomeNumber;
+
+                    await incomeInformationRepository.CreateAsync(incomeInfo);
+                    await foreignWorkerRepository.UpdateAsync(foreignWorker);
+                }
+
+                var loanRecord = await loanRecordRepository.GetByLoanNumber(incomeImageDto.LoanNumber);
+
+             //   loanRecord.State = LoanState.IncomeInfoFinish;
+                loanRecord.CreateTime = DateTime.UtcNow;
+
+                await loanRecordRepository.UpdateAsync(loanRecord);
+
+                return Ok(new BaseResponse
+                {
+                    StatusCode = ResponseStatusCode.Success,
+                    Message = "success"
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new BaseResponse
+                {
+                    StatusCode = 90019,
+                    Message = $"incomeImage api error:{ex}"
+                });
+            }
+        }
 
          // POST /api/user/loanSurveyArc
         [Authorize]
@@ -701,7 +851,7 @@ namespace QLendApi.Controllers
 
                 var cert = await certificateRepository.GetByUINoAsync(foreignWorker.Uino);
 
-                  if(loanSurveyArcDto.Type == ImageUploadType.FrontArc2)
+                if(loanSurveyArcDto.Type == ImageUploadType.FrontArc2)
                 {
                     cert.FrontArc2 = await loanSurveyArcDto.FrontArc2.GetBytes();
                     await certificateRepository.UpdateAsync(cert);

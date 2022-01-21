@@ -54,5 +54,8 @@ namespace QLendApi.lib
 
           public const int FrontArc2 = 6;
         public const int BackArc2 = 7;
+
+        public const int FrontSalaryPassbook = 8;
+        public const int PaySlip = 9;
     }
 }

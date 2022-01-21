@@ -20,13 +20,13 @@ namespace QLendApi.Dtos
 
         [Required]
         public int RemittanceWay { get; init; }
-
+/*
         [Required]
         public IFormFile FrontSalaryPassbook { get; init; }
         
         [Required]
         public IFormFile PaySlip { get; init; }
-
+*/
         [Required]
         public int PayDay { get; init; }
     }
