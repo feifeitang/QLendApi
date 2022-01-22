@@ -786,9 +786,14 @@ namespace QLendApi.Controllers
                     await incomeInformationRepository.UpdateAsync(incomeInfo);
                 }             
               
+                
                 var loanRecord = await loanRecordRepository.GetByLoanNumber(incomeImageDto.LoanNumber);
 
-                loanRecord.State = LoanState.IncomeInfoFinish;
+                if(incomeInfo.FrontSalaryPassbook != null && incomeInfo.PaySlip != null)
+                {
+                     loanRecord.State = LoanState.IncomeInfoFinish;
+                }
+               
                 loanRecord.CreateTime = DateTime.UtcNow;
 
                 await loanRecordRepository.UpdateAsync(loanRecord);
