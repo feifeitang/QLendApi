@@ -17,10 +17,10 @@ namespace QLendApi.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int IncomeNumber { get; set; }
-        public int AvgMonthlyIncome { get; set; }
-        public int LatePay { get; set; }
-        public int PayWay { get; set; }
-        public int RemittanceWay { get; set; }
+        public int? AvgMonthlyIncome { get; set; }
+        public int? LatePay { get; set; }
+        public int? PayWay { get; set; }
+        public int? RemittanceWay { get; set; }
         public byte[] FrontSalaryPassbook { get; set; }
         public byte[] PaySlip { get; set; }
         public int PayDay { get; set; }
