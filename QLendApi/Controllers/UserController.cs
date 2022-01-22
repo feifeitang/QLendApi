@@ -739,7 +739,7 @@ namespace QLendApi.Controllers
 
                 var loanRecord = await loanRecordRepository.GetByLoanNumber(incomeInfoDto.LoanNumber);
 
-                loanRecord.State = LoanState.IncomeInfoFinish;
+               // loanRecord.State = LoanState.IncomeInfoFinish;
                 loanRecord.CreateTime = DateTime.UtcNow;
 
                 await loanRecordRepository.UpdateAsync(loanRecord);
@@ -773,51 +773,22 @@ namespace QLendApi.Controllers
                 // get user info
                 var foreignWorker = this.HttpContext.Items["ForeignWorker"] as ForeignWorker;
 
-                // if incomeNumber exist
-                if (foreignWorker.IncomeNumber != null)
-                {
-                    var incomeInfo = await incomeInformationRepository.GetByIncomeNumberAsync(foreignWorker.IncomeNumber);
+                var incomeInfo = await incomeInformationRepository.GetByIncomeNumberAsync(foreignWorker.IncomeNumber);
            
-                    if(incomeImageDto.type == ImageUploadType.FrontSalaryPassbook)
-                    {
-                        incomeInfo.FrontSalaryPassbook = await incomeImageDto.FrontSalaryPassbook.GetBytes();
-                        await incomeInformationRepository.UpdateAsync(incomeInfo);                 
-                    }
-                    else if (incomeImageDto.type == ImageUploadType.PaySlip)
-                    {
-                        incomeInfo.PaySlip = await incomeImageDto.PaySlip.GetBytes();
-                        await incomeInformationRepository.UpdateAsync(incomeInfo);
-                    }
-                }
-                // if incomeNumber not exist
-                else
+                if(incomeImageDto.type == ImageUploadType.FrontSalaryPassbook)
                 {
-                    IncomeInformation incomeInfo = new IncomeInformation();
-                         
-                    incomeInfo.IncomeNumber = GenerateIncomeNumber(foreignWorker.Uino) ;                         
-                    //  FrontSalaryPassbook = await incomeImageDto.FrontSalaryPassbook.GetBytes(),
-                    // PaySlip = await incomeImageDto.PaySlip.GetBytes()
-                    
-                    if(incomeImageDto.type == ImageUploadType.FrontSalaryPassbook)
-                    {
-                        incomeInfo.FrontSalaryPassbook = await incomeImageDto.FrontSalaryPassbook.GetBytes();
-                    //    await incomeInformationRepository.UpdateAsync(incomeInfo);                 
-                    }
-                    else if (incomeImageDto.type == ImageUploadType.PaySlip)
-                    {
-                        incomeInfo.PaySlip = await incomeImageDto.PaySlip.GetBytes();
-                        // await incomeInformationRepository.UpdateAsync(incomeInfo);
-                    }
-
-                    foreignWorker.IncomeNumber = incomeInfo.IncomeNumber;
-
-                    await incomeInformationRepository.CreateAsync(incomeInfo);
-                    await foreignWorkerRepository.UpdateAsync(foreignWorker);
+                    incomeInfo.FrontSalaryPassbook = await incomeImageDto.FrontSalaryPassbook.GetBytes();
+                    await incomeInformationRepository.UpdateAsync(incomeInfo);                 
                 }
-
+                else if (incomeImageDto.type == ImageUploadType.PaySlip)
+                {
+                    incomeInfo.PaySlip = await incomeImageDto.PaySlip.GetBytes();
+                    await incomeInformationRepository.UpdateAsync(incomeInfo);
+                }             
+              
                 var loanRecord = await loanRecordRepository.GetByLoanNumber(incomeImageDto.LoanNumber);
 
-             //   loanRecord.State = LoanState.IncomeInfoFinish;
+                loanRecord.State = LoanState.IncomeInfoFinish;
                 loanRecord.CreateTime = DateTime.UtcNow;
 
                 await loanRecordRepository.UpdateAsync(loanRecord);
