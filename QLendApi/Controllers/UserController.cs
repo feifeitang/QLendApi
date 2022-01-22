@@ -1134,7 +1134,7 @@ namespace QLendApi.Controllers
         private int GenerateIncomeNumber(string arcNumber)
         {
             // Random rnd = new Random();  
-            int number = int.Parse(DateTime.UtcNow.ToString("yy") + arcNumber.Substring(5,2) + string.Format("{0:d4}", sn));
+            int number = int.Parse(DateTime.UtcNow.ToString("yy") + arcNumber.Substring(5,2) + string.Format("{0:d2}", sn) + arcNumber.Substring(8,2));
 
            // int number = int.Parse(DateTime.UtcNow.ToString("yyddHH") + string.Format("{0:d4}", sn));
             sn++;
