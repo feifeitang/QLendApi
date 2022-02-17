@@ -17,7 +17,7 @@ namespace QLendApi.Services
         public bool CheckSignupIsApprove(int state)
         {
 
-            if (state == ForeignWorkState.Approve)
+            if (state >= ForeignWorkState.Approve)
             {
                 return true;
             }
