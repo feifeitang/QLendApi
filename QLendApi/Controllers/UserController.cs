@@ -1090,18 +1090,27 @@ namespace QLendApi.Controllers
 
                 if(updateArcDto.Type == ImageUploadType.FrontArc)
                 {
-                    cert.FrontArc = await updateArcDto.FrontArc.GetBytes();
+                    cert.FrontArc = await updateArcDto.FrontArc.GetBytes();                
                     await certificateRepository.UpdateAsync(cert);
+
+                    foreignWorker.State = ForeignWorkState.Update;
+                    await foreignWorkerRepository.UpdateAsync(foreignWorker);
                 }
                 else if (updateArcDto.Type == ImageUploadType.BackArc)
                 {
                     cert.BackArc = await updateArcDto.BackArc.GetBytes();
                     await certificateRepository.UpdateAsync(cert);
+
+                    foreignWorker.State = ForeignWorkState.Update;
+                    await foreignWorkerRepository.UpdateAsync(foreignWorker);
                 }
                 else if( updateArcDto.Type == ImageUploadType.SelfieArc)
                 {
                     cert.SelfileArc = await updateArcDto.SelfieArc.GetBytes();
                     await certificateRepository.UpdateAsync(cert);
+                    
+                    foreignWorker.State = ForeignWorkState.Update;
+                    await foreignWorkerRepository.UpdateAsync(foreignWorker);
                 }
 
                 return Ok(new BaseResponse

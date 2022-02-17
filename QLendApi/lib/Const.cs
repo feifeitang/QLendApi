@@ -6,6 +6,7 @@ namespace QLendApi.lib
     }
     public class ForeignWorkState
     {
+        public const int Update = 2;
         public const int Approve = 1;
         public const int Pending = 0;
         public const int Failure = -1;
