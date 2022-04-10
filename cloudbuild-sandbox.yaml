@@ -10,7 +10,7 @@ steps:
     args: ['container', 'clusters', 'get-credentials', 'qlend-sandbox-cluster', '--zone', 'asia-east1-c']
     id: 'prepare-credentials'
   - name: 'gcr.io/$PROJECT_ID/helm'
-    args: ['--namespace=sandbox','upgrade','--install','qlend-app-api','deployments/charts','-f','deployments/charts/values.yaml','--set','image.tag=$SHORT_SHA,ingress.hosts[0].host=sandbox-app-api.qlend.tw' ]
+    args: ['--namespace=sandbox','upgrade','--install','qlend-app-api','deployments/charts','-f','deployments/charts/values.yaml','--set','image.tag=$SHORT_SHA,ingress.hosts[0].host=sandbox-app-api.qlend.tw,nodeSelector.app=api' ]
     env:
     - 'CLOUDSDK_COMPUTE_ZONE=asia-east1-c'
     - 'CLOUDSDK_CONTAINER_CLUSTER=qlend-sandbox-cluster'
