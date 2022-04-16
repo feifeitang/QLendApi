@@ -59,6 +59,9 @@ namespace QLendApi.Models
         public string CommunicationSoftwareAccount { get; set; }
         public byte[] Passport { get; set; }
         public byte[] LocalIdCard { get; set; }
+        public int? CreditScore2 { get; set; }
+        public int? DefaultRisk2 { get; set; }
+
 
         public virtual Employer EmployerNumberNavigation { get; set; }
         public virtual IncomeInformation IncomeNumberNavigation { get; set; }

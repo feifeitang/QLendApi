@@ -38,6 +38,7 @@ namespace QLendApi.Services
 
             string data = readStream.ReadToEnd();
 
+            // TODO: check the data if is error code
             Console.WriteLine("\r\n Send SMS Response: {0}", data);
 
             response.Close();
